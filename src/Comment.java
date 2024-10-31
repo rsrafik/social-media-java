@@ -1,6 +1,8 @@
 /**
  * Comment
  * 
+ * @author Ropan Datta
+ * @version
  * 
  */
 
@@ -12,4 +14,12 @@ public interface Comment {
     int getUpvotes();
 
     int getDownvotes();
+
+    void addUpvote(int userId);
+
+    void addDownvote(int userId);
+
+    default int getScore() {
+        return getUpvotes() - getDownvotes();
+    }
 }
