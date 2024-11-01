@@ -1,4 +1,124 @@
-package PACKAGE_NAME;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
+/**
+ * FoundationDatabase
+ *
+ * This class manages a database of User objects and their associated Posts. It provides
+ * methods to read users from a file, add new users, retrieve all users, and retrieve all posts.
+ * Users are stored in a serialized file format and loaded upon instantiation.
+ *
+ * @author Rachel Rafik
+ * @version November 1, 2024
+ */
 public class FoundationDatabase {
+    private static ArrayList<User> users;  // List of User objects in the database
+    private static final Object gatekeeper = new Object(); // Synchronization lock for thread safety
+
+    /**
+     * Constructs a FoundationDatabase instance and initializes the user list.
+     */
+    public FoundationDatabase() {
+        users = new ArrayList<>();
+    }
+
+    /**
+     * Reads User objects from the file "users.dat" and populates the users list.
+     * If the file does not exist, a message is printed indicating so.
+     */
+    public void readUsers() {
+        try (FileInputStream fileIn = new FileInputStream("users.dat");
+             ObjectInputStream in = new ObjectInputStream(fileIn)) {
+
+            while (true) {
+                try {
+                    User user = (User) in.readObject();
+                    users.add(user);
+                } catch (EOFException e) {
+                    break;
+                }
+            }
+
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Does not exist yet"); // File not found or no users saved yet
+        }
+    }
+
+    /**
+     * Adds a new User object to the database, appending it to the "users.dat" file.
+     * Synchronization ensures thread-safe access.
+     *
+     * @param user The User object to be added to the database
+     * @throws InterruptedException if thread synchronization is interrupted
+     */
+    public void addUser(User user) throws InterruptedException {
+        synchronized (gatekeeper) {
+            users.add(user);
+
+            boolean append = new File("users.dat").exists(); // Check if file exists to determine append mode
+
+            try (FileOutputStream fileOut = new FileOutputStream("users.dat", true);
+                 ObjectOutputStream out = append ? new AppendableObjectOutputStream(fileOut) : new ObjectOutputStream(fileOut)) {
+                out.writeObject(user); // Serialize and write User to file
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("Error writing file"); // Error during file output
+            }
+        }
+    }
+
+    /**
+     * Retrieves all User objects in the database as an array.
+     *
+     * @return An array of User objects in the database
+     */
+    public User[] getAllUsers() {
+        return users.toArray(new User[0]);
+    }
+
+    /**
+     * Retrieves all Post objects across all User objects in the database as an array.
+     *
+     * @return An array of all Post objects associated with users in the database
+     */
+    public Post[] getAllPosts() {
+        ArrayList<Post> allPosts = new ArrayList<>(); // List to hold all posts
+        for (User user : users) {
+            Post[] userPosts = user.getPosts();
+            allPosts.addAll(Arrays.asList(userPosts)); // Add each user's posts to list
+        }
+
+        return allPosts.toArray(new Post[0]);
+    }
+
+    /**
+     * AppendableObjectOutputStream
+     *
+     * Custom ObjectOutputStream that avoids writing a new header when appending
+     * objects to an existing file. This helps prevent file corruption due to
+     * multiple headers in the same file.
+     */
+    private static class AppendableObjectOutputStream extends ObjectOutputStream {
+
+        /**
+         * Constructs an AppendableObjectOutputStream.
+         *
+         * @param out The OutputStream to write to
+         * @throws IOException if an I/O error occurs
+         */
+        public AppendableObjectOutputStream(OutputStream out) throws IOException {
+            super(out);
+        }
+
+        /**
+         * Overrides writeStreamHeader to prevent writing a new header for appending.
+         *
+         * @throws IOException if an I/O error occurs
+         */
+        @Override
+        protected void writeStreamHeader() throws IOException {
+            reset(); // Avoids writing a new header when appending
+        }
+    }
 }

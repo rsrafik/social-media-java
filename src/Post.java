@@ -11,9 +11,9 @@ import java.util.List;
 public interface Post {
     int getOwnerId();
 
-    List<Integer> getUpvoterIds();
+    List<Integer> getUpvoteIds();
 
-    List<Integer> getDownvoterIds();
+    List<Integer> getDownvoteIds();
 
     int getUpvoteCount();
 
