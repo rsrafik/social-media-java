@@ -7,19 +7,17 @@
  */
 
 public interface Comment {
-    int getOwnerId();
+    int getCreatorId();
 
-    int getPostId();
+    int upvoteCounter();
 
-    int getUpvotes();
-
-    int getDownvotes();
+    int downvoteCounter();
 
     void addUpvote(int userId);
 
     void addDownvote(int userId);
 
     default int getScore() {
-        return getUpvotes() - getDownvotes();
+        return upvoteCounter() - downvoteCounter();
     }
 }
