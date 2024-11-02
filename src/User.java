@@ -84,14 +84,14 @@ public interface User {
      *
      * @return An array of the user's posts
      */
-    List<Post> getPosts();
+    List<? extends Post> getPosts();
 
     /**
      * Retrieves the pending friend requests sent to the user.
      *
      * @return A list of pending friend requests
      */
-    List<FriendRequest> getFriendRequests();
+    List<? extends FriendRequest> getFriendRequests();
 
     /**
      * Retrieves the number of friends the user has.
