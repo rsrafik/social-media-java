@@ -19,14 +19,15 @@ public class PlatformUser implements User, Serializable {
 
     private static Integer userCount = 0; // Tracks the total number of users on the platform
 
-    private Integer userId;                  // Unique identifier for the user
-    private String username;                 // Username of the user
-    private String password;                 // Password of the user
-    private ArrayList<PlatformPost> posts;   // List of posts created by the user
+    private Integer userId; // Unique identifier for the user
+    private String username; // Username of the user
+    private String password; // Password of the user
+    private ArrayList<PlatformPost> posts; // List of posts created by the user
 
-    private ArrayList<Integer> friendIds;    // List of friend user IDs
+    private ArrayList<Integer> friendIds; // List of friend user IDs
     private ArrayList<Integer> blockedUserIds; // List of blocked user IDs
-    private ArrayList<FriendRequest> friendRequests; // List of friend requests received by the user
+    private ArrayList<PlatformFriendRequest> friendRequests; // List of friend requests received by
+                                                             // the user
 
     // CONSTRUCTORS
 
@@ -126,7 +127,7 @@ public class PlatformUser implements User, Serializable {
      * @return A list of FriendRequest objects
      */
     @Override
-    public ArrayList<FriendRequest> getFriendRequests() {
+    public ArrayList<PlatformFriendRequest> getFriendRequests() {
         return friendRequests;
     }
 
@@ -209,7 +210,8 @@ public class PlatformUser implements User, Serializable {
     }
 
     /**
-     * Checks if the given object is an instance of Platform User and has the same username and password.
+     * Checks if the given object is an instance of Platform User and has the same username and
+     * password.
      *
      * @param obj The object to check
      * @return true if the User matches, false otherwise
