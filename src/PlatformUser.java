@@ -3,29 +3,32 @@ import java.util.ArrayList;
 
 /**
  * PlatformUser
- *
+ * <p>
  * This class represents a user on the platform with unique user ID, username, password,
  * and lists to store posts, friends, blocked users, and friend requests. It allows
  * management of friends and blocked users, and implements the User interface.
  * This class is serializable to allow persistence.
+ * </p>
  *
- * @author Rachel Rafik
+ * @author Rachel Rafik, L22
  * @version November 1, 2024
  */
 public class PlatformUser implements User, Serializable {
-    //FIELDS
+
+    // FIELDS
+
     private static Integer userCount = 0; // Tracks the total number of users on the platform
 
-    private Integer userId; // Unique identifier for the user
-    private String username; // Username of the user
-    private String password; // Password of the user
-    private ArrayList<PlatformPost> posts; // List of posts created by the user
+    private Integer userId;                  // Unique identifier for the user
+    private String username;                 // Username of the user
+    private String password;                 // Password of the user
+    private ArrayList<PlatformPost> posts;   // List of posts created by the user
 
-    private ArrayList<Integer> friendIds; // List of friend user IDs
+    private ArrayList<Integer> friendIds;    // List of friend user IDs
     private ArrayList<Integer> blockedUserIds; // List of blocked user IDs
     private ArrayList<FriendRequest> friendRequests; // List of friend requests received by the user
 
-    //CONSTRUCTORS
+    // CONSTRUCTORS
 
     /**
      * Constructs a PlatformUser with the specified username and password.
@@ -45,7 +48,7 @@ public class PlatformUser implements User, Serializable {
         friendRequests = new ArrayList<>();
     }
 
-    //GETTERS/SETTERS
+    // GETTERS/SETTERS
 
     /**
      * Retrieves the user's unique ID.
@@ -72,15 +75,6 @@ public class PlatformUser implements User, Serializable {
      */
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    /**
-     * Retrieves the password of the user.
-     *
-     * @return The password
-     */
-    public String getPassword() {
-        return password;
     }
 
     /**
@@ -128,7 +122,20 @@ public class PlatformUser implements User, Serializable {
         return friendRequests;
     }
 
-    //METHODS
+    /**
+     * Retrieves the list of post IDs created by the user.
+     *
+     * @return A list of post IDs
+     */
+    public ArrayList<Integer> getPostIds() {
+        ArrayList<Integer> postIds = new ArrayList<>();
+        for (PlatformPost post : posts) {
+            postIds.add(post.getPostId());
+        }
+        return postIds;
+    }
+
+    // METHODS
 
     /**
      * Retrieves the count of friends the user has.
@@ -144,8 +151,17 @@ public class PlatformUser implements User, Serializable {
      *
      * @return The number of blocked users
      */
-    public int blockedCount() {
+    public int blockedUserCount() {
         return blockedUserIds.size();
+    }
+
+    /**
+     * Retrieves the count of posts created by the user.
+     *
+     * @return The number of posts
+     */
+    public int postCount() {
+        return posts.size();
     }
 
     /**
@@ -155,5 +171,15 @@ public class PlatformUser implements User, Serializable {
      */
     public int friendRequestCount() {
         return friendRequests.size();
+    }
+
+    /**
+     * Checks if the given password matches the user's password.
+     *
+     * @param password The password to check
+     * @return true if the password matches, false otherwise
+     */
+    public boolean testPassword(String password) {
+        return this.password.equals(password);
     }
 }

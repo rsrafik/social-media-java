@@ -18,12 +18,6 @@ public interface Comment {
      */
     int getCreatorId();
 
-    /**
-     * Retrieves the id of the post underneath which the comment was created.
-     * 
-     * @return the id of the comment's post
-     */
-    int getPostId();
 
     /**
      * Retrieves the number of users who upvoted the comment.
@@ -44,14 +38,14 @@ public interface Comment {
      * 
      * @return the list of ids of the users who upvoted the comment
      */
-    List<Integer> getUpvoterIds();
+    List<Integer> getUpvoteIds();
 
     /**
      * Retrieves the ids of the users who downvoted the comment.
      * 
      * @return the list of ids of the users who downvoted the comment
      */
-    List<Integer> getDownvoterIds();
+    List<Integer> getDownvoteIds();
 
     /**
      * Attempts to add an upvote to the comment.

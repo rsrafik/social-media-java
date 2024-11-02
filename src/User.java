@@ -66,14 +66,9 @@ public interface User {
      * 
      * @return the list of ids of the posts created by the user
      */
-    List<Post> getPostIds();
+    List<Integer> getPostIds();
 
-    /**
-     * Retrieves the ids of the comments created by the user.
-     * 
-     * @return the list of ids of the comments created by the user
-     */
-    List<Post> getCommentIds();
+    Post[] getPosts();
 
     /**
      * Retrieves the pending friend requests sent to the user.

@@ -44,14 +44,14 @@ public interface Post {
      * 
      * @return the list of ids of the users who upvoted the post
      */
-    List<Integer> getUpvoterIds();
+    List<Integer> getUpvoteIds();
 
     /**
      * Retrieves the ids of the users who downvoted the post.
      * 
      * @return the list of ids of the users who downvoted the post
      */
-    List<Integer> getDownvoterIds();
+    List<Integer> getDownvoteIds();
 
     /**
      * Retrieves the comments underneath the post.
@@ -82,6 +82,8 @@ public interface Post {
      * @return true if the user's downvote was added for the first time
      */
     boolean addDownvote(int userId);
+
+    void addComment(Comment comment);
 
     /**
      * Retrieves the 'score' of the post, i.e., the difference between the upvotes
