@@ -28,6 +28,13 @@ public interface User {
     String getUsername();
 
     /**
+     * Retrieves the password associated with the user.
+     *
+     * @return The password
+     */
+    String getPassword();
+
+    /**
      * Sets the username of the user.
      *
      * @param username The username to set
@@ -48,6 +55,14 @@ public interface User {
      * @return true if the password matches, false otherwise
      */
     boolean testPassword(String password);
+
+    /**
+     * Checks whether the provided username matches the user's username.
+     *
+     * @param username The username to test
+     * @return true if the username matches, false otherwise
+     */
+    boolean testUsername(String username);
 
     /**
      * Retrieves the IDs of the user's friends.
