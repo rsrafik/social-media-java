@@ -1,3 +1,5 @@
+import java.util.List;
+
 /**
  * Comment
  * 
@@ -12,6 +14,10 @@ public interface Comment {
     int upvoteCounter();
 
     int downvoteCounter();
+
+    List<Integer> getUpvoterIds();
+
+    List<Integer> getDownvoterIds();
 
     void addUpvote(int userId);
 
