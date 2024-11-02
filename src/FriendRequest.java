@@ -6,6 +6,7 @@
  * associated with the request.
  * </p>
  *
+ * @author Ropan Datta, L22
  * @version November 1, 2024
  */
 public interface FriendRequest {

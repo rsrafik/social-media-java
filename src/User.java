@@ -9,6 +9,7 @@ import java.util.List;
  * and verifying login credentials.
  * </p>
  *
+ * @author Ropan Datta, L22
  * @version November 1, 2024
  */
 public interface User {
