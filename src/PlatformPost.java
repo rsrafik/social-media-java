@@ -1,93 +1,109 @@
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * PlatformPost
- *
+ * <p>
  * This class represents a post on a platform that supports upvotes, downvotes, and comments.
- * Each post includes an owner ID, a body text, a header (optional), lists for upvotes and
+ * Each post includes an owner ID, post content, unique post ID, lists for upvotes and
  * downvotes, and a list of comments. This class implements the Post interface and is serializable.
+ * </p>
  *
- * @author Rachel Rafik
+ * @author Rachel Rafik, L22
  * @version November 1, 2024
  */
 public class PlatformPost implements Post, Serializable {
-    //FIELDS
-    private Integer ownerId; // User ID of the post owner
-    private String header; // Optional header for the post
-    private String body; // Body text of the post
+
+    // FIELDS
+
+    private static int postCount = 0;  // Tracks the total number of posts created
+
+    private Integer postId; // Unique ID for the post
+    private Integer creatorId; // ID of the user who created the post
+    private String content; // The text content of the post
     private ArrayList<Integer> upvoteIds; // List of user IDs who upvoted the post
     private ArrayList<Integer> downvoteIds; // List of user IDs who downvoted the post
     private ArrayList<Comment> comments; // List of comments on the post
 
-    //CONSTRUCTORS
+    // CONSTRUCTORS
 
     /**
-     * Constructs a PlatformPost with the specified owner ID and body text.
-     * Initializes upvote and downvote lists and sets the header to null.
+     * Constructs a PlatformPost with the specified owner ID and content.
+     * Initializes lists for upvotes, downvotes, and comments.
      *
-     * @param userId The ID of the user who owns the post
-     * @param body The text content of the post
+     * @param creatorId The ID of the user who owns the post
+     * @param content   The text content of the post
      */
-    public PlatformPost(Integer userId, String body) {
-        ownerId = userId;
-        this.body = body;
-        upvoteIds = new ArrayList<>();
-        downvoteIds = new ArrayList<>();
-        comments = new ArrayList<>();
-        header = null;
+    public PlatformPost(Integer creatorId, String content) {
+        this.creatorId = creatorId;
+        this.content = content;
+        this.upvoteIds = new ArrayList<>();
+        this.downvoteIds = new ArrayList<>();
+        this.comments = new ArrayList<>();
+
+        this.postId = postCount;
+        postCount++;
     }
 
-    //GETTERS/SETTERS
+    // GETTERS/SETTERS
 
     /**
-     * Retrieves the ID of the post owner.
+     * Retrieves the unique ID of the post.
+     *
+     * @return The post ID
+     */
+    public int getPostId() {
+        return postId;
+    }
+
+    /**
+     * Retrieves the ID of the post creator.
      *
      * @return The user ID of the post owner
      */
-    public int getOwnerId() {
-        return ownerId;
+    public int getCreatorId() {
+        return creatorId;
     }
 
     /**
-     * Retrieves the header of the post.
-     *
-     * @return The header text, or null if not set
-     */
-    public String getHeader() {
-        return header;
-    }
-
-    /**
-     * Retrieves the body of the post.
+     * Retrieves the content of the post.
      *
      * @return The body text of the post
      */
-    public String getBody() {
-        return body;
+    public String getContent() {
+        return content;
     }
 
     /**
-     * Adds a user ID to the list of upvotes.
+     * Adds a user ID to the list of upvotes if not already present.
      *
      * @param userId The ID of the user upvoting the post
+     * @return true if the user ID was successfully added, false if already present
      */
-    public void addUpvote(int userId) {
-        upvoteIds.add(userId);
+    public boolean addUpvote(int userId) {
+        if (!upvoteIds.contains(userId)) {
+            upvoteIds.add(userId);
+            return true;
+        }
+        return false;
     }
 
     /**
-     * Adds a user ID to the list of downvotes.
+     * Adds a user ID to the list of downvotes if not already present.
      *
      * @param userId The ID of the user downvoting the post
+     * @return true if the user ID was successfully added, false if already present
      */
-    public void addDownvote(int userId) {
-        downvoteIds.add(userId);
+    public boolean addDownvote(int userId) {
+        if (!downvoteIds.contains(userId)) {
+            downvoteIds.add(userId);
+            return true;
+        }
+        return false;
     }
 
     /**
-     * Retrieves the list of upvote IDs.
+     * Retrieves the list of user IDs who upvoted the post.
      *
      * @return A list of user IDs who upvoted the post
      */
@@ -96,7 +112,7 @@ public class PlatformPost implements Post, Serializable {
     }
 
     /**
-     * Retrieves the list of downvote IDs.
+     * Retrieves the list of user IDs who downvoted the post.
      *
      * @return A list of user IDs who downvoted the post
      */
@@ -113,35 +129,7 @@ public class PlatformPost implements Post, Serializable {
         return comments;
     }
 
-    /**
-     * Retrieves the title of the post. This method returns an empty string, as the title
-     * is not currently used.
-     *
-     * @return An empty string
-     */
-    public String getTitle() {
-        return "";
-    }
-
-    /**
-     * Retrieves the total count of upvotes on the post.
-     *
-     * @return The number of upvotes
-     */
-    public int getUpvoteCount() {
-        return upvoteIds.size();
-    }
-
-    /**
-     * Retrieves the total count of downvotes on the post.
-     *
-     * @return The number of downvotes
-     */
-    public int getDownvoteCount() {
-        return downvoteIds.size();
-    }
-
-    //METHODS
+    // METHODS
 
     /**
      * Adds a comment to the post.
@@ -153,7 +141,7 @@ public class PlatformPost implements Post, Serializable {
     }
 
     /**
-     * Counts and returns the total number of upvotes.
+     * Counts and returns the total number of upvotes for the post.
      *
      * @return The number of upvotes
      */
@@ -162,7 +150,7 @@ public class PlatformPost implements Post, Serializable {
     }
 
     /**
-     * Counts and returns the total number of downvotes.
+     * Counts and returns the total number of downvotes for the post.
      *
      * @return The number of downvotes
      */

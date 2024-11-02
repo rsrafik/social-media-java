@@ -8,15 +8,36 @@ import java.util.ArrayList;
  * Each comment includes a creator ID, a message, and lists to track user IDs for upvotes
  * and downvotes. This class implements the Comment interface and is serializable.
  *
- * @author Rachel Rafik
+ * @author Rachel Rafik, L22
  * @version November 1, 2024
  */
 public class PlatformComment implements Comment, Serializable {
-    private Integer creatorID; // ID of the user who created the comment
-    private String message; // The content of the comment
 
-    private ArrayList<Integer> upvoteIds; // List of user IDs who upvoted the comment
+    // FIELDS
+
+    private Integer creatorID; // ID of the user who created the comment
+    private String message;    // The content of the comment
+
+    private ArrayList<Integer> upvoteIds;   // List of user IDs who upvoted the comment
     private ArrayList<Integer> downvoteIds; // List of user IDs who downvoted the comment
+
+    // CONSTRUCTOR
+
+    /**
+     * Constructs a PlatformComment with a specified creator ID and message.
+     * Initializes empty lists for upvotes and downvotes.
+     *
+     * @param creatorID The ID of the user who created the comment
+     * @param message The text content of the comment
+     */
+    public PlatformComment(Integer creatorID, String message) {
+        this.creatorID = creatorID;
+        this.message = message;
+        upvoteIds = new ArrayList<>();
+        downvoteIds = new ArrayList<>();
+    }
+
+    // GETTERS
 
     /**
      * Retrieves the ID of the user who created the comment.
@@ -26,6 +47,26 @@ public class PlatformComment implements Comment, Serializable {
     public int getCreatorId() {
         return creatorID;
     }
+
+    /**
+     * Retrieves the list of user IDs who upvoted the comment.
+     *
+     * @return An ArrayList of user IDs who upvoted the comment
+     */
+    public ArrayList<Integer> getUpvoteIds() {
+        return upvoteIds;
+    }
+
+    /**
+     * Retrieves the list of user IDs who downvoted the comment.
+     *
+     * @return An ArrayList of user IDs who downvoted the comment
+     */
+    public ArrayList<Integer> getDownvoteIds() {
+        return downvoteIds;
+    }
+
+    // METHODS
 
     /**
      * Counts and returns the number of upvotes for the comment.

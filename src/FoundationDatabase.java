@@ -9,11 +9,11 @@ import java.util.Arrays;
  * methods to read users from a file, add new users, retrieve all users, and retrieve all posts.
  * Users are stored in a serialized file format and loaded upon instantiation.
  *
- * @author Rachel Rafik
+ * @author Rachel Rafik, L22
  * @version November 1, 2024
  */
 public class FoundationDatabase {
-    private static ArrayList<User> users;  // List of User objects in the database
+    private static ArrayList<PlatformUser> users;  // List of User objects in the database
     private static final Object gatekeeper = new Object(); // Synchronization lock for thread safety
 
     /**
@@ -33,7 +33,7 @@ public class FoundationDatabase {
 
             while (true) {
                 try {
-                    User user = (User) in.readObject();
+                    PlatformUser user = (PlatformUser) in.readObject();
                     users.add(user);
                 } catch (EOFException e) {
                     break;
@@ -52,7 +52,7 @@ public class FoundationDatabase {
      * @param user The User object to be added to the database
      * @throws InterruptedException if thread synchronization is interrupted
      */
-    public void addUser(User user) throws InterruptedException {
+    public void addUser(PlatformUser user) throws InterruptedException {
         synchronized (gatekeeper) {
             users.add(user);
 
@@ -84,7 +84,7 @@ public class FoundationDatabase {
      */
     public Post[] getAllPosts() {
         ArrayList<Post> allPosts = new ArrayList<>(); // List to hold all posts
-        for (User user : users) {
+        for (PlatformUser user : users) {
             Post[] userPosts = user.getPosts();
             allPosts.addAll(Arrays.asList(userPosts)); // Add each user's posts to list
         }
@@ -116,7 +116,6 @@ public class FoundationDatabase {
          *
          * @throws IOException if an I/O error occurs
          */
-        @Override
         protected void writeStreamHeader() throws IOException {
             reset(); // Avoids writing a new header when appending
         }
