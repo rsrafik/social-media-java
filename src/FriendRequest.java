@@ -1,7 +1,9 @@
 /**
  * FriendRequest
  * 
- * @author Ropan
+ * The FriendRequest interface
+ * 
+ * @author Ropan Datta
  * @version
  * 
  */
