@@ -7,6 +7,7 @@ import java.util.List;
  * for managing upvotes, downvotes, comments, and retrieving the content of the post.
  * </p>
  *
+ * @author Ropan Datta, L22
  * @version November 1, 2024
  */
 public interface Post {
