@@ -1,3 +1,5 @@
+import java.util.List;
+
 /**
  * Comment
  * 
@@ -11,15 +13,19 @@ public interface Comment {
 
     int getPostId();
 
-    int getUpvotes();
+    int getUpvoteCount();
 
-    int getDownvotes();
+    int getDownvoteCount();
+
+    List<Integer> getUpvoterIds();
+
+    List<Integer> getDownvoterIds();
 
     void addUpvote(int userId);
 
     void addDownvote(int userId);
 
     default int getScore() {
-        return getUpvotes() - getDownvotes();
+        return getUpvoteCount() - getDownvoteCount();
     }
 }

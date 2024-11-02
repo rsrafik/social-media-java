@@ -1,7 +1,7 @@
 /**
  * FriendRequest
  * 
- * @author Ropan
+ * @author Ropan Datta
  * @version
  * 
  */

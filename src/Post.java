@@ -3,7 +3,7 @@ import java.util.List;
 /**
  * Post
  * 
- * @author Ropan
+ * @author Ropan Datta
  * @version
  * 
  */
@@ -11,17 +11,13 @@ import java.util.List;
 public interface Post {
     int getOwnerId();
 
-    List<Integer> getUpvoterIds();
-
-    List<Integer> getDownvoterIds();
-
     int getUpvoteCount();
 
     int getDownvoteCount();
 
-    default int getScore() {
-        return getUpvoteCount() - getDownvoteCount();
-    }
+    List<Integer> getUpvoterIds();
+
+    List<Integer> getDownvoterIds();
 
     List<Comment> getComments();
 
@@ -32,4 +28,8 @@ public interface Post {
     void addUpvote(int userId);
 
     void addDownvote(int userId);
+
+    default int getScore() {
+        return getUpvoteCount() - getDownvoteCount();
+    }
 }
