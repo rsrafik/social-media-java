@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 /**
  * PlatformComment
- *
+ * <p>
  * This class represents a comment on a platform that supports upvotes and downvotes.
  * Each comment includes a creator ID, a message, and lists to track user IDs for upvotes
  * and downvotes. This class implements the Comment interface and is serializable.
@@ -28,7 +28,7 @@ public class PlatformComment implements Comment, Serializable {
      * Initializes empty lists for upvotes and downvotes.
      *
      * @param creatorID The ID of the user who created the comment
-     * @param message The text content of the comment
+     * @param message   The text content of the comment
      */
     public PlatformComment(Integer creatorID, String message) {
         this.creatorID = creatorID;
@@ -44,6 +44,7 @@ public class PlatformComment implements Comment, Serializable {
      *
      * @return The creator's user ID
      */
+    @Override
     public int getCreatorId() {
         return creatorID;
     }
@@ -53,6 +54,7 @@ public class PlatformComment implements Comment, Serializable {
      *
      * @return An ArrayList of user IDs who upvoted the comment
      */
+    @Override
     public ArrayList<Integer> getUpvoteIds() {
         return upvoteIds;
     }
@@ -62,6 +64,7 @@ public class PlatformComment implements Comment, Serializable {
      *
      * @return An ArrayList of user IDs who downvoted the comment
      */
+    @Override
     public ArrayList<Integer> getDownvoteIds() {
         return downvoteIds;
     }
@@ -73,6 +76,7 @@ public class PlatformComment implements Comment, Serializable {
      *
      * @return The total number of upvotes
      */
+    @Override
     public int upvoteCounter() {
         return upvoteIds.size();
     }
@@ -82,6 +86,7 @@ public class PlatformComment implements Comment, Serializable {
      *
      * @return The total number of downvotes
      */
+    @Override
     public int downvoteCounter() {
         return downvoteIds.size();
     }
@@ -91,6 +96,7 @@ public class PlatformComment implements Comment, Serializable {
      *
      * @param userId The ID of the user who upvoted the comment
      */
+    @Override
     public void addUpvote(int userId) {
         upvoteIds.add(userId);
     }
@@ -100,6 +106,7 @@ public class PlatformComment implements Comment, Serializable {
      *
      * @param userId The ID of the user who downvoted the comment
      */
+    @Override
     public void addDownvote(int userId) {
         downvoteIds.add(userId);
     }
