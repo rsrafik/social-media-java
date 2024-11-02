@@ -69,6 +69,15 @@ public class PlatformUser implements User, Serializable {
     }
 
     /**
+     * Retrieves the password of the user.
+     *
+     * @return The password
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
      * Sets the username of the user.
      *
      * @param username The new username to be set
@@ -191,5 +200,18 @@ public class PlatformUser implements User, Serializable {
      */
     public boolean testUsername(String username) {
         return this.password.equals(username);
+    }
+
+    /**
+     * Checks if the given object is an instance of Platform User and has the same username and password.
+     *
+     * @param obj The object to check
+     * @return true if the User matches, false otherwise
+     */
+    public boolean equals(Object obj) {
+        if (obj instanceof PlatformUser) {
+            return testUsername(((PlatformUser) obj).getUsername()) && testPassword(((PlatformUser) obj).getPassword());
+        }
+        return false;
     }
 }
