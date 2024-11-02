@@ -29,13 +29,6 @@ public interface User {
     String getUsername();
 
     /**
-     * Retrieves the password associated with the user.
-     *
-     * @return The password
-     */
-    String getPassword();
-
-    /**
      * Sets the username of the user.
      *
      * @param username The username to set

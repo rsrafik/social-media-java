@@ -2,7 +2,7 @@ import java.io.*;
 
 /**
  * Testing
- *
+ * <p>
  * This class tests the functionality of the FoundationDatabase by adding 100 sample users,
  * saving them to a file, and then reading the file back to display the users.
  * If the file "users.dat" already exists, it is deleted at the start to ensure a fresh test.

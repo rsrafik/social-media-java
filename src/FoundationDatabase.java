@@ -116,6 +116,7 @@ public class FoundationDatabase {
          *
          * @throws IOException if an I/O error occurs
          */
+        @Override
         protected void writeStreamHeader() throws IOException {
             reset(); // Avoids writing a new header when appending
         }

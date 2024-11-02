@@ -52,6 +52,7 @@ public class PlatformPost implements Post, Serializable {
      *
      * @return The post ID
      */
+    @Override
     public int getPostId() {
         return postId;
     }
@@ -61,6 +62,7 @@ public class PlatformPost implements Post, Serializable {
      *
      * @return The user ID of the post owner
      */
+    @Override
     public int getCreatorId() {
         return creatorId;
     }
@@ -70,6 +72,7 @@ public class PlatformPost implements Post, Serializable {
      *
      * @return The body text of the post
      */
+    @Override
     public String getContent() {
         return content;
     }
@@ -80,6 +83,7 @@ public class PlatformPost implements Post, Serializable {
      * @param userId The ID of the user upvoting the post
      * @return true if the user ID was successfully added, false if already present
      */
+    @Override
     public boolean addUpvote(int userId) {
         if (!upvoteIds.contains(userId)) {
             upvoteIds.add(userId);
@@ -94,6 +98,7 @@ public class PlatformPost implements Post, Serializable {
      * @param userId The ID of the user downvoting the post
      * @return true if the user ID was successfully added, false if already present
      */
+    @Override
     public boolean addDownvote(int userId) {
         if (!downvoteIds.contains(userId)) {
             downvoteIds.add(userId);
@@ -107,6 +112,7 @@ public class PlatformPost implements Post, Serializable {
      *
      * @return A list of user IDs who upvoted the post
      */
+    @Override
     public ArrayList<Integer> getUpvoteIds() {
         return upvoteIds;
     }
@@ -116,6 +122,7 @@ public class PlatformPost implements Post, Serializable {
      *
      * @return A list of user IDs who downvoted the post
      */
+    @Override
     public ArrayList<Integer> getDownvoteIds() {
         return downvoteIds;
     }
@@ -125,6 +132,7 @@ public class PlatformPost implements Post, Serializable {
      *
      * @return A list of comments associated with the post
      */
+    @Override
     public ArrayList<Comment> getComments() {
         return comments;
     }
@@ -136,6 +144,7 @@ public class PlatformPost implements Post, Serializable {
      *
      * @param comment The comment to add to the post
      */
+    @Override
     public void addComment(Comment comment) {
         comments.add(comment);
     }
@@ -145,6 +154,7 @@ public class PlatformPost implements Post, Serializable {
      *
      * @return The number of upvotes
      */
+    @Override
     public int upvoteCounter() {
         return upvoteIds.size();
     }
@@ -154,6 +164,7 @@ public class PlatformPost implements Post, Serializable {
      *
      * @return The number of downvotes
      */
+    @Override
     public int downvoteCounter() {
         return downvoteIds.size();
     }

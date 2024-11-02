@@ -55,6 +55,7 @@ public class PlatformUser implements User, Serializable {
      *
      * @return The user's ID
      */
+    @Override
     public int getUserId() {
         return userId;
     }
@@ -64,17 +65,9 @@ public class PlatformUser implements User, Serializable {
      *
      * @return The username
      */
+    @Override
     public String getUsername() {
         return username;
-    }
-
-    /**
-     * Retrieves the password of the user.
-     *
-     * @return The password
-     */
-    public String getPassword() {
-        return password;
     }
 
     /**
@@ -82,6 +75,7 @@ public class PlatformUser implements User, Serializable {
      *
      * @param username The new username to be set
      */
+    @Override
     public void setUsername(String username) {
         this.username = username;
     }
@@ -91,6 +85,7 @@ public class PlatformUser implements User, Serializable {
      *
      * @param password The new password to be set
      */
+    @Override
     public void setPassword(String password) {
         this.password = password;
     }
@@ -100,6 +95,7 @@ public class PlatformUser implements User, Serializable {
      *
      * @return An array of the user's posts
      */
+    @Override
     public PlatformPost[] getPosts() {
         return posts.toArray(new PlatformPost[0]);
     }
@@ -109,6 +105,7 @@ public class PlatformUser implements User, Serializable {
      *
      * @return A list of user IDs representing the user's friends
      */
+    @Override
     public ArrayList<Integer> getFriendIds() {
         return friendIds;
     }
@@ -118,6 +115,7 @@ public class PlatformUser implements User, Serializable {
      *
      * @return A list of user IDs representing blocked users
      */
+    @Override
     public ArrayList<Integer> getBlockedUserIds() {
         return blockedUserIds;
     }
@@ -127,6 +125,7 @@ public class PlatformUser implements User, Serializable {
      *
      * @return A list of FriendRequest objects
      */
+    @Override
     public ArrayList<FriendRequest> getFriendRequests() {
         return friendRequests;
     }
@@ -136,6 +135,7 @@ public class PlatformUser implements User, Serializable {
      *
      * @return A list of post IDs
      */
+    @Override
     public ArrayList<Integer> getPostIds() {
         ArrayList<Integer> postIds = new ArrayList<>();
         for (PlatformPost post : posts) {
@@ -151,6 +151,7 @@ public class PlatformUser implements User, Serializable {
      *
      * @return The number of friends
      */
+    @Override
     public int friendCount() {
         return friendIds.size();
     }
@@ -160,6 +161,7 @@ public class PlatformUser implements User, Serializable {
      *
      * @return The number of blocked users
      */
+    @Override
     public int blockedUserCount() {
         return blockedUserIds.size();
     }
@@ -169,6 +171,7 @@ public class PlatformUser implements User, Serializable {
      *
      * @return The number of posts
      */
+    @Override
     public int postCount() {
         return posts.size();
     }
@@ -178,6 +181,7 @@ public class PlatformUser implements User, Serializable {
      *
      * @return The number of friend requests
      */
+    @Override
     public int friendRequestCount() {
         return friendRequests.size();
     }
@@ -188,6 +192,7 @@ public class PlatformUser implements User, Serializable {
      * @param password The password to check
      * @return true if the password matches, false otherwise
      */
+    @Override
     public boolean testPassword(String password) {
         return this.password.equals(password);
     }
@@ -198,6 +203,7 @@ public class PlatformUser implements User, Serializable {
      * @param username The username to check
      * @return true if the username matches, false otherwise
      */
+    @Override
     public boolean testUsername(String username) {
         return this.password.equals(username);
     }
@@ -208,9 +214,10 @@ public class PlatformUser implements User, Serializable {
      * @param obj The object to check
      * @return true if the User matches, false otherwise
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj instanceof PlatformUser) {
-            return testUsername(((PlatformUser) obj).getUsername()) && testPassword(((PlatformUser) obj).getPassword());
+            return ((PlatformUser) obj).getUserId() == this.userId;
         }
         return false;
     }

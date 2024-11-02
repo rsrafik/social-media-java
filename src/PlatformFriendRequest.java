@@ -37,6 +37,7 @@ public class PlatformFriendRequest implements FriendRequest, Serializable {
      *
      * @return The user ID of the sender
      */
+    @Override
     public int getUserId() {
         return userId;
     }
@@ -46,6 +47,7 @@ public class PlatformFriendRequest implements FriendRequest, Serializable {
      *
      * @return The message text
      */
+    @Override
     public String getMessage() {
         return message;
     }
