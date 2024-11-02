@@ -14,6 +14,7 @@ import java.util.Arrays;
  */
 public class FoundationDatabase {
     private static ArrayList<PlatformUser> users;  // List of User objects in the database
+    private static ArrayList<PlatformPost> posts; //List of Post objects in the database
     private static final Object gatekeeper = new Object(); // Synchronization lock for thread safety
 
     /**

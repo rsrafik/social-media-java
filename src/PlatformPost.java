@@ -1,3 +1,4 @@
+import java.awt.image.BufferedImage;
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -24,6 +25,7 @@ public class PlatformPost implements Post, Serializable {
     private ArrayList<Integer> upvoteIds; // List of user IDs who upvoted the post
     private ArrayList<Integer> downvoteIds; // List of user IDs who downvoted the post
     private ArrayList<Comment> comments; // List of comments on the post
+    private BufferedImage image; //Image associated with the post
 
     // CONSTRUCTORS
 
@@ -40,6 +42,26 @@ public class PlatformPost implements Post, Serializable {
         this.upvoteIds = new ArrayList<>();
         this.downvoteIds = new ArrayList<>();
         this.comments = new ArrayList<>();
+        this.image = null;
+
+        this.postId = postCount;
+        postCount++;
+    }
+
+    /**
+     * Constructs a PlatformPost with the specified owner ID and content.
+     * Initializes lists for upvotes, downvotes, and comments.
+     *
+     * @param creatorId The ID of the user who owns the post
+     * @param content   The text content of the post
+     */
+    public PlatformPost(Integer creatorId, String content, BufferedImage image) {
+        this.creatorId = creatorId;
+        this.content = content;
+        this.upvoteIds = new ArrayList<>();
+        this.downvoteIds = new ArrayList<>();
+        this.comments = new ArrayList<>();
+        this.image = image;
 
         this.postId = postCount;
         postCount++;
@@ -137,7 +159,25 @@ public class PlatformPost implements Post, Serializable {
         return comments;
     }
 
+    /**
+     * Retrieves image of the post.
+     *
+     * @return Image of the post.
+     */
+    public BufferedImage getImage() {
+        return image;
+    }
+
     // METHODS
+
+    /**
+     * Retrieves if the post has an image.
+     *
+     * @return True if image exists, else false
+     */
+    public boolean hasImage() {
+        return !(image == null);
+    }
 
     /**
      * Adds a comment to the post.
