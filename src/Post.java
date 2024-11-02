@@ -1,4 +1,5 @@
 import java.util.List;
+import java.awt.Image;
 
 /**
  * Post
@@ -61,6 +62,20 @@ public interface Post {
     List<Comment> getComments();
 
     /**
+     * Checks whether the post contains an image.
+     * 
+     * @return true if the post contains an image, false otherwise
+     */
+    boolean hasImage();
+
+    /**
+     * Retrieves the image in the post.
+     * 
+     * @return the image in the post, and null if there is no such image
+     */
+    Image getImage();
+
+    /**
      * Retrieves the content of the post.
      *
      * @return The text content of the post
@@ -71,7 +86,8 @@ public interface Post {
      * Adds an upvote to the post from a specified user.
      *
      * @param userId The ID of the user upvoting the post
-     * @return true if the user's upvote was added successfully, false if the user had already upvoted
+     * @return true if the user's upvote was added successfully, false if the user had already
+     *         upvoted
      */
     boolean addUpvote(int userId);
 
@@ -79,7 +95,8 @@ public interface Post {
      * Adds a downvote to the post from a specified user.
      *
      * @param userId The ID of the user downvoting the post
-     * @return true if the user's downvote was added successfully, false if the user had already downvoted
+     * @return true if the user's downvote was added successfully, false if the user had already
+     *         downvoted
      */
     boolean addDownvote(int userId);
 
