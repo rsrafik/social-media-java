@@ -47,6 +47,28 @@ public class FoundationDatabase {
     }
 
     /**
+     * Reads Post objects from the file "posts.dat" and populates the posts list.
+     * If the file does not exist, a message is printed indicating so.
+     */
+    public void readPosts() {
+        try (FileInputStream fileIn = new FileInputStream("posts.dat");
+             ObjectInputStream in = new ObjectInputStream(fileIn)) {
+
+            while (true) {
+                try {
+                    PlatformPost post = (PlatformPost) in.readObject();
+                    posts.add(post);
+                } catch (EOFException e) {
+                    break;
+                }
+            }
+
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Does not exist yet"); // File not found or no users saved yet
+        }
+    }
+
+    /**
      * Adds a new User object to the database, appending it to the "users.dat" file.
      * Synchronization ensures thread-safe access.
      *
@@ -70,6 +92,29 @@ public class FoundationDatabase {
     }
 
     /**
+     * Adds a new Post object to the database, appending it to the "posts.dat" file.
+     * Synchronization ensures thread-safe access.
+     *
+     * @param post The Post object to be added to the database
+     * @throws InterruptedException if thread synchronization is interrupted
+     */
+    public void addPost(PlatformPost post) throws InterruptedException {
+        synchronized (gatekeeper) {
+            posts.add(post);
+
+            boolean append = new File("posts.dat").exists(); // Check if file exists to determine append mode
+
+            try (FileOutputStream fileOut = new FileOutputStream("posts.dat", true);
+                 ObjectOutputStream out = append ? new AppendableObjectOutputStream(fileOut) : new ObjectOutputStream(fileOut)) {
+                out.writeObject(post); // Serialize and write User to file
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("Error writing file"); // Error during file output
+            }
+        }
+    }
+
+    /**
      * Retrieves all User objects in the database as an array.
      *
      * @return An array of User objects in the database
@@ -79,18 +124,12 @@ public class FoundationDatabase {
     }
 
     /**
-     * Retrieves all Post objects across all User objects in the database as an array.
+     * Retrieves all Post objects in the database as an array.
      *
-     * @return An array of all Post objects associated with users in the database
+     * @return An array of Post objects in the database
      */
     public ArrayList<PlatformPost> getAllPosts() {
-        ArrayList<PlatformPost> allPosts = new ArrayList<>(); // List to hold all posts
-        for (PlatformUser user : users) {
-            ArrayList<PlatformPost> userPosts = user.getPosts();
-            allPosts.addAll(userPosts); // Add each user's posts to list
-        }
-
-        return allPosts;
+        return posts;
     }
 
     /**
