@@ -96,8 +96,8 @@ public class PlatformUser implements User, Serializable {
      * @return An array of the user's posts
      */
     @Override
-    public PlatformPost[] getPosts() {
-        return posts.toArray(new PlatformPost[0]);
+    public ArrayList<PlatformPost> getPosts() {
+        return posts;
     }
 
     /**

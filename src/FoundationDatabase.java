@@ -73,8 +73,8 @@ public class FoundationDatabase {
      *
      * @return An array of User objects in the database
      */
-    public User[] getAllUsers() {
-        return users.toArray(new User[0]);
+    public ArrayList<PlatformUser> getAllUsers() {
+        return users;
     }
 
     /**
@@ -82,14 +82,14 @@ public class FoundationDatabase {
      *
      * @return An array of all Post objects associated with users in the database
      */
-    public Post[] getAllPosts() {
-        ArrayList<Post> allPosts = new ArrayList<>(); // List to hold all posts
+    public ArrayList<PlatformPost> getAllPosts() {
+        ArrayList<PlatformPost> allPosts = new ArrayList<>(); // List to hold all posts
         for (PlatformUser user : users) {
-            Post[] userPosts = user.getPosts();
-            allPosts.addAll(Arrays.asList(userPosts)); // Add each user's posts to list
+            ArrayList<PlatformPost> userPosts = user.getPosts();
+            allPosts.addAll(userPosts); // Add each user's posts to list
         }
 
-        return allPosts.toArray(new Post[0]);
+        return allPosts;
     }
 
     /**
