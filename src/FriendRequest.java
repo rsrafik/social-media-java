@@ -7,7 +7,4 @@
  */
 
 public interface FriendRequest {
-    int getUserId();
-
-    String getMessage();
 }

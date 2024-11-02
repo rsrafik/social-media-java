@@ -9,7 +9,7 @@ import java.util.List;
  */
 
 public interface User {
-    int getId();
+    int getUserId();
 
     String getUsername();
 
@@ -21,9 +21,13 @@ public interface User {
 
     List<Integer> getBlockedUserIds();
 
-    List<Integer> getPostIds();
-
-    List<Integer> getCommentIds();
+    Post[] getPosts();
 
     List<FriendRequest> getFriendRequests();
+
+    int friendCount();
+
+    int blockedCount();
+
+    int friendRequestCount();
 }

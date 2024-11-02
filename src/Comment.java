@@ -9,13 +9,11 @@ import java.util.List;
  */
 
 public interface Comment {
-    int getOwnerId();
+    int getCreatorId();
 
-    int getPostId();
+    int upvoteCounter();
 
-    int getUpvoteCount();
-
-    int getDownvoteCount();
+    int downvoteCounter();
 
     List<Integer> getUpvoterIds();
 
@@ -26,6 +24,6 @@ public interface Comment {
     void addDownvote(int userId);
 
     default int getScore() {
-        return getUpvoteCount() - getDownvoteCount();
+        return upvoteCounter() - downvoteCounter();
     }
 }
