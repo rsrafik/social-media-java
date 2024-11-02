@@ -26,18 +26,11 @@ public interface Post {
     int getCreatorId();
 
     /**
-     * Retrieves the number of users who upvoted the post.
+     * Retrieves the content of the post.
      * 
-     * @return the number of users who upvoted the post
+     * @return the content of the post
      */
-    int upvoteCounter();
-
-    /**
-     * Retrieves the number of users who downvoted the post.
-     * 
-     * @return the number of users who downvoted the post
-     */
-    int downvoteCounter();
+    String getContent();
 
     /**
      * Retrieves the ids of the users who upvoted the post.
@@ -54,18 +47,18 @@ public interface Post {
     List<Integer> getDownvoterIds();
 
     /**
-     * Retrieves the comments underneath the post.
+     * Retrieves the number of users who upvoted the post.
      * 
-     * @return the list of comments made underneath the post
+     * @return the number of users who upvoted the post
      */
-    List<Comment> getComments();
+    int upvoteCounter();
 
     /**
-     * Retrieves the content of the post.
+     * Retrieves the number of users who downvoted the post.
      * 
-     * @return the content of the post
+     * @return the number of users who downvoted the post
      */
-    String getContent();
+    int downvoteCounter();
 
     /**
      * Attempts to add an upvote to the post.
@@ -82,6 +75,21 @@ public interface Post {
      * @return true if the user's downvote was added for the first time
      */
     boolean addDownvote(int userId);
+
+    /**
+     * Retrieves the comments underneath the post.
+     * 
+     * @return the list of comments made underneath the post
+     */
+    List<Comment> getComments();
+
+    /**
+     * Adds a comment underneath the post.
+     * 
+     * @param userId the id of the commenter
+     * @param content the content of the comment
+     */
+    void addComment(int userId, String content);
 
     /**
      * Retrieves the 'score' of the post, i.e., the difference between the upvotes

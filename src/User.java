@@ -48,39 +48,32 @@ public interface User {
     boolean testPassword(String password);
 
     /**
+     * Retrieves the ids of the posts created by the user.
+     * 
+     * @return the list of ids of the posts created by the user
+     */
+    List<Integer> getPostIds();
+
+    /**
+     * Retrieves the number of posts created by the user.
+     * 
+     * @return the number of posts created by the user
+     */
+    int postCount();
+
+    // /**
+    // * Retrieves the ids of the comments created by the user.
+    // *
+    // * @return the list of ids of the comments created by the user
+    // */
+    // List<Post> getCommentIds();
+
+    /**
      * Retrieves the ids of the user's friends.
      * 
      * @return the list of ids of the user's friends
      */
     List<Integer> getFriendIds();
-
-    /**
-     * Retrieves the ids of blocked users.
-     * 
-     * @return the list of ids of the users who are blocked
-     */
-    List<Integer> getBlockedUserIds();
-
-    /**
-     * Retrieves the ids of the posts created by the user.
-     * 
-     * @return the list of ids of the posts created by the user
-     */
-    List<Post> getPostIds();
-
-    /**
-     * Retrieves the ids of the comments created by the user.
-     * 
-     * @return the list of ids of the comments created by the user
-     */
-    List<Post> getCommentIds();
-
-    /**
-     * Retrieves the pending friend requests sent to the user.
-     * 
-     * @return the list of pending friend requests
-     */
-    List<FriendRequest> getFriendRequests();
 
     /**
      * Retrieves the number of friends of the user.
@@ -90,18 +83,11 @@ public interface User {
     int friendCount();
 
     /**
-     * Retrieves the number of users blocked by the user.
+     * Retrieves the pending friend requests sent to the user.
      * 
-     * @return the number of users blocked by the user
+     * @return the list of pending friend requests
      */
-    int blockedUserCount();
-
-    /**
-     * Retrieves the number of posts created by the user.
-     * 
-     * @return the number of posts created by the user
-     */
-    int postCount();
+    List<FriendRequest> getFriendRequests();
 
     /**
      * Retrieves the number of pending friend requests for the user.
@@ -109,4 +95,18 @@ public interface User {
      * @return the number of pending friend requests for the user
      */
     int friendRequestCount();
+
+    /**
+     * Retrieves the ids of blocked users.
+     * 
+     * @return the list of ids of the users who are blocked
+     */
+    List<Integer> getBlockedUserIds();
+
+    /**
+     * Retrieves the number of users blocked by the user.
+     * 
+     * @return the number of users blocked by the user
+     */
+    int blockedUserCount();
 }
