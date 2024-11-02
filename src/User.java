@@ -84,7 +84,7 @@ public interface User {
      *
      * @return An array of the user's posts
      */
-    Post[] getPosts();
+    List<Post> getPosts();
 
     /**
      * Retrieves the pending friend requests sent to the user.
