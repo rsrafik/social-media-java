@@ -50,6 +50,14 @@ public interface User {
     boolean testPassword(String password);
 
     /**
+     * Checks whether the provided username matches the user's username.
+     *
+     * @param username The username to test
+     * @return true if the username matches, false otherwise
+     */
+    boolean testUsername(String username);
+
+    /**
      * Retrieves the IDs of the user's friends.
      *
      * @return A list of user IDs representing the user's friends

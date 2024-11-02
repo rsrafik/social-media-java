@@ -182,4 +182,14 @@ public class PlatformUser implements User, Serializable {
     public boolean testPassword(String password) {
         return this.password.equals(password);
     }
+
+    /**
+     * Checks if the given username matches the user's username.
+     *
+     * @param username The username to check
+     * @return true if the username matches, false otherwise
+     */
+    public boolean testUsername(String username) {
+        return this.password.equals(username);
+    }
 }
