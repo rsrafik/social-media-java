@@ -2,106 +2,113 @@ import java.util.List;
 
 /**
  * User
- * 
- * The User interface
- * 
- * @author Ropan Datta
- * @version
- * 
+ * <p>
+ * This interface defines the structure for a user on a platform, including methods
+ * for managing the user's friends, blocked users, posts, and friend requests.
+ * It provides methods for retrieving user information, updating usernames and passwords,
+ * and verifying login credentials.
+ * </p>
+ *
+ * @version November 1, 2024
  */
-
 public interface User {
+
     /**
-     * Retrieves the unique integer id of the user.
-     * 
-     * @return the integer id of the user
+     * Retrieves the unique ID of the user.
+     *
+     * @return The user's ID
      */
     int getUserId();
 
     /**
      * Retrieves the username associated with the user.
-     * 
-     * @return the username associated with the user
+     *
+     * @return The username
      */
     String getUsername();
 
     /**
      * Sets the username of the user.
-     * 
-     * @param username the username to set
+     *
+     * @param username The username to set
      */
     void setUsername(String username);
 
     /**
      * Sets the password of the user.
-     * 
-     * @param password the password to set
+     *
+     * @param password The password to set
      */
     void setPassword(String password);
 
     /**
-     * Checks whether the provided password matches with the user's
-     * 
-     * @param password the password to test
-     * @return true if the password matches
+     * Checks whether the provided password matches the user's password.
+     *
+     * @param password The password to test
+     * @return true if the password matches, false otherwise
      */
     boolean testPassword(String password);
 
     /**
-     * Retrieves the ids of the user's friends.
-     * 
-     * @return the list of ids of the user's friends
+     * Retrieves the IDs of the user's friends.
+     *
+     * @return A list of user IDs representing the user's friends
      */
     List<Integer> getFriendIds();
 
     /**
-     * Retrieves the ids of blocked users.
-     * 
-     * @return the list of ids of the users who are blocked
+     * Retrieves the IDs of users blocked by the user.
+     *
+     * @return A list of user IDs representing blocked users
      */
     List<Integer> getBlockedUserIds();
 
     /**
-     * Retrieves the ids of the posts created by the user.
-     * 
-     * @return the list of ids of the posts created by the user
+     * Retrieves the IDs of posts created by the user.
+     *
+     * @return A list of post IDs created by the user
      */
     List<Integer> getPostIds();
 
+    /**
+     * Retrieves an array of posts created by the user.
+     *
+     * @return An array of the user's posts
+     */
     Post[] getPosts();
 
     /**
      * Retrieves the pending friend requests sent to the user.
-     * 
-     * @return the list of pending friend requests
+     *
+     * @return A list of pending friend requests
      */
     List<FriendRequest> getFriendRequests();
 
     /**
-     * Retrieves the number of friends of the user.
-     * 
-     * @return the number of friends of the user
+     * Retrieves the number of friends the user has.
+     *
+     * @return The number of friends
      */
     int friendCount();
 
     /**
      * Retrieves the number of users blocked by the user.
-     * 
-     * @return the number of users blocked by the user
+     *
+     * @return The number of blocked users
      */
     int blockedUserCount();
 
     /**
      * Retrieves the number of posts created by the user.
-     * 
-     * @return the number of posts created by the user
+     *
+     * @return The number of posts created by the user
      */
     int postCount();
 
     /**
      * Retrieves the number of pending friend requests for the user.
-     * 
-     * @return the number of pending friend requests for the user
+     *
+     * @return The number of pending friend requests
      */
     int friendRequestCount();
 }
