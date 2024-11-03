@@ -4,7 +4,14 @@ import org.junit.Test;
 import org.junit.Assert;
 import java.io.*;
 import java.util.ArrayList;
-
+/**
+ * DatabaseTestcaseTwo
+ *
+ * This class acts test cases for the methods getAllUsers, and getAllPosts within the Database.
+ *
+ * @author Navan Dendukuri, L22
+ * @version November 3, 2024
+ */
 public class DatabaseTestcaseTwo {
     private FoundationDatabase db;
 

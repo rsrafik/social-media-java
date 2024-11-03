@@ -22,6 +22,7 @@ public class FoundationDatabase implements DatabaseInterface {
      */
     public FoundationDatabase() {
         users = new ArrayList<>();
+        posts = new ArrayList<>();
     }
 
     /**
