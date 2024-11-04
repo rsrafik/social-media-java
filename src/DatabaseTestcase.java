@@ -16,7 +16,7 @@ public class DatabaseTestcase {
     public void testDbInterfaceExists() {
         try {
             // Attempt to load the Database interface using reflection
-            Class<?> dbInterface = Class.forName("DatabaseInterface");
+            Class<?> dbInterface = Class.forName("Database");
 
             if (!dbInterface.isInterface()) {
                 fail("DatabaseInterface exists but is not an interface");
@@ -124,15 +124,15 @@ public class DatabaseTestcase {
         db.addUser(testUser);
         assertEquals("Expected 1 user in the list after addUser.",
                 1, db.getAllUsers().size());
-        assertEquals("Expected user in list to be 'TestUser'.",
-                "TestUser", db.getAllUsers().get(0).getUsername());
+        assertEquals("Expected user in list to be 'Test'.",
+                "test", db.getAllUsers().get(0).getUsername());
 
         // Check that user is also added to users.dat
         try (FileInputStream fileIn = new FileInputStream("users.dat");
              ObjectInputStream in = new ObjectInputStream(fileIn)) {
             PlatformUser userFromFile = (PlatformUser) in.readObject();
-            assertEquals("Expected user in file to be 'TestUser'.",
-                    "TestUser", userFromFile.getUsername());
+            assertEquals("Expected user in file to be 'test'.",
+                    "test", userFromFile.getUsername());
         }
     }
 
@@ -157,8 +157,8 @@ public class DatabaseTestcase {
 
             assertEquals("Expected first user in file to be 'InitialUser'.",
                     "InitialUser", user1.getUsername());
-            assertEquals("Expected second user in file to be 'TestUser'.",
-                    "TestUser", user2.getUsername());
+            assertEquals("Expected second user in file to be 'test'.",
+                    "test", user2.getUsername());
         }
     }    //end of test for addUser
 
@@ -175,15 +175,15 @@ public class DatabaseTestcase {
         db.addPost(testPost);
         assertEquals("Expected 1 post in the list after addPost.",
                 1, db.getAllPosts().size());
-        assertEquals("Expected post in list to be 'TestPost'.",
-                "TestPost", db.getAllPosts().get(0).getContent());
+        assertEquals("Expected post in list to be 'test'.",
+                "test", db.getAllPosts().get(0).getContent());
 
         // Check that post is also added to posts.dat
         try (FileInputStream fileIn = new FileInputStream("posts.dat");
              ObjectInputStream in = new ObjectInputStream(fileIn)) {
             PlatformPost postFromFile = (PlatformPost) in.readObject();
-            assertEquals("Expected post in file to be 'TestPost'.",
-                    "TestPost", postFromFile.getContent());
+            assertEquals("Expected post in file to be 'test'.",
+                    "test", postFromFile.getContent());
         }
     }
 
@@ -209,7 +209,7 @@ public class DatabaseTestcase {
             assertEquals("Expected first post in file to be 'InitialPost'.",
                     "InitialPost", post1.getContent());
             assertEquals("Expected second post in file to be 'TestPost'.",
-                    "TestPost", post2.getContent());
+                    "test", post2.getContent());
         }
     }
 

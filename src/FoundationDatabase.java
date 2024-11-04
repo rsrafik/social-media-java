@@ -1,6 +1,5 @@
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * FoundationDatabase
@@ -12,7 +11,7 @@ import java.util.Arrays;
  * @author Rachel Rafik, L22
  * @version November 1, 2024
  */
-public class FoundationDatabase implements DatabaseInterface {
+public class FoundationDatabase implements Database {
     private static ArrayList<PlatformUser> users;  // List of User objects in the database
     private static ArrayList<PlatformPost> posts; //List of Post objects in the database
     private static final Object gatekeeper = new Object(); // Synchronization lock for thread safety
