@@ -131,7 +131,7 @@ public class DatabaseTestcase {
         try (FileInputStream fileIn = new FileInputStream("users.dat");
              ObjectInputStream in = new ObjectInputStream(fileIn)) {
             PlatformUser userFromFile = (PlatformUser) in.readObject();
-            assertEquals("Expected user in file to be 'TestUser'.",
+            assertEquals("Expected user in file to be 'test'.",
                     "test", userFromFile.getUsername());
         }
     }
@@ -157,7 +157,7 @@ public class DatabaseTestcase {
 
             assertEquals("Expected first user in file to be 'InitialUser'.",
                     "InitialUser", user1.getUsername());
-            assertEquals("Expected second user in file to be 'TestUser'.",
+            assertEquals("Expected second user in file to be 'test'.",
                     "test", user2.getUsername());
         }
     }    //end of test for addUser
