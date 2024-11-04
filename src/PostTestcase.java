@@ -8,7 +8,7 @@ import org.junit.Test;
  * @author Navan Dendukuri, L22
  * @version November 3, 2024
  */
-public class PostTestCase {
+public class PostTestcase {
 
     /**
      * Tests if the Post interface exists.
