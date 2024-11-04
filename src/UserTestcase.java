@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
  * @author Mckinley Newman, L22
  * @version November 2, 2024
  */
-public class UserTestCase {
+public class UserTestcase {
 
     /**
      * Tests if the User interface exists.
