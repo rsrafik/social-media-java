@@ -190,23 +190,23 @@ public class PlatformUser implements User, Serializable {
     /**
      * Checks if the given password matches the user's password.
      *
-     * @param password The password to check
+     * @param testedPassword The password to check
      * @return true if the password matches, false otherwise
      */
     @Override
-    public boolean testPassword(String password) {
-        return this.password.equals(password);
+    public boolean testPassword(String testedPassword) {
+        return this.password.equals(testedPassword);
     }
 
     /**
      * Checks if the given username matches the user's username.
      *
-     * @param username The username to check
+     * @param testedUsername The username to check
      * @return true if the username matches, false otherwise
      */
     @Override
-    public boolean testUsername(String username) {
-        return this.password.equals(username);
+    public boolean testUsername(String testedUsername) {
+        return this.password.equals(testedUsername);
     }
 
     /**

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 public class FoundationDatabase implements Database {
     private static ArrayList<PlatformUser> users;  // List of User objects in the database
     private static ArrayList<PlatformPost> posts; //List of Post objects in the database
-    private static final Object gatekeeper = new Object(); // Synchronization lock for thread safety
+    private static final Object GATEKEEPER = new Object(); // Synchronization lock for thread safety
 
     /**
      * Constructs a FoundationDatabase instance and initializes the user list.
@@ -76,7 +76,7 @@ public class FoundationDatabase implements Database {
      * @throws InterruptedException if thread synchronization is interrupted
      */
     public void addUser(PlatformUser user) throws InterruptedException {
-        synchronized (gatekeeper) {
+        synchronized (GATEKEEPER) {
             users.add(user);
 
             boolean append = new File("users.dat").exists(); // Check if file exists to determine append mode
@@ -100,7 +100,7 @@ public class FoundationDatabase implements Database {
      * @throws InterruptedException if thread synchronization is interrupted
      */
     public void addPost(PlatformPost post) throws InterruptedException {
-        synchronized (gatekeeper) {
+        synchronized (GATEKEEPER) {
             posts.add(post);
 
             boolean append = new File("posts.dat").exists(); // Check if file exists to determine append mode
