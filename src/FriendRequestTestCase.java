@@ -1,4 +1,5 @@
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 /**
@@ -30,6 +31,7 @@ public class FriendRequestTestCase {
     @Test
     public void testPlatformImplementsFriendRequest() {
         PlatformFriendRequest friendRequest = new PlatformFriendRequest(1, "Be friends");
-        assertTrue("PlatformFriendRequest should implement FriendRequest interface", friendRequest instanceof FriendRequest);
+        assertTrue("PlatformFriendRequest should implement FriendRequest interface",
+                friendRequest instanceof FriendRequest);
     }
 }

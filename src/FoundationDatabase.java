@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 /**
  * FoundationDatabase
- *
+ * <p>
  * This class manages a database of User objects and their associated Posts. It provides
  * methods to read users from a file, add new users, retrieve all users, and retrieve all posts.
  * Users are stored in a serialized file format and loaded upon instantiation.
@@ -82,7 +82,8 @@ public class FoundationDatabase implements Database {
             boolean append = new File("users.dat").exists(); // Check if file exists to determine append mode
 
             try (FileOutputStream fileOut = new FileOutputStream("users.dat", true);
-                 ObjectOutputStream out = append ? new AppendableObjectOutputStream(fileOut) : new ObjectOutputStream(fileOut)) {
+                 ObjectOutputStream out = append ? new AppendableObjectOutputStream(fileOut) :
+                         new ObjectOutputStream(fileOut)) {
                 out.writeObject(user); // Serialize and write User to file
             } catch (IOException e) {
                 e.printStackTrace();
@@ -105,7 +106,8 @@ public class FoundationDatabase implements Database {
             boolean append = new File("posts.dat").exists(); // Check if file exists to determine append mode
 
             try (FileOutputStream fileOut = new FileOutputStream("posts.dat", true);
-                 ObjectOutputStream out = append ? new AppendableObjectOutputStream(fileOut) : new ObjectOutputStream(fileOut)) {
+                 ObjectOutputStream out = append ? new AppendableObjectOutputStream(fileOut) :
+                         new ObjectOutputStream(fileOut)) {
                 out.writeObject(post); // Serialize and write User to file
             } catch (IOException e) {
                 e.printStackTrace();
@@ -134,7 +136,7 @@ public class FoundationDatabase implements Database {
 
     /**
      * AppendableObjectOutputStream
-     *
+     * <p>
      * Custom ObjectOutputStream that avoids writing a new header when appending
      * objects to an existing file. This helps prevent file corruption due to
      * multiple headers in the same file.
