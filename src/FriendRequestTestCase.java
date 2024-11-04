@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
  * Test case for the FriendRequest interface, verifying its existence and implementation
  * by the PlatformFriendRequest class.
  *
+ * @author Mckinley Newman, L22
  * @version November 2, 2024
  */
 public class FriendRequestTestCase {
