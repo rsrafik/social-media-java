@@ -27,7 +27,7 @@ public class PlatformUser implements User, Serializable {
     private ArrayList<Integer> friendIds; // List of friend user IDs
     private ArrayList<Integer> blockedUserIds; // List of blocked user IDs
     private ArrayList<PlatformFriendRequest> friendRequests; // List of friend requests received by
-                                                             // the user
+    // the user
 
     // CONSTRUCTORS
 

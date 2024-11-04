@@ -64,14 +64,14 @@ public interface Post {
 
     /**
      * Checks whether the post contains an image.
-     * 
+     *
      * @return true if the post contains an image, false otherwise
      */
     boolean hasImage();
 
     /**
      * Retrieves the image in the post.
-     * 
+     *
      * @return the image in the post, and null if there is no such image
      */
     Image getImage();
@@ -88,7 +88,7 @@ public interface Post {
      *
      * @param userId The ID of the user upvoting the post
      * @return true if the user's upvote was added successfully, false if the user had already
-     *         upvoted
+     * upvoted
      */
     boolean addUpvote(int userId);
 
@@ -97,7 +97,7 @@ public interface Post {
      *
      * @param userId The ID of the user downvoting the post
      * @return true if the user's downvote was added successfully, false if the user had already
-     *         downvoted
+     * downvoted
      */
     boolean addDownvote(int userId);
 
