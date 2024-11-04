@@ -1,12 +1,14 @@
+import org.junit.Assert;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import java.io.*;
+import java.util.ArrayList;
 
 /**
  * Test case for the Database interface and implementation
  * also tests all database functions
  *
- * @author Mckinley Newman, Navan
+ * @author Mckinley Newman 18-217, Navan Dendukuria 218-248
  * @version Nov 3, 2024
  */
 public class DatabaseTestcase {
@@ -211,6 +213,38 @@ public class DatabaseTestcase {
             assertEquals("Expected second post in file to be 'TestPost'.",
                     "test", post2.getContent());
         }
+    }
+
+    @Test
+    public void testGetAllUsers() throws InterruptedException {
+        FoundationDatabase db = new FoundationDatabase();
+        // Add two users to the database
+        PlatformUser one = new PlatformUser("one", "one");
+        PlatformUser two = new PlatformUser("two", "two");
+        db.addUser(one);
+        db.addUser(two);
+
+        // Test get all users and check that both of the added users exist in users.
+        ArrayList<PlatformUser> users = db.getAllUsers();
+        Assert.assertEquals("Should contain 2 users", 2, users.size());
+        Assert.assertTrue("User one should be in the list", users.contains(one));
+        Assert.assertTrue("User two should be in the list", users.contains(two));
+    }
+
+    @Test
+    public void testGetAllPosts() throws InterruptedException {
+        FoundationDatabase db = new FoundationDatabase();
+        // Add two post to the database
+        PlatformPost one = new PlatformPost(1,"One");
+        PlatformPost two = new PlatformPost(2,"Two");
+        db.addPost(one);
+        db.addPost(two);
+
+        // Test get all posts and check that both of the added posts exist in users.
+        ArrayList<PlatformPost> posts = db.getAllPosts();
+        Assert.assertEquals("Should contain 2 posts", 2, posts.size());
+        Assert.assertTrue("Post one should be in the list", posts.contains(one));
+        Assert.assertTrue("Post two should be in the list", posts.contains(two));
     }
 
 }    //end of Database testcase
