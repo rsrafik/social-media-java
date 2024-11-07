@@ -15,11 +15,11 @@ public class PlatformComment implements Comment, Serializable {
 
     // FIELDS
 
-    private Integer creatorID; // ID of the user who created the comment
-    private String message;    // The content of the comment
+    private final Integer creatorID; // ID of the user who created the comment
+    private final String message;    // The content of the comment
 
-    private ArrayList<Integer> upvoteIds;   // List of user IDs who upvoted the comment
-    private ArrayList<Integer> downvoteIds; // List of user IDs who downvoted the comment
+    private final ArrayList<Integer> upvoteIds;   // List of user IDs who upvoted the comment
+    private final ArrayList<Integer> downvoteIds; // List of user IDs who downvoted the comment
 
     // CONSTRUCTOR
 

@@ -1,12 +1,16 @@
+import org.junit.Assert;
 import org.junit.Test;
+
 import static org.junit.Assert.*;
+
 import java.io.*;
+import java.util.ArrayList;
 
 /**
  * Test case for the Database interface and implementation
  * also tests all database functions
  *
- * @author Mckinley Newman, Navan
+ * @author Mckinley Newman 18-217, Navan Dendukuria 218-248
  * @version Nov 3, 2024
  */
 public class DatabaseTestcase {
@@ -16,7 +20,7 @@ public class DatabaseTestcase {
     public void testDbInterfaceExists() {
         try {
             // Attempt to load the Database interface using reflection
-            Class<?> dbInterface = Class.forName("DatabaseInterface");
+            Class<?> dbInterface = Class.forName("Database");
 
             if (!dbInterface.isInterface()) {
                 fail("DatabaseInterface exists but is not an interface");
@@ -46,8 +50,8 @@ public class DatabaseTestcase {
         // Prepare a test users.dat file with serialized PlatformUser objects
         try (FileOutputStream fileOut = new FileOutputStream("users.dat");
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-            out.writeObject(new PlatformUser("User1","pass1"));
-            out.writeObject(new PlatformUser("User2","pass2"));
+            out.writeObject(new PlatformUser("User1", "pass1"));
+            out.writeObject(new PlatformUser("User2", "pass2"));
         }
 
         db.readUsers();
@@ -83,8 +87,8 @@ public class DatabaseTestcase {
         // Prepare a test posts.dat file with serialized PlatformPost objects
         try (FileOutputStream fileOut = new FileOutputStream("posts.dat");
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-            out.writeObject(new PlatformPost(0,"Post1"));
-            out.writeObject(new PlatformPost(1,"Post2"));
+            out.writeObject(new PlatformPost(0, "Post1"));
+            out.writeObject(new PlatformPost(1, "Post2"));
         }
 
         db.readPosts();
@@ -115,7 +119,7 @@ public class DatabaseTestcase {
     @Test
     public void testAddUserToListAndFile() throws InterruptedException, IOException, ClassNotFoundException {
         FoundationDatabase db = new FoundationDatabase();
-        PlatformUser testUser = new PlatformUser("test","test");
+        PlatformUser testUser = new PlatformUser("test", "test");
         // Delete users.dat to start fresh
         File file = new File("users.dat");
         file.delete();
@@ -124,24 +128,24 @@ public class DatabaseTestcase {
         db.addUser(testUser);
         assertEquals("Expected 1 user in the list after addUser.",
                 1, db.getAllUsers().size());
-        assertEquals("Expected user in list to be 'TestUser'.",
-                "TestUser", db.getAllUsers().get(0).getUsername());
+        assertEquals("Expected user in list to be 'Test'.",
+                "test", db.getAllUsers().get(0).getUsername());
 
         // Check that user is also added to users.dat
         try (FileInputStream fileIn = new FileInputStream("users.dat");
              ObjectInputStream in = new ObjectInputStream(fileIn)) {
             PlatformUser userFromFile = (PlatformUser) in.readObject();
-            assertEquals("Expected user in file to be 'TestUser'.",
-                    "TestUser", userFromFile.getUsername());
+            assertEquals("Expected user in file to be 'test'.",
+                    "test", userFromFile.getUsername());
         }
     }
 
     @Test
     public void testAddUserWithExistingFile() throws InterruptedException, IOException, ClassNotFoundException {
         FoundationDatabase db = new FoundationDatabase();
-        PlatformUser testUser = new PlatformUser("test","test");
+        PlatformUser testUser = new PlatformUser("test", "test");
         // Prepare a users.dat file with an initial user
-        PlatformUser initialUser = new PlatformUser("InitialUser","password");
+        PlatformUser initialUser = new PlatformUser("InitialUser", "password");
         try (FileOutputStream fileOut = new FileOutputStream("users.dat");
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
             out.writeObject(initialUser);
@@ -157,8 +161,8 @@ public class DatabaseTestcase {
 
             assertEquals("Expected first user in file to be 'InitialUser'.",
                     "InitialUser", user1.getUsername());
-            assertEquals("Expected second user in file to be 'TestUser'.",
-                    "TestUser", user2.getUsername());
+            assertEquals("Expected second user in file to be 'test'.",
+                    "test", user2.getUsername());
         }
     }    //end of test for addUser
 
@@ -166,7 +170,7 @@ public class DatabaseTestcase {
     @Test
     public void testAddPostToListAndFile() throws InterruptedException, IOException, ClassNotFoundException {
         FoundationDatabase db = new FoundationDatabase();
-        PlatformPost testPost = new PlatformPost(0,"test");
+        PlatformPost testPost = new PlatformPost(0, "test");
         // Delete posts.dat to start fresh
         File file = new File("posts.dat");
         file.delete();
@@ -175,24 +179,24 @@ public class DatabaseTestcase {
         db.addPost(testPost);
         assertEquals("Expected 1 post in the list after addPost.",
                 1, db.getAllPosts().size());
-        assertEquals("Expected post in list to be 'TestPost'.",
-                "TestPost", db.getAllPosts().get(0).getContent());
+        assertEquals("Expected post in list to be 'test'.",
+                "test", db.getAllPosts().get(0).getContent());
 
         // Check that post is also added to posts.dat
         try (FileInputStream fileIn = new FileInputStream("posts.dat");
              ObjectInputStream in = new ObjectInputStream(fileIn)) {
             PlatformPost postFromFile = (PlatformPost) in.readObject();
-            assertEquals("Expected post in file to be 'TestPost'.",
-                    "TestPost", postFromFile.getContent());
+            assertEquals("Expected post in file to be 'test'.",
+                    "test", postFromFile.getContent());
         }
     }
 
     @Test
     public void testAddPostWithExistingFile() throws InterruptedException, IOException, ClassNotFoundException {
         FoundationDatabase db = new FoundationDatabase();
-        PlatformPost testPost = new PlatformPost(0,"test");
+        PlatformPost testPost = new PlatformPost(0, "test");
         // Prepare a posts.dat file with an initial post
-        PlatformPost initialPost = new PlatformPost(1,"InitialPost");
+        PlatformPost initialPost = new PlatformPost(1, "InitialPost");
         try (FileOutputStream fileOut = new FileOutputStream("posts.dat");
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
             out.writeObject(initialPost);
@@ -209,8 +213,40 @@ public class DatabaseTestcase {
             assertEquals("Expected first post in file to be 'InitialPost'.",
                     "InitialPost", post1.getContent());
             assertEquals("Expected second post in file to be 'TestPost'.",
-                    "TestPost", post2.getContent());
+                    "test", post2.getContent());
         }
+    }
+
+    @Test
+    public void testGetAllUsers() throws InterruptedException {
+        FoundationDatabase db = new FoundationDatabase();
+        // Add two users to the database
+        PlatformUser one = new PlatformUser("one", "one");
+        PlatformUser two = new PlatformUser("two", "two");
+        db.addUser(one);
+        db.addUser(two);
+
+        // Test get all users and check that both of the added users exist in users.
+        ArrayList<PlatformUser> users = db.getAllUsers();
+        Assert.assertEquals("Should contain 2 users", 2, users.size());
+        Assert.assertTrue("User one should be in the list", users.contains(one));
+        Assert.assertTrue("User two should be in the list", users.contains(two));
+    }
+
+    @Test
+    public void testGetAllPosts() throws InterruptedException {
+        FoundationDatabase db = new FoundationDatabase();
+        // Add two post to the database
+        PlatformPost one = new PlatformPost(1, "One");
+        PlatformPost two = new PlatformPost(2, "Two");
+        db.addPost(one);
+        db.addPost(two);
+
+        // Test get all posts and check that both of the added posts exist in users.
+        ArrayList<PlatformPost> posts = db.getAllPosts();
+        Assert.assertEquals("Should contain 2 posts", 2, posts.size());
+        Assert.assertTrue("Post one should be in the list", posts.contains(one));
+        Assert.assertTrue("Post two should be in the list", posts.contains(two));
     }
 
 }    //end of Database testcase

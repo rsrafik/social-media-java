@@ -1,10 +1,9 @@
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * FoundationDatabase
- *
+ * <p>
  * This class manages a database of User objects and their associated Posts. It provides
  * methods to read users from a file, add new users, retrieve all users, and retrieve all posts.
  * Users are stored in a serialized file format and loaded upon instantiation.
@@ -12,16 +11,17 @@ import java.util.Arrays;
  * @author Rachel Rafik, L22
  * @version November 1, 2024
  */
-public class FoundationDatabase implements DatabaseInterface {
+public class FoundationDatabase implements Database {
     private static ArrayList<PlatformUser> users;  // List of User objects in the database
     private static ArrayList<PlatformPost> posts; //List of Post objects in the database
-    private static final Object gatekeeper = new Object(); // Synchronization lock for thread safety
+    private static final Object GATEKEEPER = new Object(); // Synchronization lock for thread safety
 
     /**
      * Constructs a FoundationDatabase instance and initializes the user list.
      */
     public FoundationDatabase() {
         users = new ArrayList<>();
+        posts = new ArrayList<>();
     }
 
     /**
@@ -76,13 +76,14 @@ public class FoundationDatabase implements DatabaseInterface {
      * @throws InterruptedException if thread synchronization is interrupted
      */
     public void addUser(PlatformUser user) throws InterruptedException {
-        synchronized (gatekeeper) {
+        synchronized (GATEKEEPER) {
             users.add(user);
 
             boolean append = new File("users.dat").exists(); // Check if file exists to determine append mode
 
             try (FileOutputStream fileOut = new FileOutputStream("users.dat", true);
-                 ObjectOutputStream out = append ? new AppendableObjectOutputStream(fileOut) : new ObjectOutputStream(fileOut)) {
+                 ObjectOutputStream out = append ? new AppendableObjectOutputStream(fileOut) :
+                         new ObjectOutputStream(fileOut)) {
                 out.writeObject(user); // Serialize and write User to file
             } catch (IOException e) {
                 e.printStackTrace();
@@ -99,13 +100,14 @@ public class FoundationDatabase implements DatabaseInterface {
      * @throws InterruptedException if thread synchronization is interrupted
      */
     public void addPost(PlatformPost post) throws InterruptedException {
-        synchronized (gatekeeper) {
+        synchronized (GATEKEEPER) {
             posts.add(post);
 
             boolean append = new File("posts.dat").exists(); // Check if file exists to determine append mode
 
             try (FileOutputStream fileOut = new FileOutputStream("posts.dat", true);
-                 ObjectOutputStream out = append ? new AppendableObjectOutputStream(fileOut) : new ObjectOutputStream(fileOut)) {
+                 ObjectOutputStream out = append ? new AppendableObjectOutputStream(fileOut) :
+                         new ObjectOutputStream(fileOut)) {
                 out.writeObject(post); // Serialize and write User to file
             } catch (IOException e) {
                 e.printStackTrace();
@@ -134,7 +136,7 @@ public class FoundationDatabase implements DatabaseInterface {
 
     /**
      * AppendableObjectOutputStream
-     *
+     * <p>
      * Custom ObjectOutputStream that avoids writing a new header when appending
      * objects to an existing file. This helps prevent file corruption due to
      * multiple headers in the same file.
