@@ -2,23 +2,17 @@
 
 ## How to compile
 
----
-
 javac Testing.java
 
 java Testing
 
 ## Submission Details
 
----
-
 **Rachel Rafik** - Vocareum Phase 1 Workspace
 
 # Description
 
 ## Interfaces
-
----
 
 ### User
 
