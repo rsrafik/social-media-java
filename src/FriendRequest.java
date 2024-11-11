@@ -12,11 +12,11 @@
 public interface FriendRequest {
 
     /**
-     * Retrieves the ID of the user who sent the friend request.
+     * Retrieves the username of the user who sent the friend request.
      *
-     * @return The user ID of the sender
+     * @return The user of the sender
      */
-    int getUserId();
+    String getUser();
 
     /**
      * Retrieves the message associated with the friend request.

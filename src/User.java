@@ -63,7 +63,7 @@ public interface User {
      *
      * @return A list of user IDs representing the user's friends
      */
-    List<Integer> getFriendIds();
+    List<PlatformUser> getFriends();
 
     /**
      * Retrieves the IDs of users blocked by the user.

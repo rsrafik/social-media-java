@@ -21,11 +21,11 @@ public interface Post {
     int getPostId();
 
     /**
-     * Retrieves the ID of the user who created the post.
+     * Retrieves the username of the user who created the post.
      *
-     * @return The user ID of the creator
+     * @return The username of the creator
      */
-    int getCreatorId();
+    String getCreator();
 
     /**
      * Retrieves the number of users who upvoted the post.

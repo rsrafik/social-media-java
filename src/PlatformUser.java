@@ -1,141 +1,110 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.Scanner;
 
 /**
  * PlatformUser
- * <p>
- * This class represents a user on the platform with unique user ID, username, password,
- * and lists to store posts, friends, blocked users, and friend requests. It allows
- * management of friends and blocked users, and implements the User interface.
- * This class is serializable to allow persistence.
- * </p>
  *
- * @author Rachel Rafik, L22
- * @version November 1, 2024
+ * This class represents a user on the platform with unique user ID, username, password,
+ * and lists to store posts, friends, blocked users, and friend requests.
+ * This class is serializable to allow persistence.
  */
 public class PlatformUser implements User, Serializable {
 
-    // FIELDS
+    // Static Fields
+    private static final String USER_COUNT_FILE = "userCount.dat";
+    private static Integer userCount = loadUserCount(); // Load userCount from file on startup
 
-    private static Integer userCount = 0; // Tracks the total number of users on the platform
-
-    private Integer userId; // Unique identifier for the user
+    // Instance Fields
+    private Integer userId; // Unique identifier for the user (non-static)
     private String username; // Username of the user
     private String password; // Password of the user
     private ArrayList<PlatformPost> posts; // List of posts created by the user
-
-    private ArrayList<Integer> friendIds; // List of friend user IDs
+    private ArrayList<PlatformUser> friends; // List of friend user IDs
     private ArrayList<Integer> blockedUserIds; // List of blocked user IDs
-    private ArrayList<PlatformFriendRequest> friendRequests; // List of friend requests received by
-    // the user
+    private ArrayList<PlatformFriendRequest> friendRequests; // List of friend requests
 
-    // CONSTRUCTORS
-
-    /**
-     * Constructs a PlatformUser with the specified username and password.
-     * Assigns a unique user ID and increments the user count.
-     *
-     * @param username The username of the user
-     * @param password The password of the user
-     */
+    // Constructor
     public PlatformUser(String username, String password) {
         this.username = username;
         this.password = password;
-        this.userId = userCount;
-        userCount++;
+        this.userId = userCount++;
+        saveUserCount(); // Save the incremented userCount to the file
         posts = new ArrayList<>();
-        friendIds = new ArrayList<>();
+        friends = new ArrayList<>();
         blockedUserIds = new ArrayList<>();
         friendRequests = new ArrayList<>();
     }
 
-    // GETTERS/SETTERS
+    // Static Method to Load userCount from a File
+    private static Integer loadUserCount() {
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(USER_COUNT_FILE))) {
+            return in.readInt();
+        } catch (IOException e) {
+            // File does not exist or cannot be read, default to 0
+            return 0;
+        }
+    }
 
-    /**
-     * Retrieves the user's unique ID.
-     *
-     * @return The user's ID
-     */
+    // Static Method to Save userCount to a File
+    private static void saveUserCount() {
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(USER_COUNT_FILE))) {
+            out.writeInt(userCount);
+        } catch (IOException e) {
+            System.err.println("Error saving user count: " + e.getMessage());
+        }
+    }
+
+    // Getter for userId
     @Override
     public int getUserId() {
         return userId;
     }
 
-    /**
-     * Retrieves the username of the user.
-     *
-     * @return The username
-     */
+    // Getter for username
     @Override
     public String getUsername() {
         return username;
     }
 
-    /**
-     * Sets the username of the user.
-     *
-     * @param username The new username to be set
-     */
+    // Setter for username
     @Override
     public void setUsername(String username) {
         this.username = username;
     }
 
-    /**
-     * Sets the password of the user.
-     *
-     * @param password The new password to be set
-     */
+    // Setter for password
     @Override
     public void setPassword(String password) {
         this.password = password;
     }
 
-    /**
-     * Retrieves an array of posts created by the user.
-     *
-     * @return An array of the user's posts
-     */
+    // Getter for posts
     @Override
     public ArrayList<PlatformPost> getPosts() {
         return posts;
     }
 
-    /**
-     * Retrieves the list of friend IDs.
-     *
-     * @return A list of user IDs representing the user's friends
-     */
+    // Getter for friends
     @Override
-    public ArrayList<Integer> getFriendIds() {
-        return friendIds;
+    public ArrayList<PlatformUser> getFriends() {
+        return friends;
     }
 
-    /**
-     * Retrieves the list of blocked user IDs.
-     *
-     * @return A list of user IDs representing blocked users
-     */
+    // Getter for blockedUserIds
     @Override
     public ArrayList<Integer> getBlockedUserIds() {
         return blockedUserIds;
     }
 
-    /**
-     * Retrieves the list of friend requests received by the user.
-     *
-     * @return A list of FriendRequest objects
-     */
+    // Getter for friendRequests
     @Override
     public ArrayList<PlatformFriendRequest> getFriendRequests() {
         return friendRequests;
     }
 
-    /**
-     * Retrieves the list of post IDs created by the user.
-     *
-     * @return A list of post IDs
-     */
+    // Method to retrieve post IDs
     @Override
     public ArrayList<Integer> getPostIds() {
         ArrayList<Integer> postIds = new ArrayList<>();
@@ -145,77 +114,43 @@ public class PlatformUser implements User, Serializable {
         return postIds;
     }
 
-    // METHODS
-
-    /**
-     * Retrieves the count of friends the user has.
-     *
-     * @return The number of friends
-     */
+    // Method to count friends
     @Override
     public int friendCount() {
-        return friendIds.size();
+        return friends.size();
     }
 
-    /**
-     * Retrieves the count of blocked users.
-     *
-     * @return The number of blocked users
-     */
+    // Method to count blocked users
     @Override
     public int blockedUserCount() {
         return blockedUserIds.size();
     }
 
-    /**
-     * Retrieves the count of posts created by the user.
-     *
-     * @return The number of posts
-     */
+    // Method to count posts
     @Override
     public int postCount() {
         return posts.size();
     }
 
-    /**
-     * Retrieves the count of friend requests received by the user.
-     *
-     * @return The number of friend requests
-     */
+    // Method to count friend requests
     @Override
     public int friendRequestCount() {
         return friendRequests.size();
     }
 
-    /**
-     * Checks if the given password matches the user's password.
-     *
-     * @param testedPassword The password to check
-     * @return true if the password matches, false otherwise
-     */
+    // Method to test if the given password matches the user's password
     @Override
     public boolean testPassword(String testedPassword) {
         return this.password.equals(testedPassword);
     }
 
-    /**
-     * Checks if the given username matches the user's username.
-     *
-     * @param testedUsername The username to check
-     * @return true if the username matches, false otherwise
-     */
+    // Method to test if the given username matches the user's username
     @Override
     public boolean testUsername(String testedUsername) {
-        return this.password.equals(testedUsername);
+        return this.username.equals(testedUsername);
     }
 
-    /**
-     * Checks if the given object is an instance of Platform User and has the same username and
-     * password.
-     *
-     * @param obj The object to check
-     * @return true if the User matches, false otherwise
-     */
+    // Equals method to compare PlatformUser objects by userId
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof PlatformUser) {
@@ -223,4 +158,29 @@ public class PlatformUser implements User, Serializable {
         }
         return false;
     }
+
+    public boolean answerFriendRequest(PlatformFriendRequest fr, Scanner scanner, FoundationDatabase fd) {
+        System.out.println("Do you want to accept the friend request from " + fr.getUser() + "? (yes/no)");
+        String response = scanner.nextLine().trim().toLowerCase();
+
+        switch (response) {
+            case "yes":
+                PlatformUser sender = fr.accept(fd);
+                if (sender != null) {
+                    friends.add(sender); // Add the sender to the friends list
+                    friendRequests.remove(fr); // Remove the friend request after accepting
+                    fd.saveUsers(); // Update the database
+                    return true;
+                } else {
+                    return false;
+                }
+            case "no":
+                friendRequests.remove(fr); // Remove the friend request after declining
+                fd.saveUsers(); // Update the database
+                return false;
+            default:
+                return false;
+        }
+    }
+
 }
