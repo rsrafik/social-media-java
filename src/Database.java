@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Interface for FoundationDatabase, defining methods to manage users and posts
@@ -23,29 +25,27 @@ public interface Database {
      * Adds a new user to the database and saves it to persistent storage.
      *
      * @param user The PlatformUser to add to the database
-     * @throws InterruptedException if the thread is interrupted during the operation
      */
-    void addUser(PlatformUser user) throws InterruptedException;
+    void addUser(PlatformUser user);
 
     /**
      * Adds a new post to the database and saves it to persistent storage.
      *
      * @param post The PlatformPost to add to the database
-     * @throws InterruptedException if the thread is interrupted during the operation
      */
-    void addPost(PlatformPost post) throws InterruptedException;
+    void addPost(PlatformPost post);
 
     /**
      * Retrieves all users stored in the database.
      *
-     * @return An ArrayList of all PlatformUser objects in the database
+     * @return A LinkedHashMap of all PlatformUser objects with usernames as keys.
      */
-    ArrayList<PlatformUser> getAllUsers();
+    LinkedHashMap<String, PlatformUser> getAllUsers();
 
     /**
      * Retrieves all posts stored in the database.
      *
-     * @return An ArrayList of all PlatformPost objects in the database
+     * @return A LinkedHashMap of all PlatformPost objects with post IDs as keys.
      */
-    ArrayList<PlatformPost> getAllPosts();
+    LinkedHashMap<Integer, PlatformPost> getAllPosts();
 }

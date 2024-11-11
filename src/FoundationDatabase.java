@@ -1,166 +1,135 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 /**
  * FoundationDatabase
- * <p>
- * This class manages a database of User objects and their associated Posts. It provides
- * methods to read users from a file, add new users, retrieve all users, and retrieve all posts.
- * Users are stored in a serialized file format and loaded upon instantiation.
  *
- * @author Rachel Rafik, L22
- * @version November 1, 2024
+ * This class manages a database of User objects and their associated Posts.
+ * It provides methods to read users and posts from files, add new users and posts,
+ * and retrieve all users and posts.
+ *
+ * @version November 3, 2024
  */
 public class FoundationDatabase implements Database {
-    private static ArrayList<PlatformUser> users;  // List of User objects in the database
-    private static ArrayList<PlatformPost> posts; //List of Post objects in the database
-    private static final Object GATEKEEPER = new Object(); // Synchronization lock for thread safety
+    private LinkedHashMap<String, PlatformUser> users = new LinkedHashMap<>(); // Map of users
+    private LinkedHashMap<Integer, PlatformPost> posts = new LinkedHashMap<>(); // Map of posts
+    private static final String USERS_FILE = "users.dat";
+    private static final String POSTS_FILE = "posts.dat";
+    private static final Object USER_LOCK = new Object(); // Synchronization lock for users
+    private static final Object POST_LOCK = new Object(); // Synchronization lock for posts
 
     /**
-     * Constructs a FoundationDatabase instance and initializes the user list.
-     */
-    public FoundationDatabase() {
-        users = new ArrayList<>();
-        posts = new ArrayList<>();
-    }
-
-    /**
-     * Reads User objects from the file "users.dat" and populates the users list.
-     * If the file does not exist, a message is printed indicating so.
+     * Reads users from a persistent storage (users.dat) into the database.
      */
     public void readUsers() {
-        try (FileInputStream fileIn = new FileInputStream("users.dat");
-             ObjectInputStream in = new ObjectInputStream(fileIn)) {
-
-            while (true) {
-                try {
-                    PlatformUser user = (PlatformUser) in.readObject();
-                    users.add(user);
-                } catch (EOFException e) {
-                    break;
-                }
+        synchronized (USER_LOCK) {
+            try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(USERS_FILE))) {
+                users = (LinkedHashMap<String, PlatformUser>) in.readObject();
+            } catch (FileNotFoundException e) {
+                System.out.println("No existing user data found. Starting with an empty database.");
+            } catch (IOException | ClassNotFoundException e) {
+                System.out.println("Error reading user data. Starting with an empty database.");
+                users = new LinkedHashMap<>();
             }
-
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Does not exist yet"); // File not found or no users saved yet
         }
     }
 
     /**
-     * Reads Post objects from the file "posts.dat" and populates the posts list.
-     * If the file does not exist, a message is printed indicating so.
+     * Reads posts from a persistent storage (posts.dat) into the database.
      */
     public void readPosts() {
-        try (FileInputStream fileIn = new FileInputStream("posts.dat");
-             ObjectInputStream in = new ObjectInputStream(fileIn)) {
+        synchronized (POST_LOCK) {
+            try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(POSTS_FILE))) {
+                posts = (LinkedHashMap<Integer, PlatformPost>) in.readObject();
+            } catch (FileNotFoundException e) {
+                System.out.println("No existing post data found. Starting with an empty database.");
+            } catch (IOException | ClassNotFoundException e) {
+                System.out.println("Error reading post data. Starting with an empty database.");
+                posts = new LinkedHashMap<>();
+            }
+        }
+    }
 
-            while (true) {
-                try {
-                    PlatformPost post = (PlatformPost) in.readObject();
-                    posts.add(post);
-                } catch (EOFException e) {
-                    break;
+    /**
+     * Adds a new user to the database and saves it to persistent storage.
+     *
+     * @param user The PlatformUser to add to the database
+     */
+    public void addUser(PlatformUser user) {
+        synchronized (USER_LOCK) {
+            users.put(user.getUsername(), user);
+            saveUsers();
+        }
+    }
+
+    /**
+     * Adds a new post to the database and saves it to persistent storage.
+     *
+     * @param post The PlatformPost to add to the database
+     */
+    public void addPost(PlatformPost post) {
+        synchronized (POST_LOCK) {
+            posts.put(post.getPostId(), post);
+            savePosts();
+
+            if (users.containsKey(post.getCreator())) {
+                PlatformUser user = users.get(post.getCreator());
+                if (user != null) {
+                    user.getPosts().add(post);
+                    saveUsers();
+                } else {
+                    System.out.println("User not found for creator: " + post.getCreator());
                 }
-            }
-
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Does not exist yet"); // File not found or no users saved yet
-        }
-    }
-
-    /**
-     * Adds a new User object to the database, appending it to the "users.dat" file.
-     * Synchronization ensures thread-safe access.
-     *
-     * @param user The User object to be added to the database
-     * @throws InterruptedException if thread synchronization is interrupted
-     */
-    public void addUser(PlatformUser user) throws InterruptedException {
-        synchronized (GATEKEEPER) {
-            users.add(user);
-
-            boolean append = new File("users.dat").exists(); // Check if file exists to determine append mode
-
-            try (FileOutputStream fileOut = new FileOutputStream("users.dat", true);
-                 ObjectOutputStream out = append ? new AppendableObjectOutputStream(fileOut) :
-                         new ObjectOutputStream(fileOut)) {
-                out.writeObject(user); // Serialize and write User to file
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.out.println("Error writing file"); // Error during file output
+            } else {
+                System.out.println("Creator ID not found in users map: " + post.getCreator());
             }
         }
     }
 
-    /**
-     * Adds a new Post object to the database, appending it to the "posts.dat" file.
-     * Synchronization ensures thread-safe access.
-     *
-     * @param post The Post object to be added to the database
-     * @throws InterruptedException if thread synchronization is interrupted
-     */
-    public void addPost(PlatformPost post) throws InterruptedException {
-        synchronized (GATEKEEPER) {
-            posts.add(post);
-
-            boolean append = new File("posts.dat").exists(); // Check if file exists to determine append mode
-
-            try (FileOutputStream fileOut = new FileOutputStream("posts.dat", true);
-                 ObjectOutputStream out = append ? new AppendableObjectOutputStream(fileOut) :
-                         new ObjectOutputStream(fileOut)) {
-                out.writeObject(post); // Serialize and write User to file
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.out.println("Error writing file"); // Error during file output
-            }
-        }
-    }
 
     /**
-     * Retrieves all User objects in the database as an array.
+     * Retrieves all users stored in the database.
      *
-     * @return An array of User objects in the database
+     * @return A LinkedHashMap of PlatformUser objects with usernames as keys.
      */
-    public ArrayList<PlatformUser> getAllUsers() {
+    public LinkedHashMap<String, PlatformUser> getAllUsers() {
         return users;
     }
 
     /**
-     * Retrieves all Post objects in the database as an array.
+     * Retrieves all posts stored in the database.
      *
-     * @return An array of Post objects in the database
+     * @return A LinkedHashMap of PlatformPost objects with post IDs as keys.
      */
-    public ArrayList<PlatformPost> getAllPosts() {
+    public LinkedHashMap<Integer, PlatformPost> getAllPosts() {
         return posts;
     }
 
     /**
-     * AppendableObjectOutputStream
-     * <p>
-     * Custom ObjectOutputStream that avoids writing a new header when appending
-     * objects to an existing file. This helps prevent file corruption due to
-     * multiple headers in the same file.
+     * Saves the users map to the users.dat file.
      */
-    private static class AppendableObjectOutputStream extends ObjectOutputStream {
-
-        /**
-         * Constructs an AppendableObjectOutputStream.
-         *
-         * @param out The OutputStream to write to
-         * @throws IOException if an I/O error occurs
-         */
-        public AppendableObjectOutputStream(OutputStream out) throws IOException {
-            super(out);
+    public void saveUsers() {
+        synchronized (USER_LOCK) {
+            try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(USERS_FILE))) {
+                out.writeObject(users);
+            } catch (IOException e) {
+                System.out.println("Error saving user data: " + e.getMessage());
+            }
         }
+    }
 
-        /**
-         * Overrides writeStreamHeader to prevent writing a new header for appending.
-         *
-         * @throws IOException if an I/O error occurs
-         */
-        @Override
-        protected void writeStreamHeader() throws IOException {
-            reset(); // Avoids writing a new header when appending
+    /**
+     * Saves the posts map to the posts.dat file.
+     */
+    public void savePosts() {
+        synchronized (POST_LOCK) {
+            try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(POSTS_FILE))) {
+                System.out.println("Saving data...");
+                out.writeObject(posts);
+            } catch (IOException e) {
+                System.out.println("Error saving post data: " + e.getMessage());
+            }
         }
     }
 }

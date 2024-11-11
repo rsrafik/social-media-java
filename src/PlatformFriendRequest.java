@@ -1,4 +1,5 @@
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 
 /**
  * PlatformFriendRequest
@@ -13,8 +14,7 @@ import java.io.Serializable;
 public class PlatformFriendRequest implements FriendRequest, Serializable {
 
     // FIELDS
-
-    private int userId;      // ID of the user who sent the friend request
+    private String user;      // ID of the user who sent the friend request
     private String message;  // Optional message included with the friend request
 
     // CONSTRUCTORS
@@ -22,11 +22,11 @@ public class PlatformFriendRequest implements FriendRequest, Serializable {
     /**
      * Constructs a PlatformFriendRequest with a specified user ID and message.
      *
-     * @param userId  The ID of the user who sent the friend request
+     * @param user  The ID of the user who sent the friend request
      * @param message The message accompanying the friend request
      */
-    public PlatformFriendRequest(int userId, String message) {
-        this.userId = userId;
+    public PlatformFriendRequest(String user, String message) {
+        this.user = user;
         this.message = message;
     }
 
@@ -37,9 +37,8 @@ public class PlatformFriendRequest implements FriendRequest, Serializable {
      *
      * @return The user ID of the sender
      */
-    @Override
-    public int getUserId() {
-        return userId;
+    public String getUser() {
+        return user;
     }
 
     /**
@@ -50,5 +49,38 @@ public class PlatformFriendRequest implements FriendRequest, Serializable {
     @Override
     public String getMessage() {
         return message;
+    }
+
+    public static boolean sendFriendRequest(String to, String from, String message, FoundationDatabase fd) {
+        LinkedHashMap<String, PlatformUser> users = fd.getAllUsers();
+
+        if (!users.containsKey(to)) {
+            System.out.println("User '" + to + "' not found.");
+            return false;
+        }
+
+        PlatformUser recipient = users.get(to);
+        PlatformFriendRequest friendRequest = new PlatformFriendRequest(from, message);
+
+        recipient.getFriendRequests().add(friendRequest); // Add friend request to recipient's list
+        fd.saveUsers(); // Save the updated users list to persistent storage
+
+        System.out.println("Friend request sent from '" + from + "' to '" + to + "'.");
+        return true;
+    }
+
+    public PlatformUser accept(FoundationDatabase fd) {
+        LinkedHashMap<String, PlatformUser> users = fd.getAllUsers();
+
+        // Retrieve and return the sender's PlatformUser object
+        if (users.containsKey(user)) {
+            fd.saveUsers();
+            return users.get(user);
+        } else {
+            System.out.println("User '" + user + "' not found in the database.");
+            return null;
+        }
+
+
     }
 }
