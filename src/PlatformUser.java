@@ -1,27 +1,27 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * PlatformUser
  *
- * This class represents a user on the platform with unique user ID, username, password,
- * and lists to store posts, friends, blocked users, and friend requests.
- * This class is serializable to allow persistence.
+ * This class represents a user on the platform with unique user ID, username, password, and lists
+ * to store posts, friends, blocked users, and friend requests. This class is serializable to allow
+ * persistence.
  */
 public class PlatformUser implements User, Serializable {
 
     // Static Fields
+    // TODO: change this
     private static final String USER_COUNT_FILE = "userCount.dat";
-    private static Integer userCount = loadUserCount(); // Load userCount from file on startup
+    private static Integer userCount = 0;
+    // private static Integer userCount = loadUserCount(); // Load userCount from file on startup
 
     // Instance Fields
     private Integer userId; // Unique identifier for the user (non-static)
     private String username; // Username of the user
     private String password; // Password of the user
-    private ArrayList<PlatformPost> posts; // List of posts created by the user
-    private ArrayList<PlatformUser> friends; // List of friend user IDs
+    private ArrayList<Integer> postIds; // List of posts created by the user
+    private ArrayList<Integer> friendIds; // List of friend user IDs
     private ArrayList<Integer> blockedUserIds; // List of blocked user IDs
     private ArrayList<PlatformFriendRequest> friendRequests; // List of friend requests
 
@@ -31,8 +31,8 @@ public class PlatformUser implements User, Serializable {
         this.password = password;
         this.userId = userCount++;
         saveUserCount(); // Save the incremented userCount to the file
-        posts = new ArrayList<>();
-        friends = new ArrayList<>();
+        postIds = new ArrayList<>();
+        friendIds = new ArrayList<>();
         blockedUserIds = new ArrayList<>();
         friendRequests = new ArrayList<>();
     }
@@ -49,7 +49,8 @@ public class PlatformUser implements User, Serializable {
 
     // Static Method to Save userCount to a File
     private static void saveUserCount() {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(USER_COUNT_FILE))) {
+        try (ObjectOutputStream out =
+                new ObjectOutputStream(new FileOutputStream(USER_COUNT_FILE))) {
             out.writeInt(userCount);
         } catch (IOException e) {
             System.err.println("Error saving user count: " + e.getMessage());
@@ -82,14 +83,18 @@ public class PlatformUser implements User, Serializable {
 
     // Getter for posts
     @Override
-    public ArrayList<PlatformPost> getPosts() {
-        return posts;
+    public ArrayList<Integer> getPostIds() {
+        return postIds;
+    }
+
+    void addPost(int postId) {
+        postIds.add(postId);
     }
 
     // Getter for friends
     @Override
-    public ArrayList<PlatformUser> getFriends() {
-        return friends;
+    public ArrayList<Integer> getFriendIds() {
+        return friendIds;
     }
 
     // Getter for blockedUserIds
@@ -104,20 +109,10 @@ public class PlatformUser implements User, Serializable {
         return friendRequests;
     }
 
-    // Method to retrieve post IDs
-    @Override
-    public ArrayList<Integer> getPostIds() {
-        ArrayList<Integer> postIds = new ArrayList<>();
-        for (PlatformPost post : posts) {
-            postIds.add(post.getPostId());
-        }
-        return postIds;
-    }
-
     // Method to count friends
     @Override
     public int friendCount() {
-        return friends.size();
+        return friendIds.size();
     }
 
     // Method to count blocked users
@@ -129,7 +124,7 @@ public class PlatformUser implements User, Serializable {
     // Method to count posts
     @Override
     public int postCount() {
-        return posts.size();
+        return postIds.size();
     }
 
     // Method to count friend requests
@@ -140,47 +135,17 @@ public class PlatformUser implements User, Serializable {
 
     // Method to test if the given password matches the user's password
     @Override
-    public boolean testPassword(String testedPassword) {
-        return this.password.equals(testedPassword);
+    public boolean testPassword(String password) {
+        return this.password.equals(password);
     }
 
-    // Method to test if the given username matches the user's username
-    @Override
-    public boolean testUsername(String testedUsername) {
-        return this.username.equals(testedUsername);
-    }
 
     // Equals method to compare PlatformUser objects by userId
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof PlatformUser) {
-            return ((PlatformUser) obj).getUserId() == this.userId;
+        if (obj instanceof PlatformUser user) {
+            return this.userId == user.getUserId();
         }
         return false;
     }
-
-    public boolean answerFriendRequest(PlatformFriendRequest fr, Scanner scanner, FoundationDatabase fd) {
-        System.out.println("Do you want to accept the friend request from " + fr.getUser() + "? (yes/no)");
-        String response = scanner.nextLine().trim().toLowerCase();
-
-        switch (response) {
-            case "yes":
-                PlatformUser sender = fr.accept(fd);
-                if (sender != null) {
-                    friends.add(sender); // Add the sender to the friends list
-                    friendRequests.remove(fr); // Remove the friend request after accepting
-                    fd.saveUsers(); // Update the database
-                    return true;
-                } else {
-                    return false;
-                }
-            case "no":
-                friendRequests.remove(fr); // Remove the friend request after declining
-                fd.saveUsers(); // Update the database
-                return false;
-            default:
-                return false;
-        }
-    }
-
 }

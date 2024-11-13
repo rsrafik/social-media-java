@@ -5,9 +5,9 @@ import java.util.ArrayList;
 /**
  * PlatformPost
  * <p>
- * This class represents a post on a platform that supports upvotes, downvotes, and comments.
- * Each post includes an owner ID, post content, unique post ID, lists for upvotes and
- * downvotes, and a list of comments. This class implements the Post interface and is serializable.
+ * This class represents a post on a platform that supports upvotes, downvotes, and comments. Each
+ * post includes an owner ID, post content, unique post ID, lists for upvotes and downvotes, and a
+ * list of comments. This class implements the Post interface and is serializable.
  * </p>
  *
  * @author Rachel Rafik, L22
@@ -16,12 +16,13 @@ import java.util.ArrayList;
 public class PlatformPost implements Post, Serializable {
 
     // Static Fields
-    private static final String POST_COUNT_FILE = "postCount.dat";
-    private static int postCount = loadPostCount(); // Load postCount from file on startup
+    // private static final String POST_COUNT_FILE = "postCount.dat";
+    private static int postCount = 0;
+    // private static int postCount = loadPostCount(); // Load postCount from file on startup
 
     // Instance Fields
     private Integer postId; // Unique ID for the post
-    private String creator; // username of the user who created the post
+    private int creatorId; // username of the user who created the post
     private String content; // The text content of the post
     private ArrayList<Integer> upvoteIds; // List of user IDs who upvoted the post
     private ArrayList<Integer> downvoteIds; // List of user IDs who downvoted the post
@@ -31,62 +32,64 @@ public class PlatformPost implements Post, Serializable {
     // Constructors
 
     /**
-     * Constructs a PlatformPost with the specified creator ID and content.
-     * Initializes lists for upvotes, downvotes, and comments.
+     * Constructs a PlatformPost with the specified creator ID and content. Initializes lists for
+     * upvotes, downvotes, and comments.
      *
      * @param creator The username of the user who created the post
-     * @param content   The text content of the post
+     * @param content The text content of the post
      */
-    public PlatformPost(String creator, String content) {
-        this.creator = creator;
-        this.content = content;
-        this.upvoteIds = new ArrayList<>();
-        this.downvoteIds = new ArrayList<>();
-        this.comments = new ArrayList<>();
-        this.image = null;
-
+    public PlatformPost(int creatorId, String content, BufferedImage image) {
         this.postId = postCount++;
-        savePostCount(); // Save the incremented postCount to the file
-    }
 
-    /**
-     * Constructs a PlatformPost with the specified creator ID, content, and image.
-     * Initializes lists for upvotes, downvotes, and comments.
-     *
-     * @param creator The ID of the user who created the post
-     * @param content   The text content of the post
-     * @param image     The image associated with the post
-     */
-    public PlatformPost(String creator, String content, BufferedImage image) {
-        this.creator = creator;
+        this.creatorId = creatorId;
         this.content = content;
-        this.upvoteIds = new ArrayList<>();
-        this.downvoteIds = new ArrayList<>();
-        this.comments = new ArrayList<>();
         this.image = image;
 
-        this.postId = postCount++;
-        savePostCount(); // Save the incremented postCount to the file
+        this.upvoteIds = new ArrayList<>();
+        this.downvoteIds = new ArrayList<>();
+        this.comments = new ArrayList<>();
+        // savePostCount(); // Save the incremented postCount to the file
     }
+
+    // /**
+    // * Constructs a PlatformPost with the specified creator ID, content, and image.
+    // * Initializes lists for upvotes, downvotes, and comments.
+    // *
+    // * @param creator The ID of the user who created the post
+    // * @param content The text content of the post
+    // * @param image The image associated with the post
+    // */
+    // public PlatformPost(String creator, String content, BufferedImage image) {
+    // this.creator = creator;
+    // this.content = content;
+    // this.upvoteIds = new ArrayList<>();
+    // this.downvoteIds = new ArrayList<>();
+    // this.comments = new ArrayList<>();
+    // this.image = image;
+
+    // this.postId = postCount++;
+    // savePostCount(); // Save the incremented postCount to the file
+    // }
 
     // Static Method to Load postCount from a File
-    private static int loadPostCount() {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(POST_COUNT_FILE))) {
-            return in.readInt();
-        } catch (IOException e) {
-            // File does not exist or cannot be read, default to 0
-            return 0;
-        }
-    }
+    // private static int loadPostCount() {
+    // try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(POST_COUNT_FILE))) {
+    // return in.readInt();
+    // } catch (IOException e) {
+    // // File does not exist or cannot be read, default to 0
+    // return 0;
+    // }
+    // }
 
-    // Static Method to Save postCount to a File
-    private static void savePostCount() {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(POST_COUNT_FILE))) {
-            out.writeInt(postCount);
-        } catch (IOException e) {
-            System.err.println("Error saving post count: " + e.getMessage());
-        }
-    }
+    // // Static Method to Save postCount to a File
+    // private static void savePostCount() {
+    // try (ObjectOutputStream out =
+    // new ObjectOutputStream(new FileOutputStream(POST_COUNT_FILE))) {
+    // out.writeInt(postCount);
+    // } catch (IOException e) {
+    // System.err.println("Error saving post count: " + e.getMessage());
+    // }
+    // }
 
     // Getters/Setters and Methods
 
@@ -106,8 +109,8 @@ public class PlatformPost implements Post, Serializable {
      * @return The username of the post owner
      */
     @Override
-    public String getCreator() {
-        return creator;
+    public int getCreatorId() {
+        return creatorId;
     }
 
     /**

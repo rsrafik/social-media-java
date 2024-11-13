@@ -4,25 +4,27 @@ import java.util.LinkedHashMap;
 /**
  * PlatformFriendRequest
  * <p>
- * This class represents a friend request on the platform, containing the ID of the user
- * who sent the request and an optional message. The class implements the FriendRequest
- * interface and is serializable to allow for persistence.
+ * This class represents a friend request on the platform, containing the ID of the user who sent
+ * the request and an optional message. The class implements the FriendRequest interface and is
+ * serializable to allow for persistence.
  *
  * @author Rachel Rafik, L22
  * @version November 1, 2024
  */
 public class PlatformFriendRequest implements FriendRequest, Serializable {
 
+    private int fromId;
+
     // FIELDS
-    private String user;      // ID of the user who sent the friend request
-    private String message;  // Optional message included with the friend request
+    private String user; // ID of the user who sent the friend request
+    private String message; // Optional message included with the friend request
 
     // CONSTRUCTORS
 
     /**
      * Constructs a PlatformFriendRequest with a specified user ID and message.
      *
-     * @param user  The ID of the user who sent the friend request
+     * @param user The ID of the user who sent the friend request
      * @param message The message accompanying the friend request
      */
     public PlatformFriendRequest(String user, String message) {
@@ -51,7 +53,8 @@ public class PlatformFriendRequest implements FriendRequest, Serializable {
         return message;
     }
 
-    public static boolean sendFriendRequest(String to, String from, String message, FoundationDatabase fd) {
+    public static boolean sendFriendRequest(String to, String from, String message,
+            FoundationDatabase fd) {
         LinkedHashMap<String, PlatformUser> users = fd.getAllUsers();
 
         if (!users.containsKey(to)) {

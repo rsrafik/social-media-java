@@ -3,10 +3,9 @@ import java.util.List;
 /**
  * User
  * <p>
- * This interface defines the structure for a user on a platform, including methods
- * for managing the user's friends, blocked users, posts, and friend requests.
- * It provides methods for retrieving user information, updating usernames and passwords,
- * and verifying login credentials.
+ * This interface defines the structure for a user on a platform, including methods for managing the
+ * user's friends, blocked users, posts, and friend requests. It provides methods for retrieving
+ * user information, updating usernames and passwords, and verifying login credentials.
  * </p>
  *
  * @author Ropan Datta, L22
@@ -51,19 +50,11 @@ public interface User {
     boolean testPassword(String password);
 
     /**
-     * Checks whether the provided username matches the user's username.
-     *
-     * @param username The username to test
-     * @return true if the username matches, false otherwise
-     */
-    boolean testUsername(String username);
-
-    /**
      * Retrieves the IDs of the user's friends.
      *
      * @return A list of user IDs representing the user's friends
      */
-    List<PlatformUser> getFriends();
+    List<Integer> getFriendIds();
 
     /**
      * Retrieves the IDs of users blocked by the user.
@@ -78,13 +69,6 @@ public interface User {
      * @return A list of post IDs created by the user
      */
     List<Integer> getPostIds();
-
-    /**
-     * Retrieves an array of posts created by the user.
-     *
-     * @return An array of the user's posts
-     */
-    List<? extends Post> getPosts();
 
     /**
      * Retrieves the pending friend requests sent to the user.

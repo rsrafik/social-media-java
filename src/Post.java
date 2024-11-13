@@ -4,8 +4,8 @@ import java.awt.Image;
 /**
  * Post
  * <p>
- * This interface defines the structure for a post on a platform, including methods
- * for managing upvotes, downvotes, comments, and retrieving the content of the post.
+ * This interface defines the structure for a post on a platform, including methods for managing
+ * upvotes, downvotes, comments, and retrieving the content of the post.
  * </p>
  *
  * @author Ropan Datta, L22
@@ -20,12 +20,14 @@ public interface Post {
      */
     int getPostId();
 
-    /**
-     * Retrieves the username of the user who created the post.
-     *
-     * @return The username of the creator
-     */
-    String getCreator();
+    // /**
+    // * Retrieves the username of the user who created the post.
+    // *
+    // * @return The username of the creator
+    // */
+    // String getCreator();
+
+    int getCreatorId();
 
     /**
      * Retrieves the number of users who upvoted the post.
@@ -88,7 +90,7 @@ public interface Post {
      *
      * @param userId The ID of the user upvoting the post
      * @return true if the user's upvote was added successfully, false if the user had already
-     * upvoted
+     *         upvoted
      */
     boolean addUpvote(int userId);
 
@@ -97,7 +99,7 @@ public interface Post {
      *
      * @param userId The ID of the user downvoting the post
      * @return true if the user's downvote was added successfully, false if the user had already
-     * downvoted
+     *         downvoted
      */
     boolean addDownvote(int userId);
 
@@ -109,8 +111,8 @@ public interface Post {
     void addComment(Comment comment);
 
     /**
-     * Calculates and returns the score of the post, defined as the difference
-     * between the number of upvotes and downvotes.
+     * Calculates and returns the score of the post, defined as the difference between the number of
+     * upvotes and downvotes.
      *
      * @return The score of the post
      */

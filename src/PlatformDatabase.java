@@ -9,94 +9,143 @@ import java.util.*;
  *
  * @version November 3, 2024
  */
-public class PlatformDatabase implements Database {
-    private LinkedHashMap<String, PlatformUser> users = new LinkedHashMap<>(); // Map of users
-    private LinkedHashMap<Integer, PlatformPost> posts = new LinkedHashMap<>(); // Map of posts
-    private static final String USERS_FILE = "users.dat";
-    private static final String POSTS_FILE = "posts.dat";
+public class PlatformDatabase /* TODO: implements Database */ {
     private static final Object USER_LOCK = new Object(); // Synchronization lock for users
     private static final Object POST_LOCK = new Object(); // Synchronization lock for posts
 
+    // these two are kinda only useful for saving to file
+    private ArrayList<PlatformUser> users;
+    private ArrayList<PlatformPost> posts;
+
+    private HashMap<Integer, PlatformUser> userMap;
+    private LinkedHashMap<String, Integer> usernameMap;
+    private LinkedHashMap<Integer, PlatformPost> postMap; // Map of posts
+
+    public PlatformDatabase() {
+        users = new ArrayList<>();
+        posts = new ArrayList<>();
+        userMap = new HashMap<>();
+        usernameMap = new LinkedHashMap<>();
+        postMap = new LinkedHashMap<>();
+    }
+
     /**
-     * Reads users from a persistent storage (users.dat) into the database.
+     * Reads users from a file on disk
+     * 
+     * @param filename the file to read from
+     * @throws IOException if a file I/O error occurs
+     * @throws ClassNotFoundException if there is bad data in the file
      */
-    @SuppressWarnings("unchecked")
-    public void readUsers() {
+    public void readUsers(String filename) throws IOException, ClassNotFoundException {
         synchronized (USER_LOCK) {
-            try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(USERS_FILE))) {
-                users = (LinkedHashMap<String, PlatformUser>) in.readObject();
-            } catch (FileNotFoundException e) {
-                System.out.println("No existing user data found. Starting with an empty database.");
-                users = new LinkedHashMap<>();
+            ArrayList<PlatformUser> userList = new ArrayList<>();
+            try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
+                while (true) {
+                    try {
+                        userList.add((PlatformUser) in.readObject());
+                    } catch (EOFException e) {
+                        break; // End of file reached
+                    }
+                }
             } catch (IOException | ClassNotFoundException e) {
-                System.out.println("Error reading user data. Starting with an empty database.");
-                users = new LinkedHashMap<>();
+                throw e;
+            }
+            // We only add the users if the entire file is read successfully.
+            for (PlatformUser user : userList) {
+                addUser(user);
             }
         }
     }
 
     /**
-     * Reads posts from a persistent storage (posts.dat) into the database.
+     * Reads posts from a file on disk
+     * 
+     * @param filename the file to read from
+     * @throws IOException if a file I/O error occurs
+     * @throws ClassNotFoundException if there is bad data in the file
      */
-    @SuppressWarnings("unchecked")
-    public void readPosts() {
+    public void readPosts(String filename) throws IOException, ClassNotFoundException {
         synchronized (POST_LOCK) {
-            try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(POSTS_FILE))) {
-                posts = (LinkedHashMap<Integer, PlatformPost>) in.readObject();
-            } catch (FileNotFoundException e) {
-                System.out.println("No existing post data found. Starting with an empty database.");
-                posts = new LinkedHashMap<>();
+            ArrayList<PlatformPost> postList = new ArrayList<>();
+            try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename))) {
+                while (true) {
+                    try {
+                        postList.add((PlatformPost) in.readObject());
+                    } catch (EOFException e) {
+                        break; // End of file reached
+                    }
+                }
             } catch (IOException | ClassNotFoundException e) {
-                System.out.println("Error reading post data. Starting with an empty database.");
-                posts = new LinkedHashMap<>();
+                throw e;
+            }
+            // We only add the posts if the entire file is read successfully.
+            for (PlatformPost post : postList) {
+                addPost(post);
             }
         }
     }
 
     /**
-     * Adds a new user to the database and saves it to persistent storage.
+     * Adds a new user to the database.
      *
      * @param user The PlatformUser to add to the database
      */
     public void addUser(PlatformUser user) {
         synchronized (USER_LOCK) {
-            users.put(user.getUsername(), user);
-            saveUsers();
+            users.add(user);
+            userMap.put(user.getUserId(), user);
+            usernameMap.put(user.getUsername(), user.getUserId());
         }
     }
 
     /**
-     * Adds a new post to the database and saves it to persistent storage.
+     * Adds a new post to the database.
      *
      * @param post The PlatformPost to add to the database
      */
     public void addPost(PlatformPost post) {
-        synchronized (POST_LOCK) {
-            posts.put(post.getPostId(), post);
-            savePosts();
-
-            if (users.containsKey(post.getCreator())) {
-                PlatformUser user = users.get(post.getCreator());
-                if (user != null) {
-                    user.getPosts().add(post);
-                    saveUsers();
-                } else {
-                    System.out.println("User not found for creator: " + post.getCreator());
-                }
-            } else {
-                System.out.println("Creator ID not found in users map: " + post.getCreator());
+        synchronized (USER_LOCK) {
+            synchronized (POST_LOCK) {
+                int creatorId = post.getCreatorId();
+                PlatformUser creator = userMap.get(creatorId);
+                creator.addPost(post.getPostId());
+                posts.add(post);
+                postMap.put(post.getPostId(), post);
             }
         }
     }
 
+    /**
+     * Retrieves the unique user associated with an integer id.
+     * 
+     * @param id the unique id of the user we
+     * @return the user associated with the integer id
+     */
+    public PlatformUser getUser(int id) {
+        return userMap.get(id);
+    }
+
+    /**
+     * Retrieves the unique integer id associated with a username.
+     * 
+     * @param username the username to query
+     * @return the unique integer id associated witht the username or null if the user doesn't exist
+     */
+    public Integer getUserId(String username) {
+        return usernameMap.get(username);
+    }
 
     /**
      * Retrieves all users stored in the database.
      *
      * @return A LinkedHashMap of PlatformUser objects with usernames as keys.
      */
-    public LinkedHashMap<String, PlatformUser> getAllUsers() {
+    public ArrayList<PlatformUser> getUsers() {
         return users;
+    }
+
+    public PlatformPost getPost(int id) {
+        return postMap.get(id);
     }
 
     /**
@@ -104,35 +153,45 @@ public class PlatformDatabase implements Database {
      *
      * @return A LinkedHashMap of PlatformPost objects with post IDs as keys.
      */
-    public LinkedHashMap<Integer, PlatformPost> getAllPosts() {
+    public ArrayList<PlatformPost> getPosts() {
         return posts;
     }
 
     /**
-     * Saves the users map to the users.dat file.
+     * Saves user information to disk.
+     * 
+     * @param filename the file to save to
      */
-    public void saveUsers() {
+    public void saveUsers(String filename) {
         synchronized (USER_LOCK) {
-            try (ObjectOutputStream out =
-                    new ObjectOutputStream(new FileOutputStream(USERS_FILE))) {
+            try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
+                for (PlatformUser user : users) {
+                    out.writeObject(user);
+                }
                 out.writeObject(users);
             } catch (IOException e) {
-                System.out.println("Error saving user data: " + e.getMessage());
+                // System.out.println("Error saving user data: " + e.getMessage());
+                e.printStackTrace();
             }
         }
     }
 
     /**
-     * Saves the posts map to the posts.dat file.
+     * Saves post information to disk.
+     * 
+     * @param filename the file to save to
      */
-    public void savePosts() {
+    public void savePosts(String filename) {
         synchronized (POST_LOCK) {
-            try (ObjectOutputStream out =
-                    new ObjectOutputStream(new FileOutputStream(POSTS_FILE))) {
+            try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
                 System.out.println("Saving data...");
+                for (PlatformPost post : posts) {
+                    out.writeObject(post);
+                }
                 out.writeObject(posts);
             } catch (IOException e) {
-                System.out.println("Error saving post data: " + e.getMessage());
+                // System.out.println("Error saving post data: " + e.getMessage());
+                e.printStackTrace();
             }
         }
     }

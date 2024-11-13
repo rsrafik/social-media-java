@@ -1,31 +1,38 @@
 import java.io.*;
+import java.util.*;
 import java.net.*;
 
 /**
  * ExampleClient
+ * 
+ * @author Ropan Datta, L22
+ * @version November 13, 2024
  */
 public class ExampleClient {
     public static void main(String[] args) throws IOException {
-        try (Socket socket = new Socket("localhost", 5678)) {
+        Scanner sc = new Scanner(System.in);
+        try (Socket socket = new Socket("localhost", 5000)) {
             ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
             ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
             outputStream.flush();
+            outputStream.writeObject(OperationType.TESTING);
+            outputStream.writeObject(true);
+            outputStream.writeObject(OperationType.TESTING);
+            outputStream.writeObject("Hello");
+            outputStream.writeObject(OperationType.TESTING);
+            outputStream.writeObject(Boolean.TRUE);
+            outputStream.flush();
             for (int i = 0; i < 10; i++) {
-                PlatformUser user = new PlatformUser("user" + i, "world");
-                outputStream.writeObject(OperationType.ADD_USER);
-                outputStream.writeObject(user);
+                // The client only provides a username and password.
+                // It does not know anything about the representation of user data
+                // including user ids.
+                outputStream.writeObject(OperationType.CREATE_USER);
+                outputStream.writeObject("hello" + i);
+                outputStream.writeObject("world");
                 outputStream.flush();
             }
-            // PlatformUser user = new PlatformUser("hello", "world");
-            // System.out.println(user.getUserId());
-            // System.out.println(user.getUsername());
-            // System.out.println(user.postCount());
-            // outputStream.writeObject(OperationType.ADD_USER);
-            // outputStream.writeObject(user);
-            // System.out.println(user.getUserId());
-            // System.out.println(user.getUsername());
-            // System.out.println(user.postCount());
-            // // PlatformUser user2 = (PlatformUser) inputStream.readObject();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

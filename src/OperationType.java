@@ -1,4 +1,10 @@
+/**
+ * OperationType
+ * 
+ * @author Ropan Datta, L22
+ * @version November 13, 2022
+ */
+
 public enum OperationType {
-    // ADD_USER, ADD_POST, SEND_FRIENDREQUEST
-    LOGIN, CREATE_USER, CREATE_POST, SEND_FRIENDREQUEST, TESTING
+    IS_LOGGEDIN, LOGIN, LOGOUT, CREATE_USER, CREATE_POST, SEND_FRIENDREQUEST, TESTING
 }

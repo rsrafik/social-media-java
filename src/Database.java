@@ -1,10 +1,8 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.*;
 
 /**
- * Interface for FoundationDatabase, defining methods to manage users and posts
- * in a persistent storage system.
+ * Interface for FoundationDatabase, defining methods to manage users and posts in a persistent
+ * storage system.
  *
  * @author Mckinley Newman, L22
  * @version November 3, 2024
@@ -40,12 +38,12 @@ public interface Database {
      *
      * @return A LinkedHashMap of all PlatformUser objects with usernames as keys.
      */
-    LinkedHashMap<String, PlatformUser> getAllUsers();
+    Map<String, ? extends User> getAllUsers();
 
     /**
      * Retrieves all posts stored in the database.
      *
      * @return A LinkedHashMap of all PlatformPost objects with post IDs as keys.
      */
-    LinkedHashMap<Integer, PlatformPost> getAllPosts();
+    Map<Integer, PlatformPost> getAllPosts();
 }
