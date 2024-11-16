@@ -28,5 +28,7 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-# Data Stuff
+# Custom
+*.class
 *.data
+*.ser
