@@ -50,8 +50,8 @@ public class DatabaseTestcase {
         // Prepare a test users.dat file with serialized PlatformUser objects
         try (FileOutputStream fileOut = new FileOutputStream("users.dat");
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-            out.writeObject(new PlatformUser("User1", "pass1"));
-            out.writeObject(new PlatformUser("User2", "pass2"));
+            out.writeObject(new PlatformUser(0,"User1", "pass1"));
+            out.writeObject(new PlatformUser(1,"User2", "pass2"));
         }
 
         db.readUsers();
@@ -87,8 +87,8 @@ public class DatabaseTestcase {
         // Prepare a test posts.dat file with serialized PlatformPost objects
         try (FileOutputStream fileOut = new FileOutputStream("posts.dat");
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-            out.writeObject(new PlatformPost(0, "Post1"));
-            out.writeObject(new PlatformPost(1, "Post2"));
+            out.writeObject(new PlatformPost(0, 0, "Post1", null));
+            out.writeObject(new PlatformPost(1, 1, "Post2", null));
         }
 
         db.readPosts();
@@ -119,7 +119,7 @@ public class DatabaseTestcase {
     @Test
     public void testAddUserToListAndFile() throws InterruptedException, IOException, ClassNotFoundException {
         FoundationDatabase db = new FoundationDatabase();
-        PlatformUser testUser = new PlatformUser("test", "test");
+        PlatformUser testUser = new PlatformUser(0, "test", "password");
         // Delete users.dat to start fresh
         File file = new File("users.dat");
         file.delete();
@@ -143,9 +143,9 @@ public class DatabaseTestcase {
     @Test
     public void testAddUserWithExistingFile() throws InterruptedException, IOException, ClassNotFoundException {
         FoundationDatabase db = new FoundationDatabase();
-        PlatformUser testUser = new PlatformUser("test", "test");
+        PlatformUser testUser = new PlatformUser(0, "test", "testPass");
         // Prepare a users.dat file with an initial user
-        PlatformUser initialUser = new PlatformUser("InitialUser", "password");
+        PlatformUser initialUser = new PlatformUser(0, "InitialUser", "password");
         try (FileOutputStream fileOut = new FileOutputStream("users.dat");
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
             out.writeObject(initialUser);
@@ -170,7 +170,7 @@ public class DatabaseTestcase {
     @Test
     public void testAddPostToListAndFile() throws InterruptedException, IOException, ClassNotFoundException {
         FoundationDatabase db = new FoundationDatabase();
-        PlatformPost testPost = new PlatformPost(0, "test");
+        PlatformPost testPost = new PlatformPost(0, 0, "test", null);
         // Delete posts.dat to start fresh
         File file = new File("posts.dat");
         file.delete();
@@ -194,9 +194,9 @@ public class DatabaseTestcase {
     @Test
     public void testAddPostWithExistingFile() throws InterruptedException, IOException, ClassNotFoundException {
         FoundationDatabase db = new FoundationDatabase();
-        PlatformPost testPost = new PlatformPost(0, "test");
+        PlatformPost testPost = new PlatformPost(0, 0, "test", null);
         // Prepare a posts.dat file with an initial post
-        PlatformPost initialPost = new PlatformPost(1, "InitialPost");
+        PlatformPost initialPost = new PlatformPost(1, 1, "InitialPost", null);
         try (FileOutputStream fileOut = new FileOutputStream("posts.dat");
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
             out.writeObject(initialPost);
@@ -221,8 +221,8 @@ public class DatabaseTestcase {
     public void testGetAllUsers() throws InterruptedException {
         FoundationDatabase db = new FoundationDatabase();
         // Add two users to the database
-        PlatformUser one = new PlatformUser("one", "one");
-        PlatformUser two = new PlatformUser("two", "two");
+        PlatformUser one = new PlatformUser(0, "one", "one");
+        PlatformUser two = new PlatformUser(1, "two", "two");
         db.addUser(one);
         db.addUser(two);
 
@@ -237,8 +237,8 @@ public class DatabaseTestcase {
     public void testGetAllPosts() throws InterruptedException {
         FoundationDatabase db = new FoundationDatabase();
         // Add two post to the database
-        PlatformPost one = new PlatformPost(1, "One");
-        PlatformPost two = new PlatformPost(2, "Two");
+        PlatformPost one = new PlatformPost(1, 1, "One", null);
+        PlatformPost two = new PlatformPost(2, 2, "Two", null);
         db.addPost(one);
         db.addPost(two);
 
@@ -248,5 +248,10 @@ public class DatabaseTestcase {
         Assert.assertTrue("Post one should be in the list", posts.contains(one));
         Assert.assertTrue("Post two should be in the list", posts.contains(two));
     }
+
+    /*
+     * will add a separate test here for adding photos to posts
+     *  -Mckinley
+     */
 
 }    //end of Database testcase
