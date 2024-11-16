@@ -1,7 +1,6 @@
 import java.io.*;
 import java.net.*;
 import java.awt.*;
-import java.awt.image.*;
 
 /**
  * PlatformServer
@@ -72,7 +71,8 @@ class ClientHandler implements Runnable {
                             String username = (String) inputStream.readObject();
                             String password = (String) inputStream.readObject();
                             Integer userId = database.getUserId(username);
-                            if (userId != null && database.getUser(userId).testPassword(password)) {
+                            if (userId != null
+                                    && database.getUser(userId).passwordEquals(password)) {
                                 loginId = userId;
                                 outputStream.writeObject(true);
                             } else {
@@ -92,15 +92,16 @@ class ClientHandler implements Runnable {
                             // TODO: ensure that username is not taken
                             String password = (String) inputStream.readObject();
                             // TODO: ensure that password is good
-                            PlatformUser user = new PlatformUser(username, password);
+                            PlatformUser user = new PlatformUser(0, username, password);
                             System.out.println(user.getUsername());
                             database.addUser(user);
                         }
                         case CREATE_POST -> {
                             if (loginId != null) {
                                 String content = (String) inputStream.readObject();
-                                BufferedImage image = (BufferedImage) inputStream.readObject();
-                                PlatformPost post = new PlatformPost(loginId, content, image);
+                                Image image = (Image) inputStream.readObject();
+                                // TODO: generate post id
+                                PlatformPost post = new PlatformPost(0, loginId, content, image);
                                 // PlatformPost post = (PlatformPost) inputStream.readObject();
                                 database.addPost(post);
                                 outputStream.writeObject(true);
