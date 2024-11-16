@@ -2,25 +2,30 @@ import java.io.*;
 import java.util.*;
 
 /**
- * FoundationDatabase
+ * PlatformDatabase
  *
  * This class manages a database of User objects and their associated Posts. It provides methods to
  * read users and posts from files, add new users and posts, and retrieve all users and posts.
  *
- * @version November 3, 2024
+ * @author Rachel Rafik, L22
+ * @author Ropan Datta, L22
+ * @version November 15, 2024
  */
-public class PlatformDatabase /* TODO: implements Database */ {
+public class PlatformDatabase implements Database {
     private static final Object USER_LOCK = new Object(); // Synchronization lock for users
     private static final Object POST_LOCK = new Object(); // Synchronization lock for posts
 
     // these two are kinda only useful for saving to file
-    private ArrayList<PlatformUser> users;
-    private ArrayList<PlatformPost> posts;
+    private ArrayList<User> users;
+    private ArrayList<Post> posts;
 
-    private HashMap<Integer, PlatformUser> userMap;
-    private LinkedHashMap<String, Integer> usernameMap;
-    private LinkedHashMap<Integer, PlatformPost> postMap; // Map of posts
+    private HashMap<Integer, User> userMap; // Map of user IDs to users
+    private LinkedHashMap<String, Integer> usernameMap; // Map of usernames to user IDs
+    private LinkedHashMap<Integer, Post> postMap; // Map of post IDs to posts
 
+    /**
+     * Constructs a new PlatformDatabase and initializes all collections to be empty.
+     */
     public PlatformDatabase() {
         users = new ArrayList<>();
         posts = new ArrayList<>();
@@ -29,13 +34,7 @@ public class PlatformDatabase /* TODO: implements Database */ {
         postMap = new LinkedHashMap<>();
     }
 
-    /**
-     * Reads users from a file on disk
-     * 
-     * @param filename the file to read from
-     * @throws IOException if a file I/O error occurs
-     * @throws ClassNotFoundException if there is bad data in the file
-     */
+    @Override
     public void readUsers(String filename) throws IOException, ClassNotFoundException {
         synchronized (USER_LOCK) {
             ArrayList<PlatformUser> userList = new ArrayList<>();
@@ -57,13 +56,7 @@ public class PlatformDatabase /* TODO: implements Database */ {
         }
     }
 
-    /**
-     * Reads posts from a file on disk
-     * 
-     * @param filename the file to read from
-     * @throws IOException if a file I/O error occurs
-     * @throws ClassNotFoundException if there is bad data in the file
-     */
+    @Override
     public void readPosts(String filename) throws IOException, ClassNotFoundException {
         synchronized (POST_LOCK) {
             ArrayList<PlatformPost> postList = new ArrayList<>();
@@ -85,113 +78,73 @@ public class PlatformDatabase /* TODO: implements Database */ {
         }
     }
 
-    /**
-     * Adds a new user to the database.
-     *
-     * @param user The PlatformUser to add to the database
-     */
-    public void addUser(PlatformUser user) {
+    @Override
+    public void addUser(User user) {
         synchronized (USER_LOCK) {
             users.add(user);
-            userMap.put(user.getUserId(), user);
-            usernameMap.put(user.getUsername(), user.getUserId());
+            userMap.put(user.getId(), user);
+            usernameMap.put(user.getUsername(), user.getId());
         }
     }
 
-    /**
-     * Adds a new post to the database.
-     *
-     * @param post The PlatformPost to add to the database
-     */
-    public void addPost(PlatformPost post) {
+    @Override
+    public void addPost(Post post) {
         synchronized (USER_LOCK) {
             synchronized (POST_LOCK) {
                 int creatorId = post.getCreatorId();
-                PlatformUser creator = userMap.get(creatorId);
-                creator.addPost(post.getPostId());
+                User creator = userMap.get(creatorId);
+                creator.addPost(post.getId());
                 posts.add(post);
-                postMap.put(post.getPostId(), post);
+                postMap.put(post.getId(), post);
             }
         }
     }
 
-    /**
-     * Retrieves the unique user associated with an integer id.
-     * 
-     * @param id the unique id of the user we
-     * @return the user associated with the integer id
-     */
-    public PlatformUser getUser(int id) {
-        return userMap.get(id);
+    @Override
+    public User getUser(int userId) {
+        return userMap.get(userId);
     }
 
-    /**
-     * Retrieves the unique integer id associated with a username.
-     * 
-     * @param username the username to query
-     * @return the unique integer id associated witht the username or null if the user doesn't exist
-     */
+    @Override
     public Integer getUserId(String username) {
         return usernameMap.get(username);
     }
 
-    /**
-     * Retrieves all users stored in the database.
-     *
-     * @return A LinkedHashMap of PlatformUser objects with usernames as keys.
-     */
-    public ArrayList<PlatformUser> getUsers() {
+    @Override
+    public List<User> getUsers() {
         return users;
     }
 
-    public PlatformPost getPost(int id) {
-        return postMap.get(id);
+    @Override
+    public Post getPost(int postId) {
+        return postMap.get(postId);
     }
 
-    /**
-     * Retrieves all posts stored in the database.
-     *
-     * @return A LinkedHashMap of PlatformPost objects with post IDs as keys.
-     */
-    public ArrayList<PlatformPost> getPosts() {
+    @Override
+    public List<Post> getPosts() {
         return posts;
     }
 
-    /**
-     * Saves user information to disk.
-     * 
-     * @param filename the file to save to
-     */
-    public void saveUsers(String filename) {
+    @Override
+    public void saveUsers(String filename) throws IOException {
         synchronized (USER_LOCK) {
             try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
-                for (PlatformUser user : users) {
+                for (User user : users) {
                     out.writeObject(user);
                 }
                 out.writeObject(users);
-            } catch (IOException e) {
-                // System.out.println("Error saving user data: " + e.getMessage());
-                e.printStackTrace();
             }
         }
     }
 
-    /**
-     * Saves post information to disk.
-     * 
-     * @param filename the file to save to
-     */
-    public void savePosts(String filename) {
+    @Override
+    public void savePosts(String filename) throws IOException {
         synchronized (POST_LOCK) {
             try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
-                System.out.println("Saving data...");
-                for (PlatformPost post : posts) {
+                for (Post post : posts) {
                     out.writeObject(post);
                 }
                 out.writeObject(posts);
-            } catch (IOException e) {
-                // System.out.println("Error saving post data: " + e.getMessage());
-                e.printStackTrace();
             }
         }
     }

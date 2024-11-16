@@ -1,4 +1,5 @@
 import java.util.List;
+import java.awt.Image;
 
 /**
  * User
@@ -16,80 +17,72 @@ public interface User {
     /**
      * Retrieves the unique ID of the user.
      *
-     * @return The user's ID
+     * @return the ID of the user
      */
-    int getUserId();
+    Integer getId();
 
     /**
      * Retrieves the username associated with the user.
      *
-     * @return The username
+     * @return the username
      */
     String getUsername();
 
     /**
      * Sets the username of the user.
      *
-     * @param username The username to set
+     * @param username the username to set
      */
     void setUsername(String username);
 
     /**
      * Sets the password of the user.
      *
-     * @param password The password to set
+     * @param password the password to set
      */
     void setPassword(String password);
 
     /**
      * Checks whether the provided password matches the user's password.
      *
-     * @param password The password to test
+     * @param password The password to test for equality
      * @return true if the password matches, false otherwise
      */
-    boolean testPassword(String password);
+    boolean passwordEquals(String password);
 
     /**
-     * Retrieves the IDs of the user's friends.
-     *
-     * @return A list of user IDs representing the user's friends
+     * Retrieves the user's profile picture.
+     * 
+     * @return the profile picture of the user
      */
-    List<Integer> getFriendIds();
+    Image getDisplayImage();
 
     /**
-     * Retrieves the IDs of users blocked by the user.
-     *
-     * @return A list of user IDs representing blocked users
+     * Sets a new profile picture for the user.
+     * 
+     * @param image the new profile picture
      */
-    List<Integer> getBlockedUserIds();
+    void setDisplayImage(Image image);
+
+    /**
+     * Removes the user's profile picture.
+     */
+    void removeDisplayImage();
+
 
     /**
      * Retrieves the IDs of posts created by the user.
      *
-     * @return A list of post IDs created by the user
+     * @return the list of IDs of posts created by the user
      */
     List<Integer> getPostIds();
 
     /**
-     * Retrieves the pending friend requests sent to the user.
-     *
-     * @return A list of pending friend requests
+     * Adds a post.
+     * 
+     * @param postId the ID of the post
      */
-    List<? extends FriendRequest> getFriendRequests();
-
-    /**
-     * Retrieves the number of friends the user has.
-     *
-     * @return The number of friends
-     */
-    int friendCount();
-
-    /**
-     * Retrieves the number of users blocked by the user.
-     *
-     * @return The number of blocked users
-     */
-    int blockedUserCount();
+    void addPost(int postId);
 
     /**
      * Retrieves the number of posts created by the user.
@@ -97,6 +90,43 @@ public interface User {
      * @return The number of posts created by the user
      */
     int postCount();
+
+    /**
+     * Retrieves the IDs of the user's friends.
+     *
+     * @return the list of user IDs representing the user's friends
+     */
+    List<Integer> getFriendIds();
+
+    /**
+     * Adds a friend.
+     * 
+     * @param userId the ID of the user to add as a friend
+     * @return {@code true} if the user was added or was already present in the list of friends,
+     *         {@code false} if the user is blocked or could not be added for some reason
+     */
+    boolean addFriend(int userId);
+
+    /**
+     * Retrieves the number of friends the user has.
+     *
+     * @return the number of friends of the user
+     */
+    int friendCount();
+
+    /**
+     * Retrieves the IDs of users blocked by the user.
+     *
+     * @return the list of IDs of blocked users
+     */
+    List<Integer> getBlockedUserIds();
+
+    /**
+     * Retrieves the pending friend requests sent to the user.
+     *
+     * @return A list of pending friend requests
+     */
+    List<? extends FriendRequest> getFriendRequests();
 
     /**
      * Retrieves the number of pending friend requests for the user.
