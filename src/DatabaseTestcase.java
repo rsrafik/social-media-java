@@ -32,13 +32,13 @@ public class DatabaseTestcase {
         }
     }
 
-    //check if FoundationDatabase implements DatabaseInterface
+    //check if PlatformDatabase implements DatabaseInterface
     @Test
     public void testPlatformImplementsDatabaseInterface() {
         PlatformDatabase db = new PlatformDatabase();
 
-        assertTrue("FoundationDatabase should implement " +
-                "Database interface", db instanceof PlatformDatabase);
+        assertTrue("PlatformDatabase should implement " +
+                "Database interface", db instanceof Database);
     }    //end of checking implementation
 
 

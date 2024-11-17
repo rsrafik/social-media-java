@@ -31,7 +31,7 @@ public class UserTestCase {
      */
     @Test
     public void testPlatformImplementsUser() {
-        PlatformUser user = new PlatformUser("JohnS", "Hacker");
+        PlatformUser user = new PlatformUser(0, "JohnS", "Hacker");
         assertTrue("PlatformUser should implement User interface", user instanceof User);
     }
 }
