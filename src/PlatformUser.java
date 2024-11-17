@@ -22,7 +22,7 @@ public class PlatformUser implements User, Serializable {
     private ArrayList<Integer> postIds; // List of posts created by the user
     private ArrayList<Integer> friendIds; // List of friend user IDs
     private ArrayList<Integer> blockedUserIds; // List of blocked user IDs
-    private ArrayList<PlatformFriendRequest> friendRequests; // List of friend requests
+    private ArrayList<Integer> friendRequests; // List of friend requests
 
     /**
      * Constructs a new PlatformUser with an integer id, username, and password.
@@ -51,7 +51,6 @@ public class PlatformUser implements User, Serializable {
     public String getUsername() {
         return username;
     }
-
 
     @Override
     public void setUsername(String username) {
@@ -121,18 +120,18 @@ public class PlatformUser implements User, Serializable {
     }
 
     @Override
-    public List<Integer> getBlockedUserIds() {
-        return blockedUserIds;
-    }
-
-    @Override
-    public List<PlatformFriendRequest> getFriendRequests() {
+    public List<Integer> getFriendRequests() {
         return friendRequests;
     }
 
     @Override
-    public int friendRequestCount() {
-        return friendRequests.size();
+    public void addFriendRequest(int userId) {
+        friendRequests.add(userId);
+    }
+
+    @Override
+    public List<Integer> getBlockedUserIds() {
+        return blockedUserIds;
     }
 
     @Override

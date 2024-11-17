@@ -115,23 +115,23 @@ public interface User {
     int friendCount();
 
     /**
+     * Retrieves the pending friend requests sent to the user.
+     *
+     * @return A list of pending friend requests
+     */
+    List<Integer> getFriendRequests();
+
+    /**
+     * Adds an incoming friend request to the user.
+     * 
+     * @param userId
+     */
+    void addFriendRequest(int userId);
+
+    /**
      * Retrieves the IDs of users blocked by the user.
      *
      * @return the list of IDs of blocked users
      */
     List<Integer> getBlockedUserIds();
-
-    /**
-     * Retrieves the pending friend requests sent to the user.
-     *
-     * @return A list of pending friend requests
-     */
-    List<? extends FriendRequest> getFriendRequests();
-
-    /**
-     * Retrieves the number of pending friend requests for the user.
-     *
-     * @return The number of pending friend requests
-     */
-    int friendRequestCount();
 }

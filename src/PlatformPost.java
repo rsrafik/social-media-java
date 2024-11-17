@@ -26,8 +26,10 @@ public class PlatformPost implements Post, Serializable {
      * Constructs a PlatformPost with the specified creator ID and content. Initializes lists for
      * upvotes, downvotes, and comments.
      *
-     * @param creator The username of the user who created the post
-     * @param content The text content of the post
+     * @param id the ID of the post
+     * @param creatorId the ID of the user who created the post
+     * @param content the text content of the post
+     * @param image an optional image associated with the post
      */
     public PlatformPost(Integer id, Integer creatorId, String content, Image image) {
         this.id = id;

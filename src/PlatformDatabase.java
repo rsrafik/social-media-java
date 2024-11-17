@@ -79,12 +79,42 @@ public class PlatformDatabase implements Database {
     }
 
     @Override
+    public List<User> getUsers() {
+        return users;
+    }
+
+    @Override
+    public User getUser(int userId) {
+        return userMap.get(userId);
+    }
+
+    @Override
+    public Integer getUserId(String username) {
+        return usernameMap.get(username);
+    }
+
+    @Override
     public void addUser(User user) {
         synchronized (USER_LOCK) {
             users.add(user);
             userMap.put(user.getId(), user);
             usernameMap.put(user.getUsername(), user.getId());
         }
+    }
+
+    @Override
+    public int userCount() {
+        return users.size();
+    }
+
+    @Override
+    public List<Post> getPosts() {
+        return posts;
+    }
+
+    @Override
+    public Post getPost(int postId) {
+        return postMap.get(postId);
     }
 
     @Override
@@ -101,38 +131,12 @@ public class PlatformDatabase implements Database {
     }
 
     @Override
-    public User getUser(int userId) {
-        return userMap.get(userId);
-    }
-
-    @Override
-    public Integer getUserId(String username) {
-        return usernameMap.get(username);
-    }
-
-    @Override
-    public List<User> getUsers() {
-        return users;
-    }
-
-    @Override
-    public Post getPost(int postId) {
-        return postMap.get(postId);
-    }
-
-    @Override
-    public List<Post> getPosts() {
-        return posts;
-    }
-
-    @Override
     public void saveUsers(String filename) throws IOException {
         synchronized (USER_LOCK) {
             try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
                 for (User user : users) {
                     out.writeObject(user);
                 }
-                out.writeObject(users);
             }
         }
     }
@@ -144,7 +148,6 @@ public class PlatformDatabase implements Database {
                 for (Post post : posts) {
                     out.writeObject(post);
                 }
-                out.writeObject(posts);
             }
         }
     }
