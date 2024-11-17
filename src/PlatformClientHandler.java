@@ -23,8 +23,8 @@ public class PlatformClientHandler implements ClientHandler {
     private static AtomicInteger postCount;
 
     private Socket socket;
-    private Integer loggedInId;
-    private User loggedInUser;
+    protected Integer loggedInId;
+    protected User loggedInUser;
 
     public PlatformClientHandler(Socket socket) {
         if (database == null) {
