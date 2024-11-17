@@ -30,18 +30,11 @@ public interface Database {
     void readPosts(String filename) throws IOException, ClassNotFoundException;
 
     /**
-     * Adds a new user to the database.
+     * Retrieves all users stored in the database.
      *
-     * @param user the User to add to the database
+     * @return the list of users in the database
      */
-    void addUser(User user);
-
-    /**
-     * Adds a new post to the database.
-     *
-     * @param post The PlatformPost to add to the database
-     */
-    void addPost(Post post);
+    List<User> getUsers();
 
     /**
      * Retrieves the unique user associated with an integer ID.
@@ -60,11 +53,25 @@ public interface Database {
     Integer getUserId(String username);
 
     /**
-     * Retrieves all users stored in the database.
+     * Adds a new user to the database.
      *
-     * @return the list of users in the database
+     * @param user the User to add to the database
      */
-    List<User> getUsers();
+    void addUser(User user);
+
+    /**
+     * Retrieves the number of users in the database.
+     * 
+     * @return the total number of users
+     */
+    int userCount();
+
+    /**
+     * Retrieves all posts stored in the database.
+     *
+     * @return A LinkedHashMap of PlatformPost objects with post IDs as keys.
+     */
+    List<Post> getPosts();
 
     /**
      * Retrieves the post associated with a post ID.
@@ -75,16 +82,17 @@ public interface Database {
     Post getPost(int postId);
 
     /**
-     * Retrieves all posts stored in the database.
+     * Adds a new post to the database.
      *
-     * @return A LinkedHashMap of PlatformPost objects with post IDs as keys.
+     * @param post The PlatformPost to add to the database
      */
-    List<Post> getPosts();
+    void addPost(Post post);
 
     /**
      * Saves user information to disk.
      * 
      * @param filename the file to save to
+     * @throws IOException if a file I/O error occurs
      */
     void saveUsers(String filename) throws IOException;
 
@@ -92,6 +100,7 @@ public interface Database {
      * Saves post information to disk.
      * 
      * @param filename the file to save to
+     * @throws IOException if a file I/O error occurs
      */
     void savePosts(String filename) throws IOException;
 }
