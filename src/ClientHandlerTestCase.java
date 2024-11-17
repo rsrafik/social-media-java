@@ -17,14 +17,14 @@ public class ClientHandlerTestCase {
     public void interfaceExists() {
         try {
             Class<?> clientHandler = Class.forName("ClientHandler");
-            Assert.assertTrue("Post interface should exist.", clientHandler.isInterface());
+            Assert.assertTrue("ClientHandler interface should exist.", clientHandler.isInterface());
         } catch (ClassNotFoundException e) {
             Assert.fail("ClientHandler interface does not exist");
         }
     }
 
     /**
-     * Tests if PlatformPost implements the Post interface.
+     * Tests if PlatformClientHandler implements the ClientHandler interface.
      */
     @Test
     public void interfaceImplemented() {
