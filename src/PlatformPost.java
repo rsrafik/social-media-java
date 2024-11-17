@@ -1,110 +1,72 @@
-import java.awt.image.BufferedImage;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.*;
+import java.awt.Image;
 
 /**
  * PlatformPost
  * <p>
- * This class represents a post on a platform that supports upvotes, downvotes, and comments.
- * Each post includes an owner ID, post content, unique post ID, lists for upvotes and
- * downvotes, and a list of comments. This class implements the Post interface and is serializable.
+ * This class represents a post on a platform that supports upvotes, downvotes, and comments. Each
+ * post includes an owner ID, post content, unique post ID, lists for upvotes and downvotes, and a
+ * list of comments. This class implements the Post interface and is serializable.
  * </p>
  *
  * @author Rachel Rafik, L22
- * @version November 1, 2024
+ * @version November 15, 2024
  */
 public class PlatformPost implements Post, Serializable {
-
-    // FIELDS
-
-    private static int postCount = 0;  // Tracks the total number of posts created
-
-    private Integer postId; // Unique ID for the post
+    private Integer id; // Unique ID for the post
     private Integer creatorId; // ID of the user who created the post
     private String content; // The text content of the post
+    private Image image; // Image associated with the post
     private ArrayList<Integer> upvoteIds; // List of user IDs who upvoted the post
     private ArrayList<Integer> downvoteIds; // List of user IDs who downvoted the post
     private ArrayList<Comment> comments; // List of comments on the post
-    private BufferedImage image; //Image associated with the post
-
-    // CONSTRUCTORS
 
     /**
-     * Constructs a PlatformPost with the specified owner ID and content.
-     * Initializes lists for upvotes, downvotes, and comments.
+     * Constructs a PlatformPost with the specified creator ID and content. Initializes lists for
+     * upvotes, downvotes, and comments.
      *
-     * @param creatorId The ID of the user who owns the post
-     * @param content   The text content of the post
+     * @param id the ID of the post
+     * @param creatorId the ID of the user who created the post
+     * @param content the text content of the post
+     * @param image an optional image associated with the post
      */
-    public PlatformPost(Integer creatorId, String content) {
+    public PlatformPost(Integer id, Integer creatorId, String content, Image image) {
+        this.id = id;
         this.creatorId = creatorId;
         this.content = content;
-        this.upvoteIds = new ArrayList<>();
-        this.downvoteIds = new ArrayList<>();
-        this.comments = new ArrayList<>();
-        this.image = null;
-
-        this.postId = postCount;
-        postCount++;
-    }
-
-    /**
-     * Constructs a PlatformPost with the specified owner ID and content.
-     * Initializes lists for upvotes, downvotes, and comments.
-     *
-     * @param creatorId The ID of the user who owns the post
-     * @param content   The text content of the post
-     */
-    public PlatformPost(Integer creatorId, String content, BufferedImage image) {
-        this.creatorId = creatorId;
-        this.content = content;
-        this.upvoteIds = new ArrayList<>();
-        this.downvoteIds = new ArrayList<>();
-        this.comments = new ArrayList<>();
         this.image = image;
 
-        this.postId = postCount;
-        postCount++;
+        this.upvoteIds = new ArrayList<>();
+        this.downvoteIds = new ArrayList<>();
+        this.comments = new ArrayList<>();
     }
 
-    // GETTERS/SETTERS
-
-    /**
-     * Retrieves the unique ID of the post.
-     *
-     * @return The post ID
-     */
     @Override
-    public int getPostId() {
-        return postId;
+    public Integer getId() {
+        return id;
     }
 
-    /**
-     * Retrieves the ID of the post creator.
-     *
-     * @return The user ID of the post owner
-     */
     @Override
-    public int getCreatorId() {
+    public Integer getCreatorId() {
         return creatorId;
     }
 
-    /**
-     * Retrieves the content of the post.
-     *
-     * @return The body text of the post
-     */
     @Override
     public String getContent() {
         return content;
     }
 
-    /**
-     * Adds a user ID to the list of upvotes if not already present.
-     *
-     * @param userId The ID of the user upvoting the post
-     * @return true if the user ID was successfully added, false if already present
-     */
+    @Override
+    public boolean hasImage() {
+        return image != null;
+    }
+
+    @Override
+    public Image getImage() {
+        return image;
+    }
+
     @Override
     public boolean addUpvote(int userId) {
         if (!upvoteIds.contains(userId)) {
@@ -114,12 +76,6 @@ public class PlatformPost implements Post, Serializable {
         return false;
     }
 
-    /**
-     * Adds a user ID to the list of downvotes if not already present.
-     *
-     * @param userId The ID of the user downvoting the post
-     * @return true if the user ID was successfully added, false if already present
-     */
     @Override
     public boolean addDownvote(int userId) {
         if (!downvoteIds.contains(userId)) {
@@ -129,83 +85,33 @@ public class PlatformPost implements Post, Serializable {
         return false;
     }
 
-    /**
-     * Retrieves the list of user IDs who upvoted the post.
-     *
-     * @return A list of user IDs who upvoted the post
-     */
     @Override
-    public ArrayList<Integer> getUpvoteIds() {
+    public List<Integer> getUpvoteIds() {
         return upvoteIds;
     }
 
-    /**
-     * Retrieves the list of user IDs who downvoted the post.
-     *
-     * @return A list of user IDs who downvoted the post
-     */
     @Override
-    public ArrayList<Integer> getDownvoteIds() {
+    public List<Integer> getDownvoteIds() {
         return downvoteIds;
     }
 
-    /**
-     * Retrieves the list of comments on the post.
-     *
-     * @return A list of comments associated with the post
-     */
-    @Override
-    public ArrayList<Comment> getComments() {
-        return comments;
-    }
-
-    /**
-     * Retrieves image of the post.
-     *
-     * @return Image of the post.
-     */
-    public BufferedImage getImage() {
-        return image;
-    }
-
-    // METHODS
-
-    /**
-     * Retrieves if the post has an image.
-     *
-     * @return True if image exists, else false
-     */
-    public boolean hasImage() {
-        return !(image == null);
-    }
-
-    /**
-     * Adds a comment to the post.
-     *
-     * @param comment The comment to add to the post
-     */
-    @Override
-    public void addComment(Comment comment) {
-        comments.add(comment);
-    }
-
-    /**
-     * Counts and returns the total number of upvotes for the post.
-     *
-     * @return The number of upvotes
-     */
     @Override
     public int upvoteCounter() {
         return upvoteIds.size();
     }
 
-    /**
-     * Counts and returns the total number of downvotes for the post.
-     *
-     * @return The number of downvotes
-     */
     @Override
     public int downvoteCounter() {
         return downvoteIds.size();
+    }
+
+    @Override
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    @Override
+    public void addComment(Comment comment) {
+        comments.add(comment);
     }
 }

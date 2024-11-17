@@ -1,113 +1,82 @@
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.*;
 
 /**
  * PlatformComment
  * <p>
- * This class represents a comment on a platform that supports upvotes and downvotes.
- * Each comment includes a creator ID, a message, and lists to track user IDs for upvotes
- * and downvotes. This class implements the Comment interface and is serializable.
- *
+ * This class represents a comment on a platform that supports upvotes and downvotes. Each comment
+ * includes a creator ID, a content, and lists to track user IDs for upvotes and downvotes. This
+ * class implements the Comment interface and is serializable.
+ * </p>
+ * 
  * @author Rachel Rafik, L22
- * @version November 1, 2024
+ * @version November 15, 2024
  */
 public class PlatformComment implements Comment, Serializable {
+    private final Integer creatorId; // ID of the user who created the comment
+    private final String content; // The content of the comment
 
-    // FIELDS
-
-    private Integer creatorID; // ID of the user who created the comment
-    private String message;    // The content of the comment
-
-    private ArrayList<Integer> upvoteIds;   // List of user IDs who upvoted the comment
-    private ArrayList<Integer> downvoteIds; // List of user IDs who downvoted the comment
-
-    // CONSTRUCTOR
+    private final ArrayList<Integer> upvoteIds; // List of user IDs who upvoted the comment
+    private final ArrayList<Integer> downvoteIds; // List of user IDs who downvoted the comment
 
     /**
-     * Constructs a PlatformComment with a specified creator ID and message.
-     * Initializes empty lists for upvotes and downvotes.
+     * Constructs a PlatformComment with a specified creator ID and content. Initializes empty lists
+     * for upvotes and downvotes.
      *
-     * @param creatorID The ID of the user who created the comment
-     * @param message   The text content of the comment
+     * @param creatorId the ID of the user who created the comment
+     * @param content the text content of the comment
      */
-    public PlatformComment(Integer creatorID, String message) {
-        this.creatorID = creatorID;
-        this.message = message;
+    public PlatformComment(Integer creatorId, String content) {
+        this.creatorId = creatorId;
+        this.content = content;
+
         upvoteIds = new ArrayList<>();
         downvoteIds = new ArrayList<>();
     }
 
-    // GETTERS
-
-    /**
-     * Retrieves the ID of the user who created the comment.
-     *
-     * @return The creator's user ID
-     */
     @Override
-    public int getCreatorId() {
-        return creatorID;
+    public Integer getCreatorId() {
+        return creatorId;
     }
 
-    /**
-     * Retrieves the list of user IDs who upvoted the comment.
-     *
-     * @return An ArrayList of user IDs who upvoted the comment
-     */
     @Override
-    public ArrayList<Integer> getUpvoteIds() {
+    public String getContent() {
+        return content;
+    }
+
+    @Override
+    public List<Integer> getUpvoteIds() {
         return upvoteIds;
     }
 
-    /**
-     * Retrieves the list of user IDs who downvoted the comment.
-     *
-     * @return An ArrayList of user IDs who downvoted the comment
-     */
     @Override
-    public ArrayList<Integer> getDownvoteIds() {
+    public List<Integer> getDownvoteIds() {
         return downvoteIds;
     }
 
-    // METHODS
-
-    /**
-     * Counts and returns the number of upvotes for the comment.
-     *
-     * @return The total number of upvotes
-     */
     @Override
     public int upvoteCounter() {
         return upvoteIds.size();
     }
 
-    /**
-     * Counts and returns the number of downvotes for the comment.
-     *
-     * @return The total number of downvotes
-     */
     @Override
     public int downvoteCounter() {
         return downvoteIds.size();
     }
 
-    /**
-     * Adds a user ID to the list of upvotes for the comment.
-     *
-     * @param userId The ID of the user who upvoted the comment
-     */
     @Override
     public void addUpvote(int userId) {
-        upvoteIds.add(userId);
+        if (!upvoteIds.contains(userId)) {
+            downvoteIds.remove((Integer) userId); // remove earlier downvote if it exists
+            upvoteIds.add(userId);
+        }
     }
 
-    /**
-     * Adds a user ID to the list of downvotes for the comment.
-     *
-     * @param userId The ID of the user who downvoted the comment
-     */
     @Override
     public void addDownvote(int userId) {
-        downvoteIds.add(userId);
+        if (!downvoteIds.contains(userId)) {
+            upvoteIds.remove((Integer) userId); // remove earlier upvote if it exists
+            downvoteIds.add(userId);
+        }
     }
 }

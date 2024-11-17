@@ -1,8 +1,19 @@
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Test case for the Post interface, verifying its existence and implementation
+ * by the PlatformPost class.
+ *
+ * @author Navan Dendukuri, L22
+ * @version November 3, 2024
+ */
 public class PostTestCase {
-   @Test
+
+    /**
+     * Tests if the Post interface exists.
+     */
+    @Test
     public void interfaceExists() {
         try {
             Class<?> post = Class.forName("Post");
@@ -12,13 +23,12 @@ public class PostTestCase {
         }
     }
 
+    /**
+     * Tests if PlatformPost implements the Post interface.
+     */
     @Test
     public void interfaceImplemented() {
-        // Check if MyClass implements MyInterface using reflection
         boolean isImplemented = Post.class.isAssignableFrom(PlatformPost.class);
-        // Assert that MyClass implements MyInterface
         Assert.assertTrue("PlatformPost should implement Post", isImplemented);
     }
 }
-
-

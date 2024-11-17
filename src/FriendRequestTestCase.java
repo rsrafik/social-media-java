@@ -1,37 +1,38 @@
 import org.junit.Test;
+
 import static org.junit.Assert.*;
 
 /**
- * Test case for the FriendRequest interface and implementation
+ * Test case for the FriendRequest interface, verifying its existence and implementation
+ * by the PlatformFriendRequest class.
  *
- * @author Mckinley Newman
- * @version Nov 2, 2024
+ * @author Mckinley Newman, L22
+ * @version November 2, 2024
  */
 public class FriendRequestTestCase {
 
-    //check if user interface exist
+    /**
+     * Tests if the FriendRequest interface exists.
+     */
     @Test
     public void testUserInterfaceExists() {
         try {
-            // Attempt to load the User interface using reflection
             Class<?> userInterface = Class.forName("FriendRequest");
-
             if (!userInterface.isInterface()) {
                 fail("FriendRequest exists but is not an interface");
             }
-
         } catch (ClassNotFoundException e) {
-            // Fail the test if the interface does not exist
             fail("FriendRequest interface does not exist");
         }
     }
 
-    //check if PlatformFriendRequest implements FriendRequest
+    /**
+     * Tests if PlatformFriendRequest implements the FriendRequest interface.
+     */
     @Test
     public void testPlatformImplementsFriendRequest() {
-        PlatformFriendRequest friendRequest = new PlatformFriendRequest(1,"Be friends");
-
-        assertTrue("PlatformFriendRequest should implement " +
-            "FriendRequest interface", friendRequest instanceof FriendRequest);
-    }    //end of checking implementation
-}    //end of FriendRequest testcase
+        PlatformFriendRequest friendRequest = new PlatformFriendRequest("1", "Be friends");
+        assertTrue("PlatformFriendRequest should implement FriendRequest interface",
+                friendRequest instanceof FriendRequest);
+    }
+}
