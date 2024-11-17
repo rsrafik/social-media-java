@@ -30,5 +30,5 @@ bin/
 
 # Custom
 *.class
-*.data
+*.dat
 *.ser
