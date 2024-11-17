@@ -1,83 +1,41 @@
-import java.io.File;
+import java.io.*;
+import java.net.Socket;
 import java.util.*;
 
 /**
  * SampleMenu - A menu-driven system for managing user authentication,
  * profile viewing, and post creation on a simple social media platform.
  *
- * This program simulates a basic command-line interface allowing
- * users to sign in, sign up, view posts, and add new posts using
- * a menu system.
+ * This version communicates with a server for all data operations.
  *
- * @author Rachel Rafik
- * @version November 11, 2024
+ * @version November 17, 2024
  */
 public class SampleMenu {
     // Divider used for output separation
     private static final String DIVIDER = "_______________________";
 
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        File userData = new File("users.dat");
-        File postData = new File("posts.dat");
-        File postCountData = new File("postCount.dat");
-        File userCountData = new File("userCount.dat");
+        try (Socket socket = new Socket("localhost", 5001);
+             ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+             ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
+             Scanner scanner = new Scanner(System.in)) {
 
-        initializeFreshData(scanner, userData, postData, postCountData, userCountData);
+            PlatformUser currentUser = processUserAuthentication(scanner, outputStream, inputStream);
+            if (currentUser == null) {
+                System.out.println("Exiting program due to failed authentication.");
+                return;
+            }
+            System.out.println(DIVIDER);
 
-        FoundationDatabase fd = new FoundationDatabase();
-        fd.readUsers();
-        fd.readPosts();
-        LinkedHashMap<String, PlatformUser> users = fd.getAllUsers();
+            processHomePage(scanner, currentUser, outputStream, inputStream);
+            System.out.println(DIVIDER);
 
-        PlatformUser currentUser = processUserAuthentication(scanner, users, fd);
-        System.out.println(DIVIDER);
-
-        processHomePage(scanner, currentUser, fd);
-        System.out.println(DIVIDER);
-    }
-
-    /**
-     * Initializes fresh data files if prompted by the user.
-     *
-     * @param scanner       Scanner object for user input
-     * @param userData      File object for user data
-     * @param postData      File object for post data
-     * @param postCountData File object for post count data
-     * @param userCountData File object for user count data
-     */
-    private static void initializeFreshData(Scanner scanner, File userData, File postData, File postCountData, File userCountData) {
-        System.out.println("<TESTING ONLY> Start Fresh?");
-        String delete = scanner.nextLine();
-
-        if (delete.equals("y")) {
-            deleteFileIfExists(userData);
-            deleteFileIfExists(postData);
-            deleteFileIfExists(postCountData);
-            deleteFileIfExists(userCountData);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
-    /**
-     * Deletes a file if it exists.
-     *
-     * @param file File to be deleted
-     */
-    private static void deleteFileIfExists(File file) {
-        if (file.exists()) {
-            file.delete();
-        }
-    }
-
-    /**
-     * Handles user authentication through login or signup.
-     *
-     * @param scanner Scanner object for user input
-     * @param users   LinkedHashMap containing PlatformUser data
-     * @param fd      FoundationDatabase object for data management
-     * @return The authenticated PlatformUser object
-     */
-    private static PlatformUser processUserAuthentication(Scanner scanner, LinkedHashMap<String, PlatformUser> users, FoundationDatabase fd) {
+    private static PlatformUser processUserAuthentication(Scanner scanner, ObjectOutputStream outputStream, ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
         int welcomeChoice = openingMessage(scanner);
         PlatformUser currentUser = null;
         boolean done = false;
@@ -85,7 +43,7 @@ public class SampleMenu {
         while (!done) {
             switch (welcomeChoice) {
                 case 1:
-                    currentUser = handleLogin(scanner, users);
+                    currentUser = handleLogin(scanner, outputStream, inputStream);
                     if (currentUser != null) {
                         done = true;
                     } else {
@@ -93,7 +51,7 @@ public class SampleMenu {
                     }
                     break;
                 case 2:
-                    currentUser = handleSignup(scanner, users, fd);
+                    currentUser = handleSignup(scanner, outputStream, inputStream);
                     done = true;
                     break;
                 default:
@@ -103,13 +61,6 @@ public class SampleMenu {
         return currentUser;
     }
 
-    /**
-     * Displays the opening message and prompts the user to select
-     * between logging in or signing up.
-     *
-     * @param scanner The Scanner object for user input
-     * @return An integer representing the user's choice
-     */
     private static int openingMessage(Scanner scanner) {
         System.out.println("Welcome to Twitter 2.0!");
         System.out.println("Select an option");
@@ -124,41 +75,39 @@ public class SampleMenu {
         return Integer.parseInt(choice);
     }
 
-    /**
-     * Handles user login by prompting for username and password.
-     *
-     * @param scanner Scanner object for user input
-     * @param users   LinkedHashMap containing PlatformUser data
-     * @return The authenticated PlatformUser object, or null if authentication fails
-     */
-    private static PlatformUser handleLogin(Scanner scanner, LinkedHashMap<String, PlatformUser> users) {
+    private static PlatformUser handleLogin(Scanner scanner, ObjectOutputStream outputStream, ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
         System.out.println("Enter your username:");
         String username = scanner.nextLine();
-
-        PlatformUser user = users.get(username);
-        if (user == null) {
-            System.out.println("Username not found.");
-            return null;
-        }
 
         System.out.println("Enter your password:");
         String password = scanner.nextLine();
 
-        if (user.testPassword(password)) {
-            System.out.println("Login successful!");
-            return user;
+        outputStream.writeObject(OperationType.LOGIN);
+        outputStream.writeObject(username);
+        outputStream.writeObject(password);
+        outputStream.flush();
+
+        boolean success = (boolean) inputStream.readObject();
+        if (success) {
+            // Retrieve existing PlatformUser instead of creating a new one
+            outputStream.writeObject(OperationType.GET_USER);
+            outputStream.writeObject(username);
+            outputStream.flush();
+
+            PlatformUser existingUser = (PlatformUser) inputStream.readObject(); // Assumes the server sends back the user object
+            if (existingUser != null) {
+                System.out.println("Login successful!");
+                return existingUser;
+            } else {
+                System.out.println("Error fetching user data.");
+                return null;
+            }
         } else {
-            System.out.println("Incorrect password.");
+            System.out.println("Incorrect username or password.");
             return null;
         }
     }
 
-    /**
-     * Prompts the user to retry logging in or to sign up.
-     *
-     * @param scanner Scanner object for user input
-     * @return An integer representing the user's next choice
-     */
     private static int promptRetryOrSignup(Scanner scanner) {
         while (true) {
             System.out.println("[1] Try Again");
@@ -174,22 +123,22 @@ public class SampleMenu {
         }
     }
 
-    /**
-     * Handles user signup by creating a new user and adding them to the database.
-     *
-     * @param scanner Scanner object for user input
-     * @param users   LinkedHashMap containing PlatformUser data
-     * @param fd      FoundationDatabase object for data management
-     * @return The newly created PlatformUser object
-     */
-    private static PlatformUser handleSignup(Scanner scanner, LinkedHashMap<String, PlatformUser> users, FoundationDatabase fd) {
+    private static PlatformUser handleSignup(Scanner scanner, ObjectOutputStream outputStream, ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
         System.out.println("Sign Up");
         System.out.println("Enter a new username:");
         String username = scanner.nextLine();
 
-        while (users.containsKey(username)) {
+        outputStream.writeObject(OperationType.CHECK_USERNAME);
+        outputStream.writeObject(username);
+        outputStream.flush();
+        boolean usernameAvailable = (boolean) inputStream.readObject();
+        while (!usernameAvailable) {
             System.out.println("Username already exists. Please enter a different username:");
             username = scanner.nextLine();
+            outputStream.writeObject(OperationType.CHECK_USERNAME);
+            outputStream.writeObject(username);
+            outputStream.flush();
+            usernameAvailable = (boolean) inputStream.readObject();
         }
 
         String password;
@@ -202,37 +151,47 @@ public class SampleMenu {
             System.out.println("Password too short. Please enter at least 8 characters.");
         }
 
-        PlatformUser newUser = new PlatformUser(username, password);
-        users.put(username, newUser);
-        fd.addUser(newUser);
-        System.out.println("Sign-up successful! You can now log in with your new credentials.");
-        return newUser;
+        outputStream.writeObject(OperationType.CREATE_USER);
+        outputStream.writeObject(username);
+        outputStream.writeObject(password);
+        outputStream.flush();
+        boolean success = (boolean) inputStream.readObject();
+        System.out.println(success);
+
+        if (success) {
+            // Retrieve the newly created PlatformUser
+            PlatformUser newUser = (PlatformUser) inputStream.readObject();
+            System.out.println(newUser.getUsername());
+            if (newUser != null) {
+                System.out.println("Sign-up successful! You can now log in with your new credentials.");
+                return newUser;
+            } else {
+                System.out.println("Sign-up succeeded but failed to retrieve user data.");
+                return null;
+            }
+        } else {
+            System.out.println("Sign-up failed. Please try again.");
+            return null;
+        }
     }
 
-    /**
-     * Handles the home page menu after user authentication.
-     *
-     * @param scanner     Scanner object for user input
-     * @param currentUser The authenticated PlatformUser object
-     * @param fd          FoundationDatabase object for data management
-     */
-    private static void processHomePage(Scanner scanner, PlatformUser currentUser, FoundationDatabase fd) {
+    private static void processHomePage(Scanner scanner, PlatformUser currentUser, ObjectOutputStream outputStream, ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
         boolean done = false;
         while (!done) {
             int homepageChoice = displayHomePage(scanner);
 
             switch (homepageChoice) {
                 case 1:
-                    loadPostsPage(fd);
+                    loadPostsPage(outputStream, inputStream);
                     break;
                 case 2:
-                    loadUserData(currentUser, scanner, fd);
+                    loadUserData(currentUser, scanner, outputStream, inputStream);
                     break;
                 case 3:
-                    createNewPost(scanner, currentUser, fd);
+                    createNewPost(scanner, currentUser, outputStream, inputStream);
                     break;
                 case 4:
-                    logout();
+                    logout(outputStream);
                     done = true;
                     break;
                 default:
@@ -241,12 +200,6 @@ public class SampleMenu {
         }
     }
 
-    /**
-     * Displays the home page menu and prompts the user for a choice.
-     *
-     * @param scanner The Scanner object for user input
-     * @return An integer representing the user's choice
-     */
     private static int displayHomePage(Scanner scanner) {
         System.out.println("Choose an option:");
         System.out.println("[1] View Homepage");
@@ -262,13 +215,10 @@ public class SampleMenu {
         return Integer.parseInt(choice);
     }
 
-    /**
-     * Loads and displays all posts from the database.
-     *
-     * @param fd FoundationDatabase object for data management
-     */
-    private static void loadPostsPage(FoundationDatabase fd) {
-        LinkedHashMap<Integer, PlatformPost> posts = fd.getAllPosts();
+    private static void loadPostsPage(ObjectOutputStream outputStream, ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
+        outputStream.writeObject(OperationType.GET_ALL_POSTS);
+        outputStream.flush();
+        LinkedHashMap<Integer, PlatformPost> posts = (LinkedHashMap<Integer, PlatformPost>) inputStream.readObject();
 
         if (posts.isEmpty()) {
             System.out.println("No posts available.");
@@ -276,21 +226,19 @@ public class SampleMenu {
             System.out.println("Displaying all posts:");
             for (Map.Entry<Integer, PlatformPost> entry : posts.entrySet()) {
                 PlatformPost post = entry.getValue();
-                System.out.println("Creator: " + post.getCreator());
+                System.out.println("Creator ID: " + post.getCreatorId());
                 System.out.println("Content: " + post.getContent());
+                if (post.hasImage()) {
+                    System.out.println("[Image Attached]");
+                }
+                System.out.println("Upvotes: " + post.upvoteCounter());
+                System.out.println("Downvotes: " + post.downvoteCounter());
                 System.out.println(DIVIDER);
             }
         }
     }
 
-    /**
-     * Loads and displays user data and available actions.
-     *
-     * @param currentUser The current PlatformUser
-     * @param scanner     Scanner object for user input
-     * @param fd          FoundationDatabase object for data management
-     */
-    private static void loadUserData(PlatformUser currentUser, Scanner scanner, FoundationDatabase fd) {
+    private static void loadUserData(PlatformUser currentUser, Scanner scanner, ObjectOutputStream outputStream, ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
         System.out.println("Username: " + currentUser.getUsername());
         boolean valid = false;
 
@@ -305,19 +253,19 @@ public class SampleMenu {
 
             switch (choice) {
                 case "1":
-                    viewUserPosts(currentUser);
+                    viewUserPosts(currentUser, outputStream, inputStream);
                     valid = true;
                     break;
                 case "2":
-                    viewFriendsList(currentUser);
+                    viewFriendsList(currentUser, outputStream, inputStream);
                     valid = true;
                     break;
                 case "3":
-                    viewFriendRequests(currentUser);
+                    viewFriendRequests(currentUser, outputStream, inputStream);
                     valid = true;
                     break;
                 case "4":
-                    addFriend(scanner, currentUser, fd);
+                    addFriend(scanner, currentUser, outputStream, inputStream);
                     valid = true;
                     break;
                 default:
@@ -326,67 +274,73 @@ public class SampleMenu {
         }
     }
 
-    /**
-     * Displays the user's posts.
-     *
-     * @param currentUser The current PlatformUser
-     */
-    private static void viewUserPosts(PlatformUser currentUser) {
-        for (PlatformPost post : currentUser.getPosts()) {
-            System.out.println(post.getContent());
-            System.out.println(DIVIDER);
+    private static void viewUserPosts(PlatformUser currentUser, ObjectOutputStream outputStream, ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
+        outputStream.writeObject(OperationType.GET_USER_POSTS);
+        outputStream.writeObject(currentUser.getUsername());
+        outputStream.flush();
+
+        List<PlatformPost> userPosts = (List<PlatformPost>) inputStream.readObject();
+        if (userPosts.isEmpty()) {
+            System.out.println("You have no posts.");
+        } else {
+            for (PlatformPost post : userPosts) {
+                System.out.println("Post ID: " + post.getId());
+                System.out.println("Content: " + post.getContent());
+                if (post.hasImage()) {
+                    System.out.println("[Image Attached]");
+                }
+                System.out.println("Upvotes: " + post.upvoteCounter());
+                System.out.println("Downvotes: " + post.downvoteCounter());
+                System.out.println(DIVIDER);
+            }
         }
     }
 
-    /**
-     * Displays the user's friends list.
-     *
-     * @param currentUser The current PlatformUser
-     */
-    private static void viewFriendsList(PlatformUser currentUser) {
-        if (currentUser.getFriends().isEmpty()) {
+    private static void viewFriendsList(PlatformUser currentUser, ObjectOutputStream outputStream, ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
+        outputStream.writeObject(OperationType.GET_FRIENDS_LIST);
+        outputStream.writeObject(currentUser.getUsername());
+        outputStream.flush();
+
+        List<String> friends = (List<String>) inputStream.readObject();
+        if (friends.isEmpty()) {
             System.out.println("You have no friends.");
         } else {
-            for (PlatformUser friend : currentUser.getFriends()) {
-                System.out.println(friend.getUsername());
+            for (String friend : friends) {
+                System.out.println(friend);
                 System.out.println(DIVIDER);
             }
         }
     }
 
-    /**
-     * Displays and processes friend requests.
-     *
-     * @param currentUser The current PlatformUser
-     */
-    private static void viewFriendRequests(PlatformUser currentUser) {
-        if (currentUser.getFriendRequests().isEmpty()) {
+    private static void viewFriendRequests(PlatformUser currentUser, ObjectOutputStream outputStream, ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
+        outputStream.writeObject(OperationType.GET_FRIEND_REQUESTS);
+        outputStream.writeObject(currentUser.getUsername());
+        outputStream.flush();
+
+        List<String> friendRequests = (List<String>) inputStream.readObject();
+        if (friendRequests.isEmpty()) {
             System.out.println("No friend requests.");
         } else {
-            for (PlatformFriendRequest request : currentUser.getFriendRequests()) {
-                System.out.println("From: " + request.getUser());
-                System.out.println("Message: " + request.getMessage());
-                System.out.println("Accept? [Y/N]");
+            for (String request : friendRequests) {
+                System.out.println("Friend request from: " + request);
                 System.out.println(DIVIDER);
-                // Add logic to handle acceptance or rejection
             }
         }
     }
 
-    /**
-     * Adds a friend for the current user.
-     *
-     * @param scanner     Scanner object for user input
-     * @param currentUser The current PlatformUser
-     * @param fd          FoundationDatabase object for data management
-     */
-    private static void addFriend(Scanner scanner, PlatformUser currentUser, FoundationDatabase fd) {
+    private static void addFriend(Scanner scanner, PlatformUser currentUser, ObjectOutputStream outputStream, ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
         System.out.println("Enter their username:");
         String username = scanner.nextLine();
         System.out.println("Enter a message:");
         String message = scanner.nextLine();
-        boolean success = PlatformFriendRequest.sendFriendRequest(username, currentUser.getUsername(), message, fd);
 
+        outputStream.writeObject(OperationType.SEND_FRIENDREQUEST);
+        outputStream.writeObject(username);
+        outputStream.writeObject(currentUser.getUsername());
+        outputStream.writeObject(message);
+        outputStream.flush();
+
+        boolean success = (boolean) inputStream.readObject();
         if (success) {
             System.out.println("Friend request sent.");
         } else {
@@ -394,14 +348,7 @@ public class SampleMenu {
         }
     }
 
-    /**
-     * Handles post creation for the current user.
-     *
-     * @param scanner     Scanner object for user input
-     * @param currentUser The current PlatformUser
-     * @param fd          FoundationDatabase object for data management
-     */
-    private static void createNewPost(Scanner scanner, PlatformUser currentUser, FoundationDatabase fd) {
+    private static void createNewPost(Scanner scanner, PlatformUser currentUser, ObjectOutputStream outputStream, ObjectInputStream inputStream) throws IOException, ClassNotFoundException {
         while (true) {
             System.out.println("Enter your message:");
             String message = scanner.nextLine();
@@ -421,8 +368,27 @@ public class SampleMenu {
 
             switch (choiceInt) {
                 case 1:
-                    fd.addPost(new PlatformPost(currentUser.getUsername(), message));
-                    System.out.println("Post uploaded successfully!");
+                    Integer userId = currentUser.getId();
+                    if (userId == null) {
+                        System.out.println("Error: User ID is null. Cannot create post.");
+                        return;
+                    }
+
+                    System.out.println("Sending CREATE_POST request...");
+                    outputStream.writeObject(OperationType.CREATE_POST);
+                    outputStream.writeObject(currentUser.getId());
+                    outputStream.writeObject(message);
+                    outputStream.writeObject(null);
+                    outputStream.flush();
+
+                    boolean success = (boolean) inputStream.readObject();
+                    System.out.println("made it this far!!");
+                    System.out.println("Post upload response: " + success);
+                    if (success) {
+                        System.out.println("Post uploaded successfully!");
+                    } else {
+                        System.out.println("Failed to upload post.");
+                    }
                     return;
                 case 2:
                     continue;
@@ -433,10 +399,9 @@ public class SampleMenu {
         }
     }
 
-    /**
-     * Logs the user out with a farewell message.
-     */
-    private static void logout() {
+    private static void logout(ObjectOutputStream outputStream) throws IOException {
+        outputStream.writeObject(OperationType.LOGOUT);
+        outputStream.flush();
         System.out.println("Logging you out...");
         try {
             Thread.sleep(1000);

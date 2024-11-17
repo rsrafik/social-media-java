@@ -17,7 +17,7 @@ import java.net.*;
 
 public class PlatformServer {
     public static void main(String[] args) throws IOException {
-        int port = 5000;
+        int port = 5001;
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             while (true) {
                 System.out.println("Waiting for client to connect...");

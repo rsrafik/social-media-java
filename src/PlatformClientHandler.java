@@ -1,18 +1,19 @@
 import java.io.*;
 import java.net.Socket;
 import java.awt.Image;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * PlatformClientHandler
- * 
+ *
  * <p>
  * This class provides a Runnable handler for each client.
  * </p>
- * 
- * @author Ropan Datta, L22
- * @version November 16, 2024
+ *
+ * @version November 17, 2024
  */
 public class PlatformClientHandler implements ClientHandler {
     private static final String USERS_FILE = "users.dat";
@@ -77,11 +78,20 @@ public class PlatformClientHandler implements ClientHandler {
                             outputStream.flush();
                         }
                         case CREATE_POST -> {
-                            String content = (String) inputStream.readObject();
-                            Image image = (Image) inputStream.readObject();
-                            boolean result = createPost(content, image);
-                            outputStream.writeObject(result);
-                            outputStream.flush();
+                            try {
+                                System.out.println("CREATE_POST operation received.");
+                                String content = (String) inputStream.readObject();
+                                Image image = (Image) inputStream.readObject();
+                                System.out.println("Post content: " + content);
+                                boolean result = createPost(content, image);
+                                System.out.println("Post creation result: " + result);
+                                outputStream.writeObject(result);
+                                outputStream.flush();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                                outputStream.writeObject(false);
+                                outputStream.flush();
+                            }
                         }
                         case SEND_FRIENDREQUEST -> {
                             int toId = (Integer) inputStream.readObject();
@@ -89,12 +99,80 @@ public class PlatformClientHandler implements ClientHandler {
                             outputStream.writeObject(result);
                             outputStream.flush();
                         }
-                        case TESTING -> {
-                            // System.out.println("testing");
-                            // String str = (String) inputStream.readObject();
-                            Object lol = inputStream.readObject();
-                            System.out.println(lol);
+                        case CHECK_USERNAME -> {
+                            String usernameToCheck = (String) inputStream.readObject();
+                            boolean isAvailable = (database.getUserId(usernameToCheck) == null);
+                            outputStream.writeObject(isAvailable);
+                            outputStream.flush();
                         }
+                        case GET_ALL_POSTS -> {
+                            // Get all posts from the internal data structure
+                            LinkedHashMap<Integer, Post> posts = new LinkedHashMap<>();
+                            for (Post post : database.getPosts()) {
+                                posts.put(post.getId(), (PlatformPost) post);
+                            }
+                            outputStream.writeObject(posts);
+                            outputStream.flush();
+                        }
+                        case GET_USER_POSTS -> {
+                            String username = (String) inputStream.readObject();
+                            Integer userId = database.getUserId(username);
+                            List<Post> userPosts = new ArrayList<>();
+                            if (userId != null) {
+                                User user = database.getUser(userId);
+                                for (Integer postId : user.getPostIds()) {
+                                    Post post = database.getPost(postId);
+                                    if (post != null) {
+                                        userPosts.add(post);
+                                    }
+                                }
+                            }
+                            outputStream.writeObject(userPosts);
+                            outputStream.flush();
+                        }
+                        case GET_FRIENDS_LIST -> {
+                            String username = (String) inputStream.readObject();
+                            Integer userId = database.getUserId(username);
+                            List<String> friendsList = new ArrayList<>();
+                            if (userId != null) {
+                                User user = database.getUser(userId);
+                                for (Integer friendId : user.getFriendIds()) {
+                                    User friend = database.getUser(friendId);
+                                    if (friend != null) {
+                                        friendsList.add(friend.getUsername());
+                                    }
+                                }
+                            }
+                            outputStream.writeObject(friendsList);
+                            outputStream.flush();
+                        }
+                        case GET_FRIEND_REQUESTS -> {
+                            String username = (String) inputStream.readObject();
+                            Integer userId = database.getUserId(username);
+                            List<String> friendRequests = new ArrayList<>();
+                            if (userId != null) {
+                                User user = database.getUser(userId);
+                                for (Integer requestId : user.getFriendRequests()) {
+                                    User requester = database.getUser(requestId);
+                                    if (requester != null) {
+                                        friendRequests.add(requester.getUsername());
+                                    }
+                                }
+                            }
+                            outputStream.writeObject(friendRequests);
+                            outputStream.flush();
+                        }
+                        case GET_USER -> {
+                            String username = (String) inputStream.readObject();
+                            Integer userId = database.getUserId(username);
+                            PlatformUser user = null;
+                            if (userId != null) {
+                                user = (PlatformUser) database.getUser(userId);
+                            }
+                            outputStream.writeObject(user);
+                            outputStream.flush();
+                        }
+
                         default -> {
                             throw new UnsupportedOperationException(String
                                     .format("Unimplemented operation %s!", operation.toString()));
@@ -150,10 +228,13 @@ public class PlatformClientHandler implements ClientHandler {
 
     @Override
     public boolean createUser(String username, String password) {
+        System.out.println("CREATED USER");
         if (database.getUserId(username) != null) {
             return false;
         }
+
         int userId = userCount.getAndIncrement();
+        System.out.println("new id is " + userId);
         User user = new PlatformUser(userId, username, password);
         database.addUser(user);
         return true;
@@ -161,14 +242,24 @@ public class PlatformClientHandler implements ClientHandler {
 
     @Override
     public boolean createPost(String content, Image image) {
-        if (!isLoggedIn()) {
+        try {
+            if (!isLoggedIn()) {
+                System.out.println("User is not logged in.");
+                return false;
+            }
+            int postId = postCount.getAndIncrement();
+            System.out.println("Creating post with ID: " + postId);
+            Post post = new PlatformPost(postId, loggedInId, content, image);
+            System.out.println("Post created: " + post);
+            database.addPost(post);
+            System.out.println("Post added to database.");
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
-        int postId = postCount.getAndIncrement();
-        Post post = new PlatformPost(postId, loggedInId, content, image);
-        database.addPost(post);
-        return true;
     }
+
 
     @Override
     public boolean sendFriendRequest(int userId) {
