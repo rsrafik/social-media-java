@@ -6,7 +6,7 @@ import org.junit.Test;
  * by the PlatformClientHandler class.
  *
  * @author Navan Dendukuri, L22
- * @version November 3, 2024
+ * @version November 17, 2024
  */
 public class ClientHandlerTestCase {
 
@@ -28,7 +28,7 @@ public class ClientHandlerTestCase {
      */
     @Test
     public void interfaceImplemented() {
-        boolean isImplemented = Post.class.isAssignableFrom(PlatformClientHandler.class);
+        boolean isImplemented = ClientHandler.class.isAssignableFrom(PlatformClientHandler.class);
         Assert.assertTrue("PlatformClientHandler should implement ClientHandler", isImplemented);
     }
 }
