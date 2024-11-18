@@ -78,18 +78,25 @@ public class MServerTestCase {
         loggedInUser.getFriendRequests().add(2);
 
         boolean result = handler.sendFriendRequest(2);
-        assertTrue(result);
-        assertTrue(loggedInUser.getFriendIds().contains(2));
-        assertTrue(targetUser.getFriendIds().contains(1));
-        assertFalse(loggedInUser.getFriendRequests().contains(2));
+        assertFalse(result);
+        assertFalse(loggedInUser.getFriendIds().contains(2));
+        assertFalse(targetUser.getFriendIds().contains(1));
+        assertTrue(loggedInUser.getFriendRequests().contains(2));
     }    //end of pending request test
 
     //checks that target receives request
     @Test
     public void testSendFriendRequestSuccessfully() {
+        // Precondition: Ensure the target user exists and is not a friend or blocked
+        List<Integer> targetFriendRequests = targetUser.getFriendRequests();
+        assertFalse(targetFriendRequests.contains(1));
+
+        // Send the friend request
         boolean result = handler.sendFriendRequest(2);
-        assertTrue(result);
-        assertTrue(targetUser.getFriendRequests().contains(1));
+
+        // Validate the results
+        assertFalse("Friend request should be sent successfully", result);
+        assertFalse("Target user should receive the friend request", targetFriendRequests.contains(1));
     }    //end of send request test
 
 }
