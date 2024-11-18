@@ -99,4 +99,4 @@ public class MServerTestCase {
         assertFalse("Target user should receive the friend request", targetFriendRequests.contains(1));
     }    //end of send request test
 
-}
+}    //end of test
