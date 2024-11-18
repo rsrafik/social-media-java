@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class PlatformClient {
     public static void main(String[] args) {
-        try (Socket socket = new Socket("localhost", 5002);
+        try (Socket socket = new Socket("localhost", 5000);
              ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
              ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
              Scanner scanner = new Scanner(System.in)) {
@@ -22,11 +22,11 @@ public class PlatformClient {
                     System.out.println("2. Sign Up");
                     System.out.println("3. Exit");
                     System.out.print("Choose an option: ");
-                    int choice = scanner.nextInt();
-                    scanner.nextLine(); // Consume newline
+                    String choice = scanner.nextLine();
+                    //scanner.nextLine(); // Consume newline
 
                     switch (choice) {
-                        case 1 -> {
+                        case "1" -> {
                             // Log In
                             outputStream.writeObject(OperationType.LOGIN);
                             System.out.print("Enter username: ");
@@ -39,7 +39,7 @@ public class PlatformClient {
                             loggedIn = (boolean) inputStream.readObject();
                             System.out.println(loggedIn ? "Login successful!" : "Login failed. Try again.");
                         }
-                        case 2 -> {
+                        case "2" -> {
                             // Sign Up
                             outputStream.writeObject(OperationType.CREATE_USER);
                             System.out.print("Enter new username: ");
@@ -63,7 +63,7 @@ public class PlatformClient {
                             loggedIn = (boolean) inputStream.readObject();
                             System.out.println(loggedIn ? "Login successful!" : "Login failed. Try again.");
                         }
-                        case 3 -> {
+                        case "3" -> {
                             // Exit
                             running = false;
                         }
@@ -75,11 +75,11 @@ public class PlatformClient {
                     System.out.println("2. Send Friend Request");
                     System.out.println("3. Log Out");
                     System.out.print("Choose an option: ");
-                    int action = scanner.nextInt();
-                    scanner.nextLine(); // Consume newline
+                    String action = scanner.nextLine();
+                    //scanner.nextLine(); // Consume newline
 
                     switch (action) {
-                        case 1 -> {
+                        case "1" -> {
                             // Create Post
                             outputStream.writeObject(OperationType.CREATE_POST);
                             System.out.print("Enter post content: ");
@@ -90,7 +90,7 @@ public class PlatformClient {
                             boolean postResult = (boolean) inputStream.readObject();
                             System.out.println(postResult ? "Post created successfully!" : "Failed to create post.");
                         }
-                        case 2 -> {
+                        case "2" -> {
                             // Send Friend Request
                             outputStream.writeObject(OperationType.SEND_FRIENDREQUEST);
                             System.out.print("Enter user ID to send friend request: ");
@@ -100,7 +100,7 @@ public class PlatformClient {
                             boolean friendRequestResult = (boolean) inputStream.readObject();
                             System.out.println(friendRequestResult ? "Friend request sent!" : "Failed to send friend request.");
                         }
-                        case 3 -> {
+                        case "3" -> {
                             // Log Out
                             outputStream.writeObject(OperationType.LOGOUT);
                             outputStream.flush();
