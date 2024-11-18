@@ -178,6 +178,7 @@ public class PlatformClientHandler implements ClientHandler {
         if (userId == loggedInId) { // can't be friends with yourself unfortunately
             return false;
         }
+        // TODO: make this thread-safe
         User user = database.getUser(userId);
         if (user == null || user.getBlockedUserIds().contains(loggedInId)) {
             return false;
