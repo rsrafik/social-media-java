@@ -28,7 +28,7 @@ public class ClientHandlerTestCase {
      */
     @Test
     public void interfaceImplemented() {
-        boolean isImplemented = Post.class.isAssignableFrom(PlatformClientHandler.class);
+        boolean isImplemented = ClientHandler.class.isAssignableFrom(PlatformClientHandler.class);
         Assert.assertTrue("PlatformClientHandler should implement ClientHandler", isImplemented);
     }
 }

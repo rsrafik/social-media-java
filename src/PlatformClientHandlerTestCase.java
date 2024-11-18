@@ -50,9 +50,9 @@ public class PlatformClientHandlerTestCase {
     @Test
     public void testCreateUser() {
         PlatformClientHandler handler = new PlatformClientHandler(new Socket());
-        boolean userCreated = handler.createUser("User", "Password");
+        boolean userCreated = handler.createUser("Username", "Password");
         assertTrue(userCreated);
-        boolean duplicateUser = handler.createUser("User", "Password");
+        boolean duplicateUser = handler.createUser("Username", "newPassword");
         assertFalse(duplicateUser);
     }
 
