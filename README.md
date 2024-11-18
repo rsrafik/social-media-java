@@ -14,11 +14,12 @@ javac PlatformClient.java
 java PlatformClient
 ```
 
-## Submission Details
+## Submission Details (and History)
 
 ---
 
 **Rachel Rafik** - Vocareum Phase 2 Workspace
+**Rachel Rafik** - Vocareum Phase 1 Workspace
 
 # Description
 
