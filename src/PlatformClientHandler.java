@@ -84,8 +84,8 @@ public class PlatformClientHandler implements ClientHandler {
                             outputStream.flush();
                         }
                         case SEND_FRIENDREQUEST -> {
-                            int toId = (Integer) inputStream.readObject();
-                            boolean result = sendFriendRequest(toId);
+                            int userId = (Integer) inputStream.readObject();
+                            boolean result = sendFriendRequest(userId);
                             outputStream.writeObject(result);
                             outputStream.flush();
                         }
