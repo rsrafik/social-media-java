@@ -2,11 +2,18 @@ import org.junit.Test;
 import java.net.Socket;
 import java.awt.image.BufferedImage;
 import static org.junit.Assert.*;
-
+/**
+ * Test case for the methods isLoggedIn(), LogIn(), LogOut(), CreateUser(), and CreatePost() in the
+ * PlatformClientHandler class.
+ *
+ * @author Navan Dendukuri, L22
+ * @version November 17, 2024
+ */
 public class PlatformClientHandlerTestCase {
 
+    // Tests the isLoggedIn method from PlatformClientHandler
     @Test
-    public void testIsLoggedIn() throws Exception {
+    public void testIsLoggedIn() {
         PlatformClientHandler handler = new PlatformClientHandler(new Socket());
         assertFalse(handler.isLoggedIn());
         handler.createUser("User", "Password");
@@ -16,8 +23,9 @@ public class PlatformClientHandlerTestCase {
         assertFalse(handler.isLoggedIn());
     }
 
+    // Tests the LogIn method from PlatformClientHandler
     @Test
-    public void testLogIn() throws Exception {
+    public void testLogIn() {
         PlatformClientHandler handler = new PlatformClientHandler(new Socket());
         boolean isUserCreated = handler.createUser("User", "Password");
         assertTrue(isUserCreated);
@@ -27,8 +35,9 @@ public class PlatformClientHandlerTestCase {
         assertFalse(loginFailed);
     }
 
+    // Tests the LogOut method from PlatformClientHandler
     @Test
-    public void testLogOut() throws Exception {
+    public void testLogOut() {
         PlatformClientHandler handler = new PlatformClientHandler(new Socket());
         handler.createUser("User", "Password");
         handler.logIn("User", "Password");
@@ -37,8 +46,9 @@ public class PlatformClientHandlerTestCase {
         assertFalse(handler.isLoggedIn());
     }
 
+    // Tests the createUser method from PlatformClientHandler
     @Test
-    public void testCreateUser() throws Exception {
+    public void testCreateUser() {
         PlatformClientHandler handler = new PlatformClientHandler(new Socket());
         boolean userCreated = handler.createUser("User", "Password");
         assertTrue(userCreated);
@@ -46,8 +56,9 @@ public class PlatformClientHandlerTestCase {
         assertFalse(duplicateUser);
     }
 
+    // Tests the createPosts method from PlatformClientHandler
     @Test
-    public void testCreatePost() throws Exception {
+    public void testCreatePost() {
         PlatformClientHandler handler = new PlatformClientHandler(new Socket());
         handler.createUser("User", "Password");
         handler.logIn("User", "Password");
