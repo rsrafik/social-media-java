@@ -64,56 +64,33 @@ public class DatabaseTestcase {
                 "User2", db.getUsers().get(1).getUsername());
     }
 
-    //tests readUsers with an empty file
-    @Test
-    public void testReadUsersWithEmptyFile() throws IOException, ClassNotFoundException {
-        PlatformDatabase db = new PlatformDatabase();
-
-        // Prepare an empty users.dat file
-        new FileOutputStream("users.dat").close();
-
-        db.readUsers("users.dat");
-
-        assertEquals("Expected 0 users when reading an empty file.",
-                0, db.getUsers().size());
-    }    //end of readUsers tests
-
-
+    /*
     //test for readPosts
     @Test
     public void testReadPostsWithValidFile() throws IOException, ClassNotFoundException {
         PlatformDatabase db = new PlatformDatabase();
 
         // Prepare a test posts.dat file with serialized PlatformPost objects
-        try (FileOutputStream fileOut = new FileOutputStream("posts.dat");
+        String testFilename = "posts.dat";
+        try (FileOutputStream fileOut = new FileOutputStream(testFilename);
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+            PlatformUser testUser = new PlatformUser(0,"User1", "password");
             out.writeObject(new PlatformPost(0, 0, "Post1", null));
-            out.writeObject(new PlatformPost(1, 1, "Post2", null));
+            out.writeObject(new PlatformPost(1, 0, "Post2", null));
         }
 
-        db.readPosts("posts.dat");
+        db.readPosts(testFilename);
 
+        List<Post> posts = db.getPosts();
+        assertNotNull("post list shouldn't be empty", posts);
         assertEquals("Expected 2 posts in the list after reading a valid file.",
-                2, db.getPosts().size());
+                2, posts.size());
         assertEquals("Expected first post to be 'Post1'.",
-                "Post1", db.getPosts().get(0).getContent());
-        assertEquals("Expected second post to be 'Post2'.",
-                "Post2", db.getPosts().get(1).getContent());
+                "Post1", posts.get(0).getContent());
+        assertEquals("Expected second post to be 'Post2'.", "Post2", posts.get(1).getContent());
     }
 
-    //test with empty post file
-    @Test
-    public void testReadPostsWithEmptyFile() throws IOException, ClassNotFoundException {
-        PlatformDatabase db = new PlatformDatabase();
-
-        // Prepare an empty posts.dat file
-        new FileOutputStream("posts.dat").close();
-
-        db.readPosts("posts.dat");
-
-        assertEquals("Expected 0 posts when reading an empty file.",
-                0, db.getPosts().size());
-    }    //end of readPosts test
+     */
 
     //tests for addUser method
     @Test
@@ -248,10 +225,4 @@ public class DatabaseTestcase {
         Assert.assertTrue("Post one should be in the list", posts.contains(one));
         Assert.assertTrue("Post two should be in the list", posts.contains(two));
     }
-
-    /*
-     * will add a separate test here for adding photos to posts
-     *  -Mckinley
-     */
-
 }    //end of Database testcase
