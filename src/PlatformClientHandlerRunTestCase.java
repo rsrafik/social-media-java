@@ -2,15 +2,23 @@ import org.junit.Test;
 import java.io.*;
 import java.net.Socket;
 import static org.junit.Assert.*;
-
+/**
+ * Test case for the run methods in the
+ * PlatformClientHandler class using input
+ * output streams and mock socket to simulate
+ * client and server communication.
+ *
+ * @author Navan Dendukuri, L22
+ * @version November 17, 2024
+ */
 public class PlatformClientHandlerRunTestCase {
-    private PlatformClientHandler handler;
+
+    // Tests if the run method from PlatformClientHandler works
     @Test
-    public void testRun() throws IOException, ClassNotFoundException {
+    public void testRun() throws IOException {
         // Create piped streams to test client-server
         PipedOutputStream clientOutput = new PipedOutputStream();
         PipedInputStream serverInput = new PipedInputStream(clientOutput);
-
         PipedOutputStream serverOutput = new PipedOutputStream();
         PipedInputStream clientInput = new PipedInputStream(serverOutput);
         Socket socket = new MockSocket(serverInput, serverOutput);
@@ -50,16 +58,19 @@ public class PlatformClientHandlerRunTestCase {
         private final InputStream inputStream;
         private final OutputStream outputStream;
 
+        // Constructor to initialize the mock socket with input and output streams
         public MockSocket(InputStream inputStream, OutputStream outputStream) {
             this.inputStream = inputStream;
             this.outputStream = outputStream;
         }
 
+        // Returns the input stream for the mock socket
         @Override
         public InputStream getInputStream() {
             return inputStream;
         }
 
+        // Returns the output stream for the mock socket
         @Override
         public OutputStream getOutputStream() {
             return outputStream;
