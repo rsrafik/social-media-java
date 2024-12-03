@@ -4,6 +4,8 @@ import java.awt.Image;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+// TODO: reconsider friend requests
+
 /**
  * PlatformClientHandler
  * 
@@ -83,10 +85,59 @@ public class PlatformClientHandler implements ClientHandler {
                             outputStream.writeObject(result);
                             outputStream.flush();
                         }
-                        case SEND_FRIENDREQUEST -> {
-                            int toId = (Integer) inputStream.readObject();
-                            boolean result = sendFriendRequest(toId);
+                        case GET_BLOCKED_USERS -> {
+                            outputStream.writeObject(getBlockedUserIds());
+                        }
+                        case BLOCK_USER -> {
+                            int userId = (Integer) inputStream.readObject();
+                            boolean result = addBlockedUser(userId);
                             outputStream.writeObject(result);
+                            outputStream.flush();
+                        }
+                        case UNBLOCK_USER -> {
+                            int userId = (Integer) inputStream.readObject();
+                            boolean result = removeBlockedUser(userId);
+                            outputStream.writeObject(result);
+                            outputStream.flush();
+                        }
+                        case GET_FRIENDREQUESTS -> {
+                            outputStream.writeObject(getFriendRequests());
+                            outputStream.flush();
+                        }
+                        case SEND_FRIENDREQUEST -> {
+                            int userId = (Integer) inputStream.readObject();
+                            boolean result = sendFriendRequest(userId);
+                            outputStream.writeObject(result);
+                            outputStream.flush();
+                        }
+                        case CANCEL_FRIENDREQUEST -> {
+                            int userId = (Integer) inputStream.readObject();
+                            boolean result = cancelFriendRequest(userId);
+                            outputStream.writeObject(result);
+                            outputStream.flush();
+                        }
+                        case FETCH_POST -> {
+                            int postId = (Integer) inputStream.readObject();
+                            Post post = fetchPost(postId);
+                            outputStream.writeObject(post);
+                            outputStream.flush();
+                        }
+                        case UPVOTE_POST -> {
+                            int postId = (Integer) inputStream.readObject();
+                            boolean result = upvotePost(postId);
+                            outputStream.writeObject(result);
+                            outputStream.flush();
+                        }
+                        case DOWNVOTE_POST -> {
+                            int postId = (Integer) inputStream.readObject();
+                            boolean result = downvotePost(postId);
+                            outputStream.writeObject(result);
+                            outputStream.flush();
+                        }
+                        case SEARCH_USER -> {
+                            String search = (String) inputStream.readObject();
+                            List<User> users = searchUsername(search);
+                            outputStream.writeObject(users);
                             outputStream.flush();
                         }
                         case TESTING -> {
@@ -100,10 +151,10 @@ public class PlatformClientHandler implements ClientHandler {
                                     .format("Unimplemented operation %s!", operation.toString()));
                         }
                     }
-                } catch (EOFException e) {
+                } catch (EOFException ex) {
                     break;
-                } catch (ClassNotFoundException e) {
-                    e.printStackTrace();
+                } catch (ClassNotFoundException ex) {
+                    ex.printStackTrace();
                 }
             }
         } catch (IOException ex) {
@@ -171,6 +222,39 @@ public class PlatformClientHandler implements ClientHandler {
     }
 
     @Override
+    public List<Integer> getBlockedUserIds() {
+        if (!isLoggedIn()) {
+            return null;
+        }
+        return loggedInUser.getBlockedUserIds();
+    }
+
+    @Override
+    public boolean addBlockedUser(int userId) {
+        if (!isLoggedIn()) {
+            return false;
+        }
+        database.addBlockedUser(loggedInId, userId);
+        return true;
+    }
+
+    @Override
+    public boolean removeBlockedUser(int userId) {
+        if (!isLoggedIn()) {
+            return false;
+        }
+        database.removeBlockedUser(loggedInId, userId);
+        return true;
+    }
+
+    public List<Integer> getFriendRequests() {
+        if (!isLoggedIn()) {
+            return null;
+        }
+        return loggedInUser.getFriendRequests();
+    }
+
+    @Override
     public boolean sendFriendRequest(int userId) {
         if (!isLoggedIn()) {
             return false;
@@ -178,6 +262,7 @@ public class PlatformClientHandler implements ClientHandler {
         if (userId == loggedInId) { // can't be friends with yourself unfortunately
             return false;
         }
+        // TODO: make this thread-safe
         User user = database.getUser(userId);
         if (user == null || user.getBlockedUserIds().contains(loggedInId)) {
             return false;
@@ -196,5 +281,56 @@ public class PlatformClientHandler implements ClientHandler {
             }
         }
         return true;
+    }
+
+    public boolean cancelFriendRequest(int userId) {
+        if (!isLoggedIn()) {
+            return false;
+        }
+        // TODO: change this
+        User user = database.getUser(userId);
+        if (user == null) {
+            return false;
+        }
+        List<Integer> friendRequests = user.getFriendRequests();
+        if (friendRequests.contains(loggedInId)) {
+            database.removeFriendRequest(loggedInId, userId);
+        }
+
+        return true;
+    }
+
+    @Override
+    public Post fetchPost(int postId) {
+        if (!isLoggedIn()) {
+            return null;
+        }
+        Post post = database.getPost(postId);
+        User creator = database.getUser(post.getCreatorId());
+        // TODO: consider if all posts are public or if posts are only visible to friends/followers
+        if (creator != null && creator.hasBlockedUser(loggedInId)) {
+            return null;
+        }
+        return post;
+    }
+
+    public boolean upvotePost(int postId) {
+        Post post = database.getPost(postId);
+        // TODO
+        return false;
+    }
+
+    public boolean downvotePost(int postId) {
+        // TODO
+        return false;
+    }
+
+    public List<User> searchUsername(String search) {
+        if (!isLoggedIn()) {
+            return null;
+        }
+        List<User> users = database.searchUsername(search);
+        // TODO: filter blocked users
+        return users;
     }
 }

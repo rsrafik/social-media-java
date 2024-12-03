@@ -12,7 +12,7 @@ import java.awt.Image;
  * 
  * @author Rachel Rafik, L22
  * @author Ropan Datta, L22
- * @version November 15, 2024
+ * @version December 3, 2024
  */
 public class PlatformUser implements User, Serializable {
     private Integer id; // Unique identifier for the user (non-static)
@@ -115,6 +115,11 @@ public class PlatformUser implements User, Serializable {
     }
 
     @Override
+    public void removeFriend(int userId) {
+        friendIds.remove((Integer) userId);
+    }
+
+    @Override
     public int friendCount() {
         return friendIds.size();
     }
@@ -125,13 +130,41 @@ public class PlatformUser implements User, Serializable {
     }
 
     @Override
-    public void addFriendRequest(int userId) {
-        friendRequests.add(userId);
+    public boolean addFriendRequest(int userId) {
+        if (blockedUserIds.contains(userId)) {
+            return false;
+        }
+        if (!friendRequests.contains(userId)) {
+            friendRequests.add(userId);
+        }
+        return true;
+    }
+
+    @Override
+    public void removeFriendRequest(int userId) {
+        friendRequests.remove((Integer) userId);
     }
 
     @Override
     public List<Integer> getBlockedUserIds() {
         return blockedUserIds;
+    }
+
+    @Override
+    public boolean hasBlockedUser(int userId) {
+        return blockedUserIds.contains(userId);
+    }
+
+    @Override
+    public void addBlockedUser(int userId) {
+        if (!blockedUserIds.contains(userId)) {
+            blockedUserIds.add(userId);
+        }
+    }
+
+    @Override
+    public void removeBlockedUser(int userId) {
+        blockedUserIds.remove((Integer) userId);
     }
 
     @Override

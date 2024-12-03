@@ -32,3 +32,4 @@ bin/
 *.class
 *.dat
 *.ser
+src/*.dat

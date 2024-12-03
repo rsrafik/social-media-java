@@ -69,7 +69,6 @@ public interface User {
      */
     void removeDisplayImage();
 
-
     /**
      * Retrieves the IDs of posts created by the user.
      *
@@ -92,6 +91,35 @@ public interface User {
     int postCount();
 
     /**
+     * Retrieves the IDs of users blocked by the user.
+     *
+     * @return the list of IDs of blocked users
+     */
+    List<Integer> getBlockedUserIds();
+
+    /**
+     * Checks whether or not a user has been blocked.
+     * 
+     * @param userId the ID of the user to check for
+     * @return whether or not the user has been blocked
+     */
+    boolean hasBlockedUser(int userId);
+
+    /**
+     * Blocks a user.
+     * 
+     * @param userId the ID of the user to block
+     */
+    void addBlockedUser(int userId);
+
+    /**
+     * Unblocks a user.
+     * 
+     * @param userId the ID of the user to unblock
+     */
+    void removeBlockedUser(int userId);
+
+    /**
      * Retrieves the IDs of the user's friends.
      *
      * @return the list of user IDs representing the user's friends
@@ -106,6 +134,13 @@ public interface User {
      *         {@code false} if the user is blocked or could not be added for some reason
      */
     boolean addFriend(int userId);
+
+    /**
+     * Removes a friend.
+     * 
+     * @param userId the ID of the friend to remove
+     */
+    void removeFriend(int userId);
 
     /**
      * Retrieves the number of friends the user has.
@@ -124,14 +159,16 @@ public interface User {
     /**
      * Adds an incoming friend request to the user.
      * 
-     * @param userId
+     * @param userId the ID of the user who sent the friend request
+     * @return {@code true} if the friend request was sent successfully, {@code false} if the friend
+     *         request failed
      */
-    void addFriendRequest(int userId);
+    boolean addFriendRequest(int userId);
 
     /**
-     * Retrieves the IDs of users blocked by the user.
-     *
-     * @return the list of IDs of blocked users
+     * Removes an incoming friend request to the user.
+     * 
+     * @param userId the ID of the user who canceled the friend request
      */
-    List<Integer> getBlockedUserIds();
+    void removeFriendRequest(int userId);
 }

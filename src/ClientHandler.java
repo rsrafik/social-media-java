@@ -1,3 +1,4 @@
+import java.util.List;
 import java.awt.Image;
 
 /**
@@ -51,9 +52,33 @@ public interface ClientHandler extends Runnable {
      * 
      * @param content the text content of the post
      * @param image an optional image added to the post
-     * @return {@code true} if the post was created successfully, {@code false}
+     * @return {@code true} if the post was created successfully, {@code false} if post creation
+     *         failed
      */
     boolean createPost(String content, Image image);
+
+    /**
+     * Retrieves the IDs of the blocked users.
+     * 
+     * @return the list of blocked user IDs
+     */
+    List<Integer> getBlockedUserIds();
+
+    /**
+     * Adds a user to the list of blocked users.
+     * 
+     * @param userId the ID of the user to block
+     * @return {@code true} if the user was blocked successfully
+     */
+    boolean addBlockedUser(int userId);
+
+    /**
+     * Removes a user from the list of blocked users.
+     * 
+     * @param userId the ID of the user to unblock
+     * @return {@code true} if the user was unblocked successfully
+     */
+    boolean removeBlockedUser(int userId);
 
     /**
      * Tries to send a friend request to another user or accepts an incoming friend request.
@@ -63,4 +88,9 @@ public interface ClientHandler extends Runnable {
      *         otherwise
      */
     boolean sendFriendRequest(int userId);
+
+    /**
+     * Retrieves a post
+     */
+    Post fetchPost(int postId);
 }

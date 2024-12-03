@@ -12,8 +12,8 @@ import java.util.*;
  * @version November 15, 2024
  */
 public class PlatformDatabase implements Database {
-    private static final Object USER_LOCK = new Object(); // Synchronization lock for users
-    private static final Object POST_LOCK = new Object(); // Synchronization lock for posts
+    private final Object USER_LOCK = new Object(); // Synchronization lock for users
+    private final Object POST_LOCK = new Object(); // Synchronization lock for posts
 
     // these two are kinda only useful for saving to file
     private ArrayList<User> users;
@@ -80,17 +80,23 @@ public class PlatformDatabase implements Database {
 
     @Override
     public List<User> getUsers() {
-        return users;
+        synchronized (USER_LOCK) {
+            return users;
+        }
     }
 
     @Override
     public User getUser(int userId) {
-        return userMap.get(userId);
+        synchronized (USER_LOCK) {
+            return userMap.get(userId);
+        }
     }
 
     @Override
     public Integer getUserId(String username) {
-        return usernameMap.get(username);
+        synchronized (USER_LOCK) {
+            return usernameMap.get(username);
+        }
     }
 
     @Override
@@ -104,29 +110,107 @@ public class PlatformDatabase implements Database {
 
     @Override
     public int userCount() {
-        return users.size();
+        synchronized (USER_LOCK) {
+            return users.size();
+        }
     }
 
     @Override
     public List<Post> getPosts() {
-        return posts;
+        synchronized (POST_LOCK) {
+            return posts;
+        }
     }
 
     @Override
     public Post getPost(int postId) {
-        return postMap.get(postId);
+        synchronized (POST_LOCK) {
+            return postMap.get(postId);
+        }
     }
 
     @Override
     public void addPost(Post post) {
+        int creatorId = post.getCreatorId();
         synchronized (USER_LOCK) {
-            synchronized (POST_LOCK) {
-                int creatorId = post.getCreatorId();
-                User creator = userMap.get(creatorId);
-                creator.addPost(post.getId());
-                posts.add(post);
-                postMap.put(post.getId(), post);
+            User creator = userMap.get(creatorId);
+            creator.addPost(post.getId());
+        }
+        synchronized (POST_LOCK) {
+            posts.add(post);
+            postMap.put(post.getId(), post);
+        }
+    }
+
+    @Override
+    public void addUpvotePost(int postId, int userId) {
+        synchronized (POST_LOCK) {
+            Post post = getPost(postId);
+            post.addUpvote(userId);
+        }
+    }
+
+    @Override
+    public void addDownvotePost(int postId, int userId) {
+        synchronized (POST_LOCK) {
+            Post post = getPost(postId);
+            post.addDownvote(userId);
+        }
+    }
+
+    @Override
+    public void addComment(int postId, Comment comment) {
+        synchronized (POST_LOCK) {
+            Post post = getPost(postId);
+            post.addComment(comment);
+        }
+    }
+
+    @Override
+    public void addBlockedUser(int userId, int blockedId) {
+        synchronized (USER_LOCK) {
+            User user = getUser(userId);
+            user.addBlockedUser(blockedId);
+        }
+    }
+
+    @Override
+    public void removeBlockedUser(int userId, int blockedId) {
+        synchronized (USER_LOCK) {
+            User user = getUser(userId);
+            user.removeBlockedUser(blockedId);
+        }
+    }
+
+    // TODO
+    public void addFriendRequest(int userId, int toId) {
+        synchronized (USER_LOCK) {
+            User to = getUser(toId);
+            to.addFriendRequest(userId);
+        }
+    }
+
+    // TODO
+    public void removeFriendRequest(int userId, int fromId) {
+        synchronized (USER_LOCK) {
+            User user = getUser(userId);
+            user.removeFriendRequest(fromId);
+        }
+    }
+
+    @Override
+    public List<User> searchUsername(String search) {
+        if (search.isEmpty()) {
+            return null;
+        }
+        synchronized (USER_LOCK) {
+            ArrayList<User> searchedUsers = new ArrayList<>();
+            for (User user : users) {
+                if (user.getUsername().contains(search)) {
+                    searchedUsers.add(user);
+                }
             }
+            return searchedUsers;
         }
     }
 

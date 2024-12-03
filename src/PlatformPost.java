@@ -70,6 +70,7 @@ public class PlatformPost implements Post, Serializable {
     @Override
     public boolean addUpvote(int userId) {
         if (!upvoteIds.contains(userId)) {
+            downvoteIds.remove((Integer) userId);
             upvoteIds.add(userId);
             return true;
         }
@@ -79,6 +80,7 @@ public class PlatformPost implements Post, Serializable {
     @Override
     public boolean addDownvote(int userId) {
         if (!downvoteIds.contains(userId)) {
+            upvoteIds.remove((Integer) userId);
             downvoteIds.add(userId);
             return true;
         }
