@@ -84,9 +84,57 @@ public interface Database {
     /**
      * Adds a new post to the database.
      *
-     * @param post The PlatformPost to add to the database
+     * @param post the PlatformPost to add to the database
      */
     void addPost(Post post);
+
+    /**
+     * Adds an upvote to a post.
+     * 
+     * @param postId the ID of the post to upvote
+     * @param userId the ID of the user who upvoted the post
+     */
+    void addUpvotePost(int postId, int userId);
+
+    /**
+     * Adds a downvote to a post.
+     * 
+     * @param postId the ID of the post to downvote
+     * @param userId the ID of the user who downvoted the post
+     */
+    void addDownvotePost(int postId, int userId);
+
+    /**
+     * Adds a comment to the post.
+     * 
+     * @param postId the ID of the post to which the comment is added
+     * @param comment the comment to be added
+     */
+    void addComment(int postId, Comment comment);
+
+    /**
+     * Adds a user to the list of blocked users.
+     * 
+     * @param userId the ID of the user adding the block
+     * @param blockedId the ID of the user being blocked
+     */
+    void addBlockedUser(int userId, int blockedId);
+
+    /**
+     * Removes a user from the list of blocked users.
+     * 
+     * @param userId the ID of the user removing the block
+     * @param blockedId the ID of the user being unblocked
+     */
+    void removeBlockedUser(int userId, int blockedId);
+
+    /**
+     * Searches for users by username.
+     * 
+     * @param search the search term
+     * @return the list of users containing the search term in their username.
+     */
+    List<User> searchUsername(String search);
 
     /**
      * Saves user information to disk.
