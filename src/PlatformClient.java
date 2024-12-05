@@ -69,7 +69,8 @@ public class PlatformClient {
      * @param inputStream the input stream to receive data from the server
      * @param scanner the Scanner to read user input
      */
-    private static void handleLogin(ObjectOutputStream outputStream, ObjectInputStream inputStream, Scanner scanner) throws IOException, ClassNotFoundException {
+    private static void handleLogin(ObjectOutputStream outputStream, ObjectInputStream inputStream, Scanner scanner)
+            throws IOException, ClassNotFoundException {
         outputStream.writeObject(OperationType.LOGIN);  // Request login operation
         System.out.print("Enter username: ");
         String username = scanner.nextLine();
@@ -91,7 +92,8 @@ public class PlatformClient {
      * @param scanner the Scanner to read user input
      * @return true if the user is successfully logged in after sign-up, false otherwise
      */
-    private static boolean handleSignUp(ObjectOutputStream outputStream, ObjectInputStream inputStream, Scanner scanner) throws IOException, ClassNotFoundException {
+    private static boolean handleSignUp(ObjectOutputStream outputStream, ObjectInputStream inputStream, Scanner scanner)
+            throws IOException, ClassNotFoundException {
         outputStream.writeObject(OperationType.CREATE_USER);  // Request user creation
         System.out.print("Enter new username: ");
         String newUsername = scanner.nextLine();
@@ -122,7 +124,8 @@ public class PlatformClient {
      * @param inputStream the input stream to receive data from the server
      * @param scanner the Scanner to read user input
      */
-    private static void handleCreatePost(ObjectOutputStream outputStream, ObjectInputStream inputStream, Scanner scanner) throws IOException, ClassNotFoundException {
+    private static void handleCreatePost(ObjectOutputStream outputStream, ObjectInputStream inputStream,
+                                         Scanner scanner) throws IOException, ClassNotFoundException {
         outputStream.writeObject(OperationType.CREATE_POST);  // Request post creation
         System.out.print("Enter post content: ");
         String content = scanner.nextLine();
@@ -141,7 +144,8 @@ public class PlatformClient {
      * @param inputStream the input stream to receive data from the server
      * @param scanner the Scanner to read user input
      */
-    private static void handleFriendRequest(ObjectOutputStream outputStream, ObjectInputStream inputStream, Scanner scanner) throws IOException, ClassNotFoundException {
+    private static void handleFriendRequest(ObjectOutputStream outputStream, ObjectInputStream inputStream,
+                                            Scanner scanner) throws IOException, ClassNotFoundException {
         outputStream.writeObject(OperationType.SEND_FRIENDREQUEST);  // Request friend request operation
         System.out.print("Enter user ID to send friend request: ");
         int userId = scanner.nextInt();
