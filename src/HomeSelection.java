@@ -1,5 +1,8 @@
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 class HomeSelection {
 
@@ -8,31 +11,48 @@ class HomeSelection {
         mainPanel.setBackground(Color.WHITE);
 
         // Create the search bar panel
-        JPanel searchBarPanel = new JPanel();
-        searchBarPanel.setLayout(new GridBagLayout()); // Use GridBagLayout for centering
+        JPanel searchBarPanel = new JPanel(new BorderLayout());
         searchBarPanel.setBackground(Color.WHITE);
+        searchBarPanel.setBorder(new EmptyBorder(20, 0, 20, 0)); // Add vertical padding
 
-        // Set fixed height for the search bar panel
-        searchBarPanel.setPreferredSize(new Dimension(0, 100));
-
-        // Calculate the initial width dynamically
-
-        // Create the search field with the calculated initial width
+        // Create the search field
         SearchTextField searchField = new SearchTextField();
-        searchField.setPreferredSize(new Dimension(400, 40)); // Set the size dynamically
+        searchField.setPreferredSize(new Dimension(400, 40));
 
-        // Add search field to the center of the search bar panel
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 0; // Center horizontally
-        gbc.gridy = 0; // Center vertically
-        gbc.anchor = GridBagConstraints.CENTER; // Align to center
-        searchBarPanel.add(searchField, gbc);
+        // Center the search field in the panel
+        JPanel centerPanel = new JPanel();
+        centerPanel.setBackground(Color.WHITE);
+        centerPanel.add(searchField);
+        searchBarPanel.add(centerPanel, BorderLayout.CENTER);
 
-        // Add search bar panel to the top of the main panel
+        // Create the "Create New Post" button
+        RoundedButton createPostButton = new RoundedButton("Create New Post");
+        createPostButton.setForeground(Color.WHITE);
+        createPostButton.setBackground(new Color(0, 122, 255)); // Blue color
+        createPostButton.setFont(new Font("Arial", Font.BOLD, 14));
+        createPostButton.setFocusPainted(false);
+        createPostButton.setBorderPainted(false);
+        createPostButton.setOpaque(false);
+
+        // Add action listener for the button
+        createPostButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JOptionPane.showInputDialog("Enter your message:");
+            }
+        });
+
+        // Add the button to the right (East) of the search bar panel
+        JPanel eastPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        eastPanel.setBackground(Color.WHITE);
+        eastPanel.setBorder(new EmptyBorder(0, 0, 0, 20)); // Add right padding
+        eastPanel.add(createPostButton);
+        searchBarPanel.add(eastPanel, BorderLayout.EAST);
+
+        // Add the search bar panel to the top of the main panel
         mainPanel.add(searchBarPanel, BorderLayout.NORTH);
 
-
-        // Add the scrollable content in the SOUTH region
+        // Add the scrollable content in the CENTER region
         addScrollableContent(mainPanel);
     }
 
@@ -44,9 +64,9 @@ class HomeSelection {
 
         // Add 5 individual posts to the content panel
         for (int i = 1; i <= 5; i++) {
-            JPanel post = SinglePost.individualPost(); // Create an individual post
-            contentPanel.add(Box.createVerticalStrut(40)); // Add spacing between posts
+            JPanel post = SinglePost.individualPost("friend"); // Create an individual post
             contentPanel.add(post); // Add the post to the content panel
+            contentPanel.add(Box.createVerticalStrut(40)); // Add spacing between posts
         }
 
         // Wrap the content panel in a scroll pane

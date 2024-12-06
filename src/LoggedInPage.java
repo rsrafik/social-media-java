@@ -68,7 +68,7 @@ public class LoggedInPage {
         buttons[1] = createSidebarButton("Profile", gridPanel, buttons, jf);
         buttons[2] = createSidebarButton("Inbox", gridPanel, buttons, jf);
 
-        buttons[3] = new TransparentJButton("Log out");
+        buttons[3] = new TransparentJButton("Log Out and Exit");
         buttons[3].setHorizontalAlignment(SwingConstants.LEFT);
         buttons[3].setPreferredSize(new Dimension(250, 50));
         buttons[3].setFont(new Font("Arial", Font.BOLD, 20));
@@ -77,9 +77,23 @@ public class LoggedInPage {
         buttons[3].setOpaque(true);
         buttons[3].setBorder(new EmptyBorder(0, 20, 0, 0));
         buttons[3].addActionListener(e -> {
-            selectedButton = "Log out";
-            resetButtons(buttons);
+            // Display the confirmation dialog
+            int result = JOptionPane.showConfirmDialog(
+                    jf,
+                    "Are you sure you want to log out and exit?",
+                    "Confirm Logout",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE
+            );
+
+            // Handle the user's choice
+            if (result == JOptionPane.YES_OPTION) {
+                jf.dispose(); // Close the JFrame if "Yes" is selected
+            }
+
+            selectedButton = "Log out"; // Retain functionality to update the selected button
         });
+
 
         gridPanel.add(buttons[3]);
 
@@ -96,7 +110,8 @@ public class LoggedInPage {
         button.setBackground(Color.LIGHT_GRAY);
         button.setForeground(Color.BLACK);
         button.setOpaque(true);
-        button.setBorder(new EmptyBorder(0, 20, 0, 0));
+
+        button.setBorder(new EmptyBorder(0,20,0,0));
 
         if ("Home".equals(text)) {
             button.setBackground(Color.DARK_GRAY);
