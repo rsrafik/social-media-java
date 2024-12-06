@@ -51,6 +51,13 @@ public interface User {
     boolean passwordEquals(String password);
 
     /**
+     * Checks whether the user has a profile picture.
+     * 
+     * @return whether or not the user's display image is null
+     */
+    boolean hasDisplayImage();
+
+    /**
      * Retrieves the user's profile picture.
      * 
      * @return the profile picture of the user
@@ -91,6 +98,80 @@ public interface User {
     int postCount();
 
     /**
+     * Retrieves the IDs of the users being followed.
+     * 
+     * @return the the list of IDs the user is following
+     */
+    List<Integer> getFollowingIds();
+
+    /**
+     * Follows a user.
+     * 
+     * @param userId the ID of the user to follow
+     */
+    void addFollowing(int userId);
+
+    /**
+     * Unfollows a user.
+     * 
+     * @param userId the ID of the user to unfollow
+     */
+    void removeFollowing(int userId);
+
+    /**
+     * Retrieves the IDs of the user's followers.
+     *
+     * @return the list of user IDs representing the user's followers
+     */
+    List<Integer> getFollowerIds();
+
+    /**
+     * Adds a follower.
+     * 
+     * @param userId the ID of the user to add as a follower
+     * @return {@code true} if the user was added or was already present in the list of followers,
+     *         {@code false} if the user is blocked or could not be added for some reason
+     */
+    boolean addFollower(int userId);
+
+    /**
+     * Removes a follower.
+     * 
+     * @param userId the ID of the follower to remove
+     */
+    void removeFollower(int userId);
+
+    /**
+     * Retrieves the number of follower the user has.
+     *
+     * @return the number of followers of the user
+     */
+    int followerCount();
+
+    /**
+     * Retrieves the pending follow requests sent to the user.
+     *
+     * @return A list of pending follow requests
+     */
+    List<Integer> getFollowRequests();
+
+    /**
+     * Adds an incoming follow request to the user.
+     * 
+     * @param userId the ID of the user who sent the follow request
+     * @return {@code true} if the follow request was sent successfully, {@code false} if the follow
+     *         request failed
+     */
+    boolean addFollowRequest(int userId);
+
+    /**
+     * Removes an incoming follow request to the user.
+     * 
+     * @param userId the ID of the user who canceled the follow request
+     */
+    void removeFollowRequest(int userId);
+
+    /**
      * Retrieves the IDs of users blocked by the user.
      *
      * @return the list of IDs of blocked users
@@ -118,57 +199,4 @@ public interface User {
      * @param userId the ID of the user to unblock
      */
     void removeBlockedUser(int userId);
-
-    /**
-     * Retrieves the IDs of the user's friends.
-     *
-     * @return the list of user IDs representing the user's friends
-     */
-    List<Integer> getFriendIds();
-
-    /**
-     * Adds a friend.
-     * 
-     * @param userId the ID of the user to add as a friend
-     * @return {@code true} if the user was added or was already present in the list of friends,
-     *         {@code false} if the user is blocked or could not be added for some reason
-     */
-    boolean addFriend(int userId);
-
-    /**
-     * Removes a friend.
-     * 
-     * @param userId the ID of the friend to remove
-     */
-    void removeFriend(int userId);
-
-    /**
-     * Retrieves the number of friends the user has.
-     *
-     * @return the number of friends of the user
-     */
-    int friendCount();
-
-    /**
-     * Retrieves the pending friend requests sent to the user.
-     *
-     * @return A list of pending friend requests
-     */
-    List<Integer> getFriendRequests();
-
-    /**
-     * Adds an incoming friend request to the user.
-     * 
-     * @param userId the ID of the user who sent the friend request
-     * @return {@code true} if the friend request was sent successfully, {@code false} if the friend
-     *         request failed
-     */
-    boolean addFriendRequest(int userId);
-
-    /**
-     * Removes an incoming friend request to the user.
-     * 
-     * @param userId the ID of the user who canceled the friend request
-     */
-    void removeFriendRequest(int userId);
 }

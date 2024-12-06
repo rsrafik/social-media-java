@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.util.concurrent.*;
 
 /**
  * PlatformServer
@@ -17,14 +18,14 @@ import java.net.*;
 
 public class PlatformServer {
     public static void main(String[] args) throws IOException {
+        ExecutorService service = Executors.newFixedThreadPool(8);
         int port = 5000;
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             while (true) {
                 System.out.println("Waiting for client to connect...");
-                try {
-                    Socket socket = serverSocket.accept();
-                    Thread thread = new Thread(new PlatformClientHandler(socket));
-                    thread.start();
+                try (Socket socket = serverSocket.accept()) {
+                    System.out.println("Waiting for client handler...");
+                    service.execute(new PlatformClientHandler(socket));
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }

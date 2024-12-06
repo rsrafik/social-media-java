@@ -9,7 +9,7 @@ import java.util.*;
  *
  * @author Rachel Rafik, L22
  * @author Ropan Datta, L22
- * @version November 15, 2024
+ * @version December 6, 2024
  */
 public class PlatformDatabase implements Database {
     private final Object USER_LOCK = new Object(); // Synchronization lock for users
@@ -80,8 +80,13 @@ public class PlatformDatabase implements Database {
 
     @Override
     public List<User> getUsers() {
+        return users;
+    }
+
+    @Override
+    public boolean existsUser(int userId) {
         synchronized (USER_LOCK) {
-            return users;
+            return userMap.containsKey(userId);
         }
     }
 
@@ -89,6 +94,14 @@ public class PlatformDatabase implements Database {
     public User getUser(int userId) {
         synchronized (USER_LOCK) {
             return userMap.get(userId);
+        }
+    }
+
+    @Override
+    public User fetchUser(int userId) throws IOException, ClassNotFoundException {
+        synchronized (USER_LOCK) {
+            User user = userMap.get(userId);
+            return (User) deepCopy(user);
         }
     }
 
@@ -117,8 +130,13 @@ public class PlatformDatabase implements Database {
 
     @Override
     public List<Post> getPosts() {
+        return posts;
+    }
+
+    @Override
+    public boolean existsPost(int postId) {
         synchronized (POST_LOCK) {
-            return posts;
+            return postMap.containsKey(postId);
         }
     }
 
@@ -126,6 +144,14 @@ public class PlatformDatabase implements Database {
     public Post getPost(int postId) {
         synchronized (POST_LOCK) {
             return postMap.get(postId);
+        }
+    }
+
+    @Override
+    public Post fetchPost(int postId) throws IOException, ClassNotFoundException {
+        synchronized (POST_LOCK) {
+            Post post = postMap.get(postId);
+            return (Post) deepCopy(post);
         }
     }
 
@@ -143,7 +169,7 @@ public class PlatformDatabase implements Database {
     }
 
     @Override
-    public void addUpvotePost(int postId, int userId) {
+    public void addPostUpvote(int postId, int userId) {
         synchronized (POST_LOCK) {
             Post post = getPost(postId);
             post.addUpvote(userId);
@@ -151,10 +177,26 @@ public class PlatformDatabase implements Database {
     }
 
     @Override
-    public void addDownvotePost(int postId, int userId) {
+    public void removePostUpvote(int postId, int userId) {
+        synchronized (POST_LOCK) {
+            Post post = getPost(postId);
+            post.removeUpvote(userId);
+        }
+    }
+
+    @Override
+    public void addPostDownvote(int postId, int userId) {
         synchronized (POST_LOCK) {
             Post post = getPost(postId);
             post.addDownvote(userId);
+        }
+    }
+
+    @Override
+    public void removePostDownvote(int postId, int userId) {
+        synchronized (POST_LOCK) {
+            Post post = getPost(postId);
+            post.removeDownvote(userId);
         }
     }
 
@@ -167,9 +209,59 @@ public class PlatformDatabase implements Database {
     }
 
     @Override
+    public boolean addFollower(int userId, int followerId) {
+        synchronized (USER_LOCK) {
+            User user = getUser(userId);
+            User follower = getUser(userId);
+            if (!user.addFollower(followerId)) {
+                return false;
+            }
+            follower.addFollowing(userId);
+            return true;
+        }
+    }
+
+    @Override
+    public void removeFollower(int userId, int followerId) {
+        synchronized (USER_LOCK) {
+            User user = getUser(userId);
+            User follower = getUser(followerId);
+            follower.removeFollowing(userId);
+            user.removeFollower(followerId);
+        }
+    }
+
+    @Override
+    public boolean addFollowRequest(int userId, int fromId) {
+        synchronized (USER_LOCK) {
+            User user = getUser(userId);
+            return user.addFollowRequest(userId);
+        }
+    }
+
+    @Override
+    public void removeFollowRequest(int userId, int fromId) {
+        synchronized (USER_LOCK) {
+            User user = getUser(userId);
+            user.removeFollowRequest(fromId);
+        }
+    }
+
+    @Override
+    public boolean hasBlockedUser(int userId, int blockedId) {
+        synchronized (USER_LOCK) {
+            User user = getUser(userId);
+            return user.hasBlockedUser(blockedId);
+        }
+    }
+
+    @Override
     public void addBlockedUser(int userId, int blockedId) {
         synchronized (USER_LOCK) {
             User user = getUser(userId);
+            User blocked = getUser(blockedId);
+            blocked.removeFollowRequest(userId);
+            blocked.removeFollowing(userId);
             user.addBlockedUser(blockedId);
         }
     }
@@ -182,24 +274,8 @@ public class PlatformDatabase implements Database {
         }
     }
 
-    // TODO
-    public void addFriendRequest(int userId, int toId) {
-        synchronized (USER_LOCK) {
-            User to = getUser(toId);
-            to.addFriendRequest(userId);
-        }
-    }
-
-    // TODO
-    public void removeFriendRequest(int userId, int fromId) {
-        synchronized (USER_LOCK) {
-            User user = getUser(userId);
-            user.removeFriendRequest(fromId);
-        }
-    }
-
     @Override
-    public List<User> searchUsername(String search) {
+    public List<User> searchUsername(String search) throws IOException, ClassNotFoundException {
         if (search.isEmpty()) {
             return null;
         }
@@ -207,7 +283,7 @@ public class PlatformDatabase implements Database {
             ArrayList<User> searchedUsers = new ArrayList<>();
             for (User user : users) {
                 if (user.getUsername().contains(search)) {
-                    searchedUsers.add(user);
+                    searchedUsers.add((User) deepCopy(user));
                 }
             }
             return searchedUsers;
@@ -232,6 +308,19 @@ public class PlatformDatabase implements Database {
                 for (Post post : posts) {
                     out.writeObject(post);
                 }
+            }
+        }
+    }
+
+    private Object deepCopy(Object obj) throws IOException, ClassNotFoundException {
+        // Serialize the object
+        try (ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+                ObjectOutputStream out = new ObjectOutputStream(byteOut);) {
+            out.writeObject(obj);
+            // Deserialize the object
+            try (ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
+                    ObjectInputStream in = new ObjectInputStream(byteIn);) {
+                return in.readObject();
             }
         }
     }

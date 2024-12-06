@@ -1,10 +1,9 @@
 import java.io.*;
 import java.net.Socket;
 import java.awt.Image;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-// TODO: reconsider friend requests
 
 /**
  * PlatformClientHandler
@@ -25,8 +24,8 @@ public class PlatformClientHandler implements ClientHandler {
     private static AtomicInteger postCount;
 
     private Socket socket;
-    protected Integer loggedInId;
-    protected User loggedInUser;
+    private Integer loggedInId;
+    private User loggedInUser;
 
     public PlatformClientHandler(Socket socket) {
         if (database == null) {
@@ -78,41 +77,56 @@ public class PlatformClientHandler implements ClientHandler {
                             outputStream.writeObject(result);
                             outputStream.flush();
                         }
-                        case CREATE_POST -> {
-                            String content = (String) inputStream.readObject();
-                            Image image = (Image) inputStream.readObject();
-                            boolean result = createPost(content, image);
-                            outputStream.writeObject(result);
-                            outputStream.flush();
-                        }
                         case GET_BLOCKED_USERS -> {
-                            outputStream.writeObject(getBlockedUserIds());
+                            List<Integer> blockedUserIds = getBlockedUserIds();
+                            outputStream.writeObject(blockedUserIds);
+                            outputStream.flush();
                         }
                         case BLOCK_USER -> {
                             int userId = (Integer) inputStream.readObject();
-                            boolean result = addBlockedUser(userId);
+                            boolean result = blockUser(userId);
                             outputStream.writeObject(result);
                             outputStream.flush();
                         }
                         case UNBLOCK_USER -> {
                             int userId = (Integer) inputStream.readObject();
-                            boolean result = removeBlockedUser(userId);
+                            boolean result = unblockUser(userId);
                             outputStream.writeObject(result);
                             outputStream.flush();
                         }
-                        case GET_FRIENDREQUESTS -> {
-                            outputStream.writeObject(getFriendRequests());
+                        case GET_FOLLOWREQUESTS -> {
+                            List<Integer> followRequests = getFollowRequests();
+                            outputStream.writeObject(followRequests);
                             outputStream.flush();
                         }
-                        case SEND_FRIENDREQUEST -> {
+                        case SEND_FOLLOWREQUEST -> {
                             int userId = (Integer) inputStream.readObject();
-                            boolean result = sendFriendRequest(userId);
+                            boolean result = sendFollowRequest(userId);
                             outputStream.writeObject(result);
                             outputStream.flush();
                         }
-                        case CANCEL_FRIENDREQUEST -> {
+                        case CANCEL_FOLLOWREQUEST -> {
                             int userId = (Integer) inputStream.readObject();
-                            boolean result = cancelFriendRequest(userId);
+                            boolean result = cancelFollowRequest(userId);
+                            outputStream.writeObject(result);
+                            outputStream.flush();
+                        }
+                        case ACCEPT_FOLLOWREQUEST -> {
+                            int userId = (Integer) inputStream.readObject();
+                            boolean result = acceptFollowRequest(userId);
+                            outputStream.writeObject(result);
+                            outputStream.flush();
+                        }
+                        case REJECT_FOLLOWREQUEST -> {
+                            int userId = (Integer) inputStream.readObject();
+                            boolean result = rejectFollowRequest(userId);
+                            outputStream.writeObject(result);
+                            outputStream.flush();
+                        }
+                        case CREATE_POST -> {
+                            String content = (String) inputStream.readObject();
+                            Image image = (Image) inputStream.readObject();
+                            boolean result = createPost(content, image);
                             outputStream.writeObject(result);
                             outputStream.flush();
                         }
@@ -134,10 +148,28 @@ public class PlatformClientHandler implements ClientHandler {
                             outputStream.writeObject(result);
                             outputStream.flush();
                         }
+                        case FETCH_COMMENTS -> {
+                            // TODO
+                        }
+                        case CREATE_COMMENT -> {
+                            int postId = (Integer) inputStream.readObject();
+                            String content = (String) inputStream.readObject();
+                            boolean result = createComment(postId, content);
+                            outputStream.writeObject(result);
+                            outputStream.flush();
+                        }
+                        case DELETE_COMMENT -> {
+                            // TODO
+                        }
                         case SEARCH_USER -> {
                             String search = (String) inputStream.readObject();
                             List<User> users = searchUsername(search);
                             outputStream.writeObject(users);
+                            outputStream.flush();
+                        }
+                        case LOAD_FEED -> {
+                            List<Post> feed = loadFeed();
+                            outputStream.writeObject(feed);
                             outputStream.flush();
                         }
                         case TESTING -> {
@@ -154,6 +186,8 @@ public class PlatformClientHandler implements ClientHandler {
                 } catch (EOFException ex) {
                     break;
                 } catch (ClassNotFoundException ex) {
+                    ex.printStackTrace();
+                } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             }
@@ -226,12 +260,16 @@ public class PlatformClientHandler implements ClientHandler {
         if (!isLoggedIn()) {
             return null;
         }
+        // TODO: make it thread safe
         return loggedInUser.getBlockedUserIds();
     }
 
     @Override
-    public boolean addBlockedUser(int userId) {
+    public boolean blockUser(int userId) {
         if (!isLoggedIn()) {
+            return false;
+        }
+        if (!database.existsUser(userId)) {
             return false;
         }
         database.addBlockedUser(loggedInId, userId);
@@ -239,7 +277,7 @@ public class PlatformClientHandler implements ClientHandler {
     }
 
     @Override
-    public boolean removeBlockedUser(int userId) {
+    public boolean unblockUser(int userId) {
         if (!isLoggedIn()) {
             return false;
         }
@@ -247,56 +285,70 @@ public class PlatformClientHandler implements ClientHandler {
         return true;
     }
 
-    public List<Integer> getFriendRequests() {
+    @Override
+    public List<Integer> getFollowRequests() {
         if (!isLoggedIn()) {
             return null;
         }
-        return loggedInUser.getFriendRequests();
+        return loggedInUser.getFollowRequests();
     }
 
     @Override
-    public boolean sendFriendRequest(int userId) {
+    public boolean sendFollowRequest(int userId) {
         if (!isLoggedIn()) {
             return false;
         }
         if (userId == loggedInId) { // can't be friends with yourself unfortunately
             return false;
         }
-        // TODO: make this thread-safe
-        User user = database.getUser(userId);
-        if (user == null || user.getBlockedUserIds().contains(loggedInId)) {
+        if (!database.existsUser(userId)) {
             return false;
         }
-        if (user.getFriendIds().contains(loggedInId)) { // already friends with the user
-            return false;
-        }
-        List<Integer> friendRequests = loggedInUser.getFriendRequests();
-        if (friendRequests.contains(loggedInId)) {
-            friendRequests.remove((Integer) loggedInId);
-            user.addFriend(loggedInId);
-            loggedInUser.addFriend(userId);
-        } else {
-            if (!user.getFriendRequests().contains(loggedInId)) {
-                user.addFriendRequest(loggedInId);
-            }
-        }
-        return true;
+        return database.addFollowRequest(userId, loggedInId);
     }
 
-    public boolean cancelFriendRequest(int userId) {
+    @Override
+    public boolean cancelFollowRequest(int userId) {
         if (!isLoggedIn()) {
             return false;
         }
-        // TODO: change this
-        User user = database.getUser(userId);
-        if (user == null) {
+        if (!database.existsUser(userId)) {
             return false;
         }
-        List<Integer> friendRequests = user.getFriendRequests();
-        if (friendRequests.contains(loggedInId)) {
-            database.removeFriendRequest(loggedInId, userId);
-        }
+        database.removeFollowRequest(userId, loggedInId);
+        return true;
+    }
 
+    @Override
+    public boolean acceptFollowRequest(int userId) {
+        if (!isLoggedIn()) {
+            return false;
+        }
+        if (!database.existsUser(userId)) {
+            return false;
+        }
+        try {
+            User user = database.fetchUser(userId);
+            if (!user.getFollowRequests().contains(userId)) {
+                return false;
+            }
+            database.removeFollowRequest(loggedInId, userId);
+            return database.addFollower(loggedInId, userId);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+    @Override
+    public boolean rejectFollowRequest(int userId) {
+        if (!isLoggedIn()) {
+            return false;
+        }
+        if (!database.existsUser(userId)) {
+            return false;
+        }
+        database.removeFollowRequest(loggedInId, userId);
         return true;
     }
 
@@ -305,32 +357,100 @@ public class PlatformClientHandler implements ClientHandler {
         if (!isLoggedIn()) {
             return null;
         }
-        Post post = database.getPost(postId);
-        User creator = database.getUser(post.getCreatorId());
-        // TODO: consider if all posts are public or if posts are only visible to friends/followers
-        if (creator != null && creator.hasBlockedUser(loggedInId)) {
+        if (!database.existsPost(postId)) {
             return null;
         }
-        return post;
+        try {
+            Post post = database.fetchPost(postId);
+            int creatorId = post.getCreatorId();
+            if (database.hasBlockedUser(creatorId, loggedInId)) {
+                return null;
+            }
+            return post;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
+    @Override
     public boolean upvotePost(int postId) {
+        if (!isLoggedIn()) {
+            return false;
+        }
         Post post = database.getPost(postId);
-        // TODO
-        return false;
+        int creatorId = post.getCreatorId();
+        if (database.hasBlockedUser(creatorId, loggedInId)) {
+            return false;
+        }
+        database.addPostUpvote(postId, loggedInId);
+        return true;
     }
 
+    @Override
     public boolean downvotePost(int postId) {
-        // TODO
+        if (!isLoggedIn()) {
+            return false;
+        }
+        database.addPostDownvote(postId, loggedInId);
+        return true;
+    }
+
+    @Override
+    public boolean createComment(int postId, String content) {
+        if (!isLoggedIn()) {
+            return false;
+        }
+        Post post = database.getPost(postId);
+        User postCreator = database.getUser(post.getCreatorId());
+        if (postCreator.hasBlockedUser(loggedInId)) {
+            return false;
+        }
+        Comment comment = new PlatformComment(loggedInId, content);
+        database.addComment(postId, comment);
+        return true;
+    }
+
+    // TODO
+    public boolean deleteComment(int commentId) {
         return false;
     }
 
+    @Override
     public List<User> searchUsername(String search) {
         if (!isLoggedIn()) {
             return null;
         }
-        List<User> users = database.searchUsername(search);
-        // TODO: filter blocked users
-        return users;
+        try {
+            List<User> users = database.searchUsername(search);
+            users.removeIf(user -> user.hasBlockedUser(loggedInId));
+            return users;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public List<Post> loadFeed() {
+        if (!isLoggedIn()) {
+            return null;
+        }
+        ArrayList<Post> feed = new ArrayList<>();
+        try {
+            User user = database.fetchUser(loggedInId);
+            for (int followingId : user.getFollowingIds()) {
+                User following = database.fetchUser(followingId);
+                for (int postId : following.getPostIds()) {
+                    Post post = database.fetchPost(postId);
+                    feed.add(post);
+                }
+            }
+            feed.sort(Comparator.comparing(Post::calculateScore).reversed());
+            return feed;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        return feed;
     }
 }
