@@ -65,32 +65,104 @@ public interface ClientHandler extends Runnable {
     List<Integer> getBlockedUserIds();
 
     /**
-     * Adds a user to the list of blocked users.
+     * Blocks a user.
      * 
      * @param userId the ID of the user to block
      * @return {@code true} if the user was blocked successfully
      */
-    boolean addBlockedUser(int userId);
+    boolean blockUser(int userId);
 
     /**
-     * Removes a user from the list of blocked users.
+     * Unblocks a user.
      * 
      * @param userId the ID of the user to unblock
      * @return {@code true} if the user was unblocked successfully
      */
-    boolean removeBlockedUser(int userId);
+    boolean unblockUser(int userId);
 
     /**
-     * Tries to send a friend request to another user or accepts an incoming friend request.
+     * Retrieves the follow requests sent to the user.
      * 
-     * @param userId the ID of the user to send a friend request to or accept a friend request from
-     * @return {@code true} if the friend request was sent or accepted successfully, {@code false}
-     *         otherwise
+     * @return the list of follow requests
      */
-    boolean sendFriendRequest(int userId);
+    List<Integer> getFollowRequests();
 
     /**
-     * Retrieves a post
+     * Sends a follow request to another user.
+     * 
+     * @param userId the ID of the user to send a follow request to
+     * @return {@code true} if the follow request was sent successfully, {@code false} otherwise
+     */
+    boolean sendFollowRequest(int userId);
+
+    /**
+     * Unsends a follow request.
+     * 
+     * @param userId the ID of the user to whom the follow request was sent
+     * @return whether the follow request was unsent successfully
+     */
+    boolean cancelFollowRequest(int userId);
+
+    /**
+     * Accepts a follow request.
+     * 
+     * @param userId the ID of the user whose follow request to accept
+     * @return whether the follow request was accepted successfully
+     */
+    boolean acceptFollowRequest(int userId);
+
+    /**
+     * Rejects a follow request.
+     * 
+     * @param userId the ID of the user whose follow request to reject
+     * @return whether the follow request was rejected successfully
+     */
+    boolean rejectFollowRequest(int userId);
+
+    /**
+     * Retrieves a post.
+     * 
+     * @param postId the ID of the post to fetch
+     * @return the post associated with the post ID
      */
     Post fetchPost(int postId);
+
+    /**
+     * Upvotes a post.
+     * 
+     * @param postId the ID of the post to upvote
+     * @return whether the post was upvoted successfully
+     */
+    boolean upvotePost(int postId);
+
+    /**
+     * Downvotes a post.
+     * 
+     * @param postId the ID of the post to downvote
+     * @return whether the post was downvoted successfully
+     */
+    boolean downvotePost(int postId);
+
+    /**
+     * Comments on a post.
+     * 
+     * @param postId the ID of the post to add the comment to
+     * @param content the text content of the comment
+     */
+    boolean createComment(int postId, String content);
+
+    /**
+     * Searches for a user by username.
+     * 
+     * @param search the text to search for in the username
+     * @return the list of users whose username contains the search text
+     */
+    List<User> searchUsername(String search);
+
+    /**
+     * Generates a default feed based on followed users.
+     * 
+     * @return a list of posts from followed users, sorted by their score
+     */
+    List<Post> loadFeed();
 }

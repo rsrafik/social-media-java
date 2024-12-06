@@ -42,6 +42,22 @@ public class PlatformPost implements Post, Serializable {
         this.comments = new ArrayList<>();
     }
 
+    /**
+     * Copy constructor.
+     * 
+     * @param post the PlatformPost to copy
+     */
+    public PlatformPost(PlatformPost post) {
+        id = post.id;
+        creatorId = post.creatorId;
+        content = post.content;
+        image = post.image;
+
+        upvoteIds = new ArrayList<>(post.upvoteIds);
+        downvoteIds = new ArrayList<>(post.downvoteIds);
+        comments = new ArrayList<>(post.comments);
+    }
+
     @Override
     public Integer getId() {
         return id;
@@ -78,6 +94,11 @@ public class PlatformPost implements Post, Serializable {
     }
 
     @Override
+    public boolean removeUpvote(int userId) {
+        return upvoteIds.remove((Integer) userId);
+    }
+
+    @Override
     public boolean addDownvote(int userId) {
         if (!downvoteIds.contains(userId)) {
             upvoteIds.remove((Integer) userId);
@@ -85,6 +106,11 @@ public class PlatformPost implements Post, Serializable {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean removeDownvote(int userId) {
+        return downvoteIds.remove((Integer) userId);
     }
 
     @Override

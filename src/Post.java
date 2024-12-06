@@ -72,6 +72,15 @@ public interface Post {
     boolean addUpvote(int userId);
 
     /**
+     * Removes an upvote from the post from a specified user.
+     *
+     * @param userId the ID of the user removing their upvote
+     * @return true if the user's upvote was removed successfully, false if the user had not upvoted
+     *         before
+     */
+    boolean removeUpvote(int userId);
+
+    /**
      * Adds a downvote to the post from a specified user.
      *
      * @param userId the ID of the user downvoting the post
@@ -79,6 +88,15 @@ public interface Post {
      *         downvoted
      */
     boolean addDownvote(int userId);
+
+    /**
+     * Removes a downvote from the post from a specified user.
+     *
+     * @param userId the ID of the user removing their downvote
+     * @return true if the user's downvote was removed successfully, false if the user had not
+     *         downvoted before
+     */
+    boolean removeDownvote(int userId);
 
     /**
      * Retrieves the number of users who upvoted the post.

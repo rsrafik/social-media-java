@@ -7,7 +7,7 @@ import java.util.List;
  *
  * @author Mckinley Newman, L22
  * @author Ropan Datta, L22
- * @version November 15, 2024
+ * @version December 6, 2024
  */
 public interface Database {
 
@@ -37,12 +37,29 @@ public interface Database {
     List<User> getUsers();
 
     /**
+     * Checks whether a user exists.
+     * 
+     * @param userId the user ID to check for
+     * @return whether the user ID exists in the database
+     */
+    boolean existsUser(int userId);
+
+    /**
      * Retrieves the unique user associated with an integer ID.
      * 
      * @param userId the unique ID of the user
      * @return the user associated with the integer ID
      */
     User getUser(int userId);
+
+    /**
+     * Retrieves a copy of a user.
+     * 
+     * @param userId the ID of the user to fetch
+     * @return a copy of the user
+     * @throws Exception
+     */
+    User fetchUser(int userId) throws Exception;
 
     /**
      * Retrieves the unique integer ID associated with a username.
@@ -74,12 +91,28 @@ public interface Database {
     List<Post> getPosts();
 
     /**
+     * Checks whether a post exists.
+     * 
+     * @param postId the post ID to check for
+     * @return whether the post ID exists in the database
+     */
+    boolean existsPost(int postId);
+
+    /**
      * Retrieves the post associated with a post ID.
      * 
      * @param postId the unique ID of the post
      * @return the post associated with the integer ID
      */
     Post getPost(int postId);
+
+    /**
+     * Retrieves a copy of a user.
+     * 
+     * @param postId the ID of the post to fetch
+     * @return a copy of the post
+     */
+    Post fetchPost(int postId) throws Exception;
 
     /**
      * Adds a new post to the database.
@@ -94,7 +127,15 @@ public interface Database {
      * @param postId the ID of the post to upvote
      * @param userId the ID of the user who upvoted the post
      */
-    void addUpvotePost(int postId, int userId);
+    void addPostUpvote(int postId, int userId);
+
+    /**
+     * Removes an upvote from a post.
+     * 
+     * @param postId the ID of the post to remove the upvote from
+     * @param userId the ID of the user removing their upvote
+     */
+    void removePostUpvote(int postId, int userId);
 
     /**
      * Adds a downvote to a post.
@@ -102,7 +143,15 @@ public interface Database {
      * @param postId the ID of the post to downvote
      * @param userId the ID of the user who downvoted the post
      */
-    void addDownvotePost(int postId, int userId);
+    void addPostDownvote(int postId, int userId);
+
+    /**
+     * Removes a downvote from the post.
+     * 
+     * @param postId the ID of the post to remove the downvote from
+     * @param userId the ID of the user removing their downvote
+     */
+    void removePostDownvote(int postId, int userId);
 
     /**
      * Adds a comment to the post.
@@ -111,6 +160,49 @@ public interface Database {
      * @param comment the comment to be added
      */
     void addComment(int postId, Comment comment);
+
+    /**
+     * Adds a follower to a user's followers.
+     * 
+     * @param userId the ID of the user being followed
+     * @param followerId the ID of the follower
+     * @return whether the follower could be added
+     */
+    boolean addFollower(int userId, int followerId);
+
+    /**
+     * Removes a follower from a user's followers.
+     * 
+     * @param userId the ID of the user being unfollowed
+     * @param followerId the ID of the user unfollowing
+     */
+    void removeFollower(int userId, int followerId);
+
+    /**
+     * Adds a follow request to a user.
+     * 
+     * @param userId the ID of the user to add the follow request to
+     * @param fromId the ID of the user sending the follow request
+     * @return whether the follow request could be added
+     */
+    boolean addFollowRequest(int userId, int fromId);
+
+    /**
+     * Removes a follow request from a user.
+     * 
+     * @param userId the ID of the user to remove the follow request from
+     * @param fromId the ID of the user who had sent the follow request
+     */
+    void removeFollowRequest(int userId, int fromId);
+
+    /**
+     * Checks whether a user has been blocked.
+     * 
+     * @param userId the ID of the user who has potentially initiated the block
+     * @param blockedId the ID of the user who has potentially been blocked
+     * @return whether {@code userId} has blocked {@code blockedId}
+     */
+    boolean hasBlockedUser(int userId, int blockedId);
 
     /**
      * Adds a user to the list of blocked users.
@@ -133,8 +225,10 @@ public interface Database {
      * 
      * @param search the search term
      * @return the list of users containing the search term in their username.
+     * @throws IOException if an error occurs while deep copying a User object
+     * @throws ClassNotFoundException should not happen
      */
-    List<User> searchUsername(String search);
+    List<User> searchUsername(String search) throws IOException, ClassNotFoundException;
 
     /**
      * Saves user information to disk.

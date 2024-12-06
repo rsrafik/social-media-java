@@ -18,14 +18,15 @@ public class PlatformUser implements User, Serializable {
     private Integer id; // Unique identifier for the user (non-static)
     private String username; // Username of the user
     private String password; // Password of the user
-    private Image displayImage; // profile picture
+    private Image displayImage; // Profile picture of the user
     private ArrayList<Integer> postIds; // List of posts created by the user
-    private ArrayList<Integer> friendIds; // List of friend user IDs
+    private ArrayList<Integer> followingIds; // List of IDs being followed
+    private ArrayList<Integer> followerIds; // List of follower IDs
     private ArrayList<Integer> blockedUserIds; // List of blocked user IDs
-    private ArrayList<Integer> friendRequests; // List of friend requests
+    private ArrayList<Integer> followRequests; // List of follow requests
 
     /**
-     * Constructs a new PlatformUser with an integer id, username, and password.
+     * Constructs a new PlatformUser with an integer ID, username, and password.
      * 
      * @param id the integer ID of the created user
      * @param username the username of the created user
@@ -37,9 +38,27 @@ public class PlatformUser implements User, Serializable {
         this.password = password;
 
         postIds = new ArrayList<>();
-        friendIds = new ArrayList<>();
+        followingIds = new ArrayList<>();
+        followerIds = new ArrayList<>();
         blockedUserIds = new ArrayList<>();
-        friendRequests = new ArrayList<>();
+        followRequests = new ArrayList<>();
+    }
+
+    /**
+     * Copy constructor.
+     * 
+     * @param user the PlatformUser to copy
+     */
+    public PlatformUser(PlatformUser user) {
+        id = user.id;
+        username = user.username;
+        password = user.password;
+
+        postIds = new ArrayList<>(user.postIds);
+        followingIds = new ArrayList<>(user.followingIds);
+        followerIds = new ArrayList<>(user.followerIds);
+        blockedUserIds = new ArrayList<>(user.blockedUserIds);
+        followRequests = new ArrayList<>(user.followRequests);
     }
 
     @Override
@@ -65,6 +84,11 @@ public class PlatformUser implements User, Serializable {
     @Override
     public boolean passwordEquals(String password) {
         return this.password.equals(password);
+    }
+
+    @Override
+    public boolean hasDisplayImage() {
+        return displayImage != null;
     }
 
     @Override
@@ -98,51 +122,67 @@ public class PlatformUser implements User, Serializable {
     }
 
     @Override
-    public List<Integer> getFriendIds() {
-        return friendIds;
+    public List<Integer> getFollowingIds() {
+        return followingIds;
     }
 
     @Override
-    public boolean addFriend(int userId) {
-        if (friendIds.contains(userId)) {
-            return true;
+    public void addFollowing(int userId) {
+        if (!followingIds.contains(userId)) {
+            followingIds.add(userId);
         }
-        if (!blockedUserIds.contains(userId)) {
-            friendIds.add(userId);
-            return true;
-        }
-        return false;
     }
 
     @Override
-    public void removeFriend(int userId) {
-        friendIds.remove((Integer) userId);
+    public void removeFollowing(int userId) {
+        followingIds.remove((Integer) userId);
     }
 
     @Override
-    public int friendCount() {
-        return friendIds.size();
+    public List<Integer> getFollowerIds() {
+        return followerIds;
     }
 
     @Override
-    public List<Integer> getFriendRequests() {
-        return friendRequests;
-    }
-
-    @Override
-    public boolean addFriendRequest(int userId) {
+    public boolean addFollower(int userId) {
         if (blockedUserIds.contains(userId)) {
             return false;
         }
-        if (!friendRequests.contains(userId)) {
-            friendRequests.add(userId);
+        if (!followerIds.contains(userId)) {
+            followerIds.add(userId);
         }
         return true;
     }
 
     @Override
-    public void removeFriendRequest(int userId) {
-        friendRequests.remove((Integer) userId);
+    public void removeFollower(int userId) {
+        followerIds.remove((Integer) userId);
+    }
+
+    @Override
+    public int followerCount() {
+        return followerIds.size();
+    }
+
+    @Override
+    public List<Integer> getFollowRequests() {
+        return followRequests;
+    }
+
+    @Override
+    public boolean addFollowRequest(int userId) {
+        if (blockedUserIds.contains(userId)) {
+            return false;
+        }
+        if (!followRequests.contains(userId)) {
+            followRequests.add(userId);
+        }
+        return true;
+    }
+
+    @Override
+    public void removeFollowRequest(int userId) {
+        followRequests.remove((Integer) userId);
     }
 
     @Override
@@ -158,6 +198,8 @@ public class PlatformUser implements User, Serializable {
     @Override
     public void addBlockedUser(int userId) {
         if (!blockedUserIds.contains(userId)) {
+            removeFollowRequest(userId);
+            removeFollower(userId);
             blockedUserIds.add(userId);
         }
     }
