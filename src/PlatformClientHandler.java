@@ -45,137 +45,139 @@ public class PlatformClientHandler implements ClientHandler {
     @Override
     public void run() {
         try {
-            ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
-            outputStream.flush();
-            ObjectInputStream inputStream = new ObjectInputStream(socket.getInputStream());
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+            out.flush();
+            ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
             System.out.println("Client connected!");
             while (true) {
                 try {
-                    OperationType operation = (OperationType) inputStream.readObject();
+                    OperationType operation = (OperationType) in.readObject();
                     switch (operation) {
                         case IS_LOGGEDIN -> {
                             boolean result = isLoggedIn();
-                            outputStream.writeObject(result);
-                            outputStream.flush();
+                            out.writeBoolean(result);
+                            out.flush();
                         }
                         case LOGIN -> {
-                            String username = (String) inputStream.readObject();
-                            String password = (String) inputStream.readObject();
+                            String username = in.readUTF();
+                            String password = in.readUTF();
                             boolean result = logIn(username, password);
-                            outputStream.writeObject(result);
-                            outputStream.flush();
+                            out.writeBoolean(result);
+                            out.flush();
                         }
                         case LOGOUT -> {
                             boolean result = logOut();
-                            outputStream.writeObject(result);
-                            outputStream.flush();
+                            out.writeBoolean(result);
+                            out.flush();
                         }
                         case CREATE_USER -> {
-                            String username = (String) inputStream.readObject();
-                            String password = (String) inputStream.readObject();
+                            String username = in.readUTF();
+                            String password = in.readUTF();
                             boolean result = createUser(username, password);
-                            outputStream.writeObject(result);
-                            outputStream.flush();
+                            out.writeBoolean(result);
+                            out.flush();
                         }
                         case GET_BLOCKED_USERS -> {
                             List<Integer> blockedUserIds = getBlockedUserIds();
-                            outputStream.writeObject(blockedUserIds);
-                            outputStream.flush();
+                            out.writeObject(blockedUserIds);
+                            out.flush();
                         }
                         case BLOCK_USER -> {
-                            int userId = (Integer) inputStream.readObject();
+                            int userId = in.readInt();
                             boolean result = blockUser(userId);
-                            outputStream.writeObject(result);
-                            outputStream.flush();
+                            out.writeBoolean(result);
+                            out.flush();
                         }
                         case UNBLOCK_USER -> {
-                            int userId = (Integer) inputStream.readObject();
+                            int userId = in.readInt();
                             boolean result = unblockUser(userId);
-                            outputStream.writeObject(result);
-                            outputStream.flush();
+                            out.writeBoolean(result);
+                            out.flush();
                         }
                         case GET_FOLLOWREQUESTS -> {
                             List<Integer> followRequests = getFollowRequests();
-                            outputStream.writeObject(followRequests);
-                            outputStream.flush();
+                            out.writeObject(followRequests);
+                            out.flush();
                         }
                         case SEND_FOLLOWREQUEST -> {
-                            int userId = (Integer) inputStream.readObject();
+                            int userId = in.readInt();
                             boolean result = sendFollowRequest(userId);
-                            outputStream.writeObject(result);
-                            outputStream.flush();
+                            out.writeBoolean(result);
+                            out.flush();
                         }
                         case CANCEL_FOLLOWREQUEST -> {
-                            int userId = (Integer) inputStream.readObject();
+                            int userId = in.readInt();
                             boolean result = cancelFollowRequest(userId);
-                            outputStream.writeObject(result);
-                            outputStream.flush();
+                            out.writeBoolean(result);
+                            out.flush();
                         }
                         case ACCEPT_FOLLOWREQUEST -> {
-                            int userId = (Integer) inputStream.readObject();
+                            int userId = in.readInt();
                             boolean result = acceptFollowRequest(userId);
-                            outputStream.writeObject(result);
-                            outputStream.flush();
+                            out.writeBoolean(result);
+                            out.flush();
                         }
                         case REJECT_FOLLOWREQUEST -> {
-                            int userId = (Integer) inputStream.readObject();
+                            int userId = in.readInt();
                             boolean result = rejectFollowRequest(userId);
-                            outputStream.writeObject(result);
-                            outputStream.flush();
+                            out.writeBoolean(result);
+                            out.flush();
                         }
                         case CREATE_POST -> {
-                            String content = (String) inputStream.readObject();
-                            Image image = (Image) inputStream.readObject();
+                            String content = (String) in.readObject();
+                            Image image = (Image) in.readObject();
                             boolean result = createPost(content, image);
-                            outputStream.writeObject(result);
-                            outputStream.flush();
+                            out.writeBoolean(result);
+                            out.flush();
                         }
                         case FETCH_POST -> {
-                            int postId = (Integer) inputStream.readObject();
+                            int postId = in.readInt();
                             Post post = fetchPost(postId);
-                            outputStream.writeObject(post);
-                            outputStream.flush();
+                            out.writeObject(post);
+                            out.flush();
                         }
                         case UPVOTE_POST -> {
-                            int postId = (Integer) inputStream.readObject();
+                            int postId = in.readInt();
                             boolean result = upvotePost(postId);
-                            outputStream.writeObject(result);
-                            outputStream.flush();
+                            out.writeBoolean(result);
+                            out.flush();
                         }
                         case DOWNVOTE_POST -> {
-                            int postId = (Integer) inputStream.readObject();
+                            int postId = in.readInt();
                             boolean result = downvotePost(postId);
-                            outputStream.writeObject(result);
-                            outputStream.flush();
+                            out.writeBoolean(result);
+                            out.flush();
                         }
                         case FETCH_COMMENTS -> {
                             // TODO
+                            throw new UnsupportedOperationException();
                         }
                         case CREATE_COMMENT -> {
-                            int postId = (Integer) inputStream.readObject();
-                            String content = (String) inputStream.readObject();
+                            int postId = in.readInt();
+                            String content = (String) in.readObject();
                             boolean result = createComment(postId, content);
-                            outputStream.writeObject(result);
-                            outputStream.flush();
+                            out.writeBoolean(result);
+                            out.flush();
                         }
                         case DELETE_COMMENT -> {
                             // TODO
+                            throw new UnsupportedOperationException();
                         }
                         case SEARCH_USER -> {
-                            String search = (String) inputStream.readObject();
+                            String search = in.readUTF();
                             List<User> users = searchUsername(search);
-                            outputStream.writeObject(users);
-                            outputStream.flush();
+                            out.writeObject(users);
+                            out.flush();
                         }
                         case LOAD_FEED -> {
                             List<Post> feed = loadFeed();
-                            outputStream.writeObject(feed);
-                            outputStream.flush();
+                            out.writeObject(feed);
+                            out.flush();
                         }
                         case TESTING -> {
                             // System.out.println("testing");
-                            // String str = (String) inputStream.readObject();
-                            Object lol = inputStream.readObject();
+                            // String str = (String) in.readObject();
+                            Object lol = in.readObject();
                             System.out.println(lol);
                         }
                         default -> {
@@ -235,6 +237,9 @@ public class PlatformClientHandler implements ClientHandler {
 
     @Override
     public boolean createUser(String username, String password) {
+        if (!username.matches("[A-Za-z0-9]+")) {
+            return false;
+        }
         if (database.getUserId(username) != null) {
             return false;
         }
