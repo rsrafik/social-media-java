@@ -196,4 +196,28 @@ public class DatabaseTestcase {
         Assert.assertEquals("Post should have not comments", 0, one.getComments().size());
     }    //end of comment tests
 
+    //test follower functions
+    @Test
+    public void testFollower() throws IOException, ClassNotFoundException {
+        PlatformDatabase db = new PlatformDatabase();
+        PlatformUser tester1 = new PlatformUser(0, "tester", "testerPass");
+        PlatformUser tester2 = new PlatformUser(1, "tester", "testerPass");
+        db.addUser(tester1);
+        db.addUser(tester2);
+
+        //test adding and remove follower
+        db.addFollower(0, 1);
+        Assert.assertEquals("Expected user to have 1 follower", 1,
+            tester1.getFollowerIds().size());
+
+        db.removeFollower(0, 1);
+        Assert.assertEquals("Expected user to have no followers", 0,
+                tester1.getFollowerIds().size());
+
+        //test follow request
+        db.addFollowRequest(1, 0);
+        Assert.assertEquals("tester2 should have a follow request", 1,
+            tester2.getFollowRequests().size());
+    }    //end of follow request
+
 }    //end of Database testcase
