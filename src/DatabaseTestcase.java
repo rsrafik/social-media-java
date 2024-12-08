@@ -152,9 +152,23 @@ public class DatabaseTestcase {
         db.addUser(tester);
         PlatformUserInfo testInfo = new PlatformUserInfo(tester);
 
-        Assert.assertNotEquals("Should result in tester1 info", testInfo, db.searchUsername("tester"));
+        Assert.assertNotEquals("Should result in tester1 info", testInfo,
+            db.searchUsername("tester"));
     }    //end of search user test
 
+    @Test
+    public void testUpvoteAndDownvote() throws IOException, ClassNotFoundException {
+        PlatformDatabase db = new PlatformDatabase();
+        PlatformUser tester = new PlatformUser(0, "tester", "testerPass");
+        db.addUser(tester);
+        PlatformPost one = new PlatformPost(1, 0, "One", null);
+        db.addPost(one);
 
+        db.addPostUpvote(1, 0);
+        Assert.assertEquals("Expected 1 post to be upvote.", 1, one.getUpvoteIds().size());
+
+        db.addPostDownvote(1, 0);
+        Assert.assertEquals("Expected 1 post to be down vote.", 1, one.getDownvoteIds().size());
+    }
 
 }    //end of Database testcase
