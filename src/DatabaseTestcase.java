@@ -10,7 +10,7 @@ import java.util.*;
  * Test case for the Database interface and implementation
  * also tests all database functions
  *
- * @author Mckinley Newman 18-217, Navan Dendukuria 218-248
+ * @author Mckinley Newman 18-217, Navan Dendukuri 218-248
  * @version Nov 3, 2024
  */
 public class DatabaseTestcase {
@@ -194,9 +194,10 @@ public class DatabaseTestcase {
     @Test
     public void testAddPostWithExistingFile() throws InterruptedException, IOException, ClassNotFoundException {
         PlatformDatabase db = new PlatformDatabase();
+        PlatformUser testUser  = new PlatformUser(0, "testUser", "password");
         PlatformPost testPost = new PlatformPost(0, 0, "test", null);
         // Prepare a posts.dat file with an initial post
-        PlatformPost initialPost = new PlatformPost(1, 1, "InitialPost", null);
+        PlatformPost initialPost = new PlatformPost(1, 0, "InitialPost", null);
         try (FileOutputStream fileOut = new FileOutputStream("posts.dat");
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
             out.writeObject(initialPost);

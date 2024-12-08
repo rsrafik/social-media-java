@@ -46,7 +46,7 @@ public class MServerTestCase {
     //should return false if sending friend request to user that doesn't exist
     @Test
     public void testSendFriendRequestToNonexistentUser() {
-        boolean result = handler.sendFriendRequest(999);
+        boolean result = handler.sendFollowRequest(999);
         assertFalse(result);
     }    //end of nonexistent user test
 
@@ -56,7 +56,7 @@ public class MServerTestCase {
         // Simulate the logged-in user being blocked by the target user
         targetUser.getBlockedUserIds().add(1);
 
-        boolean result = handler.sendFriendRequest(2);
+        boolean result = handler.sendFollowRequest(2);
         assertFalse(result);
     }    //end of blocked user test
 
@@ -64,10 +64,10 @@ public class MServerTestCase {
     @Test
     public void testSendFriendRequestToExistingFriend() {
         // Simulate the logged-in user already being friends with the target user
-        loggedInUser.getFriendIds().add(2);
-        targetUser.getFriendIds().add(1);
+        loggedInUser.getFollowerIds().add(2);
+        targetUser.getFollowerIds().add(1);
 
-        boolean result = handler.sendFriendRequest(2);
+        boolean result = handler.sendFollowRequest(2);
         assertFalse(result);
     }    //end of existing friend test
 
@@ -75,24 +75,24 @@ public class MServerTestCase {
     @Test
     public void testSendFriendRequestWithPendingRequest() {
         // Simulate a pending friend request from the target user to the logged-in user
-        loggedInUser.getFriendRequests().add(2);
+        loggedInUser.getFollowRequests().add(2);
 
-        boolean result = handler.sendFriendRequest(2);
+        boolean result = handler.sendFollowRequest(2);
         assertFalse(result);
-        assertFalse(loggedInUser.getFriendIds().contains(2));
-        assertFalse(targetUser.getFriendIds().contains(1));
-        assertTrue(loggedInUser.getFriendRequests().contains(2));
+        assertFalse(loggedInUser.getFollowerIds().contains(2));
+        assertFalse(targetUser.getFollowerIds().contains(1));
+        assertTrue(loggedInUser.getFollowRequests().contains(2));
     }    //end of pending request test
 
     //checks that target receives request
     @Test
     public void testSendFriendRequestSuccessfully() {
         // Precondition: Ensure the target user exists and is not a friend or blocked
-        List<Integer> targetFriendRequests = targetUser.getFriendRequests();
+        List<Integer> targetFriendRequests = targetUser.getFollowRequests();
         assertFalse(targetFriendRequests.contains(1));
 
         // Send the friend request
-        boolean result = handler.sendFriendRequest(2);
+        boolean result = handler.sendFollowRequest(2);
 
         // Validate the results
         assertFalse("Friend request should be sent successfully", result);
