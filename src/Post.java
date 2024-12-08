@@ -72,15 +72,6 @@ public interface Post {
     boolean addUpvote(int userId);
 
     /**
-     * Removes an upvote from the post from a specified user.
-     *
-     * @param userId the ID of the user removing their upvote
-     * @return true if the user's upvote was removed successfully, false if the user had not upvoted
-     *         before
-     */
-    boolean removeUpvote(int userId);
-
-    /**
      * Adds a downvote to the post from a specified user.
      *
      * @param userId the ID of the user downvoting the post
@@ -88,6 +79,15 @@ public interface Post {
      *         downvoted
      */
     boolean addDownvote(int userId);
+
+    /**
+     * Removes an upvote from the post from a specified user.
+     *
+     * @param userId the ID of the user removing their upvote
+     * @return true if the user's upvote was removed successfully, false if the user had not upvoted
+     *         before
+     */
+    boolean removeUpvote(int userId);
 
     /**
      * Removes a downvote from the post from a specified user.
@@ -125,6 +125,13 @@ public interface Post {
      * @param comment the comment to add to the post
      */
     void addComment(Comment comment);
+
+    /**
+     * Removes a comment from the post.
+     * 
+     * @param commentId the ID of the comment to remove
+     */
+    void removeComment(int commentId);
 
     /**
      * Calculates and returns the score of the post, defined as the difference between the number of
