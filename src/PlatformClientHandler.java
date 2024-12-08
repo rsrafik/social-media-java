@@ -21,6 +21,7 @@ public class PlatformClientHandler implements ClientHandler {
     private static PlatformDatabase database;
     private static AtomicInteger userCount;
     private static AtomicInteger postCount;
+    private static AtomicInteger commentCount;
 
     private Socket socket;
     private Integer loggedInId;
@@ -164,8 +165,10 @@ public class PlatformClientHandler implements ClientHandler {
                             out.flush();
                         }
                         case FETCH_COMMENTS -> {
-                            // TODO
-                            throw new UnsupportedOperationException();
+                            int postId = in.readInt();
+                            List<Comment> comments = fetchComments(postId);
+                            out.writeObject(comments);
+                            out.flush();
                         }
                         case CREATE_COMMENT -> {
                             int postId = in.readInt();
@@ -175,12 +178,14 @@ public class PlatformClientHandler implements ClientHandler {
                             out.flush();
                         }
                         case DELETE_COMMENT -> {
-                            // TODO
-                            throw new UnsupportedOperationException();
+                            int commentId = in.readInt();
+                            boolean result = deleteComment(commentId);
+                            out.writeBoolean(result);
+                            out.flush();
                         }
                         case SEARCH_USER -> {
                             String search = in.readUTF();
-                            List<User> users = searchUsername(search);
+                            List<UserInfo> users = searchUsername(search);
                             out.writeObject(users);
                             out.flush();
                         }
@@ -431,7 +436,7 @@ public class PlatformClientHandler implements ClientHandler {
             return null;
         }
         try {
-            int creatorId = database.getCreatorId(postId);
+            int creatorId = database.getPosterId(postId);
             if (database.hasBlockedUser(creatorId, loggedInId)) {
                 return null;
             }
@@ -451,7 +456,7 @@ public class PlatformClientHandler implements ClientHandler {
         if (!database.existsPost(postId)) {
             return false;
         }
-        int creatorId = database.getCreatorId(postId);
+        int creatorId = database.getPosterId(postId);
         if (database.hasBlockedUser(creatorId, loggedInId)) {
             return false;
         }
@@ -467,12 +472,33 @@ public class PlatformClientHandler implements ClientHandler {
         if (!database.existsPost(postId)) {
             return false;
         }
-        int creatorId = database.getCreatorId(postId);
+        int creatorId = database.getPosterId(postId);
         if (database.hasBlockedUser(creatorId, loggedInId)) {
             return false;
         }
         database.addPostDownvote(postId, loggedInId);
         return true;
+    }
+
+    @Override
+    public List<Comment> fetchComments(int postId) {
+        if (!isLoggedIn()) {
+            return null;
+        }
+        if (!database.existsPost(postId)) {
+            return null;
+        }
+        int creatorId = database.getPosterId(postId);
+        if (database.hasBlockedUser(creatorId, loggedInId)) {
+            return null;
+        }
+        try {
+            Post post = database.fetchPost(postId);
+            return post.getComments();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -483,29 +509,42 @@ public class PlatformClientHandler implements ClientHandler {
         if (!database.existsPost(postId)) {
             return false;
         }
-        int creatorId = database.getCreatorId(postId);
+        int creatorId = database.getPosterId(postId);
         if (database.hasBlockedUser(creatorId, loggedInId)) {
             return false;
         }
-        Comment comment = new PlatformComment(loggedInId, content);
+        int commentId = commentCount.getAndIncrement();
+        Comment comment = new PlatformComment(commentId, loggedInId, content);
         database.addComment(postId, comment);
         return true;
     }
 
-    // TODO
+    // TODO: @Override
     public boolean deleteComment(int commentId) {
-        return false;
+        if (!isLoggedIn()) {
+            return false;
+        }
+        if (!database.existsComment(commentId)) {
+            return false;
+        }
+        int postId = database.getPostIdOfComment(commentId);
+        int commenterId = database.getCommenterId(commentId);
+        int creatorId = database.getPosterId(postId);
+        if (loggedInId.intValue() == commenterId || loggedInId.intValue() == creatorId) {
+            database.removeComment(commentId);
+        }
+        return true;
     }
 
     @Override
-    public List<User> searchUsername(String search) {
+    public List<UserInfo> searchUsername(String search) {
         if (!isLoggedIn()) {
             return null;
         }
         try {
-            List<User> users = database.searchUsername(search);
-            users.removeIf(user -> user.hasBlockedUser(loggedInId));
-            return users;
+            List<UserInfo> userInfos = database.searchUsername(search);
+            userInfos.removeIf(userInfo -> database.hasBlockedUser(userInfo.getId(), loggedInId));
+            return userInfos;
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
