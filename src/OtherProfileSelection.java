@@ -35,6 +35,19 @@ class OtherProfileSelection {
         followingButton.setFocusPainted(false);
         followingButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         followingButton.setPreferredSize(new Dimension(150, 40));
+        followingButton.addActionListener(e -> {
+            boolean sendFollow;
+
+            try {
+                sendFollow = PlatformRunner.client.sendFollowRequest(SearchTextField.chosenOne.getId());
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+
+            if (sendFollow)
+                JOptionPane.showMessageDialog(null, "Sent follow request!!");
+        });
+
         topPanel.add(followingButton);
 
         // Blocked button

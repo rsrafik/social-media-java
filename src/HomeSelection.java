@@ -2,13 +2,14 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.IOException;
+import java.util.List;
 
 class HomeSelection {
 
     private static JPanel mainContentPanel; // Panel to dynamically switch content
     private static JScrollPane currentScrollPane; // Keeps track of the current scrollable content
 
-    public static void mainView(JPanel mainPanel) {
+    public static void mainView(JPanel mainPanel) throws IOException, ClassNotFoundException {
         mainPanel.setLayout(new BorderLayout());
         mainPanel.setBackground(Color.WHITE);
 
@@ -102,18 +103,20 @@ class HomeSelection {
         mainContentPanel.add(currentScrollPane, BorderLayout.CENTER);
     }
 
-    private static JScrollPane createScrollableContent() {
+    private static JScrollPane createScrollableContent() throws IOException, ClassNotFoundException {
         // Create a panel to hold the content
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS)); // Arrange posts vertically
         contentPanel.setBackground(Color.WHITE);
 
+
+        List<Post> loadPost = PlatformRunner.client.loadFeed();
         // Add 5 individual posts to the content panel
-//        for (int i = 1; i <= 5; i++) {
-//            JPanel post = SinglePost.individualPost("Username!!", "Message!!","friend"); // Create an individual post
-//            contentPanel.add(post); // Add the post to the content panel
-//            contentPanel.add(Box.createVerticalStrut(40)); // Add spacing between posts
-//        }
+        for (int i = 0; i < loadPost.size(); i++) {
+            JPanel post = SinglePost.individualPost(loadPost.get(i),"friend"); // Create an individual post
+            contentPanel.add(post); // Add the post to the content panel
+            contentPanel.add(Box.createVerticalStrut(40)); // Add spacing between posts
+        }
 
         // Wrap the content panel in a scroll pane
         JScrollPane scrollPane = new JScrollPane(contentPanel);

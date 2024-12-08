@@ -95,11 +95,21 @@ public class LoggedInPage {
 
             // Handle the user's choice
             if (result == JOptionPane.YES_OPTION) {
-                // Load the Welcome page instead of disposing of the frame
-                jf.getContentPane().removeAll();
-                Welcome.welcomeGUI(jf);
-                jf.revalidate();
-                jf.repaint();
+                boolean loggedoutSuccess;
+
+                try {
+                    loggedoutSuccess = PlatformRunner.client.logOut();
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+                if (loggedoutSuccess) {
+                    // Load the Welcome page instead of disposing of the frame
+                    jf.getContentPane().removeAll();
+                    Welcome.welcomeGUI(jf);
+                    jf.revalidate();
+                    jf.repaint();
+                }
             }
 
             selectedButton = "Log Out"; // Retain functionality to update the selected button
