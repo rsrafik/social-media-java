@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class SearchTextField extends JTextField {
     public static User chosenOne;
@@ -66,9 +67,7 @@ public class SearchTextField extends JTextField {
         searchButton.addActionListener(e -> {
             try {
                 handleSearchAction();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            } catch (ClassNotFoundException ex) {
+            } catch (IOException | ClassNotFoundException ex) {
                 throw new RuntimeException(ex);
             }
         });
@@ -119,8 +118,17 @@ public class SearchTextField extends JTextField {
         List<User> results = PlatformRunner.client.searchUser(searchText);
         List<String> usernames = new ArrayList<>();
 
-        for(User result: results)
-            usernames.add(result.getUsername());
+
+        for(int i = 0; i < results.size(); i++) {
+            if (results.get(i).getId().equals(PlatformRunner.client.fetchLoggedInUser().getId()))
+                results.remove(i);
+        }
+
+        for(User result: results) {
+                usernames.add(result.getUsername());
+        }
+
+
 
         // Create a dropdown with options
         JComboBox<String> dropdown = new JComboBox<>(usernames.toArray(new String[0]));
@@ -151,6 +159,7 @@ public class SearchTextField extends JTextField {
             User selectedUser = null;
 
             for(int i = 0; i < usernames.size(); i++) {
+                assert selectedOption != null;
                 if (selectedOption.equals(usernames.get(i))) {
                     selectedUser = results.get(i);
                     break;

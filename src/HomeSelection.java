@@ -22,7 +22,15 @@ class HomeSelection {
         searchField.setPreferredSize(new Dimension(400, 40));
 
         // Set search action listener to switch to OtherProfileSelection
-        searchField.setSearchActionListener(selectedOption -> switchToOtherProfileView());
+        searchField.setSearchActionListener(selectedOption -> {
+            try {
+                switchToOtherProfileView();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         // Center the search field in the panel
         JPanel centerPanel = new JPanel();
@@ -117,7 +125,7 @@ class HomeSelection {
         return scrollPane;
     }
 
-    private static void switchToOtherProfileView() {
+    private static void switchToOtherProfileView() throws IOException, ClassNotFoundException {
         // Remove any existing content, including OtherProfileSelection if it was already displayed
         mainContentPanel.removeAll();
 
