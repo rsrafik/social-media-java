@@ -176,6 +176,30 @@ public interface Database {
     int commentCount();
 
     /**
+     * Checks whether a comment exists.
+     * 
+     * @param commentId the comment ID to check for
+     * @return whether the comment ID exists in the database
+     */
+    boolean existsComment(int commentId);
+
+    /**
+     * Retrieves the creator of a comment.
+     * 
+     * @param commentId the ID of the comment
+     * @return the ID of the commenter
+     */
+    int getCommenterId(int commentId);
+
+    /**
+     * Retrieves the post ID of a comment.
+     * 
+     * @param commentId the ID of the comment
+     * @return the ID of the post on which the comment was made
+     */
+    int getPostIdOfComment(int commentId);
+
+    /**
      * Adds a comment to the post.
      * 
      * @param postId the ID of the post to which the comment is added

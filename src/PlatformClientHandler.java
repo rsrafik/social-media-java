@@ -520,7 +520,7 @@ public class PlatformClientHandler implements ClientHandler {
         return true;
     }
 
-    // TODO: @Override
+    @Override
     public boolean deleteComment(int commentId) {
         if (!isLoggedIn()) {
             return false;

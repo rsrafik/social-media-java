@@ -183,6 +183,14 @@ public interface ClientHandler extends Runnable {
     boolean createComment(int postId, String content);
 
     /**
+     * Deletes a comment.
+     * 
+     * @param commentId the ID of the comment to delete
+     * @return whether the comment was successfully deleted
+     */
+    boolean deleteComment(int commentId);
+
+    /**
      * Searches for a user by username.
      * 
      * @param search the text to search for in the username

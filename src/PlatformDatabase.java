@@ -228,14 +228,14 @@ public class PlatformDatabase implements Database {
         }
     }
 
-    // TODO: override
+    @Override
     public boolean existsComment(int commentId) {
         synchronized (POST_LOCK) {
             return commentMap.containsKey(commentId);
         }
     }
 
-    // TODO: override
+    @Override
     public int getCommenterId(int commentId) {
         synchronized (POST_LOCK) {
             int postId = commentMap.get(commentId);
@@ -249,7 +249,7 @@ public class PlatformDatabase implements Database {
         throw new NullPointerException();
     }
 
-    // TODO: override
+    @Override
     public int getPostIdOfComment(int commentId) {
         synchronized (POST_LOCK) {
             return commentMap.get(commentId);
