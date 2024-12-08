@@ -37,6 +37,13 @@ public interface Database {
     List<User> getUsers();
 
     /**
+     * Retrieves the number of users in the database.
+     * 
+     * @return the total number of users
+     */
+    int userCount();
+
+    /**
      * Checks whether a user exists.
      * 
      * @param userId the user ID to check for
@@ -77,18 +84,18 @@ public interface Database {
     void addUser(User user);
 
     /**
-     * Retrieves the number of users in the database.
-     * 
-     * @return the total number of users
-     */
-    int userCount();
-
-    /**
      * Retrieves all posts stored in the database.
      *
      * @return A LinkedHashMap of PlatformPost objects with post IDs as keys.
      */
     List<Post> getPosts();
+
+    /**
+     * Retrieves the number of posts in the database.
+     * 
+     * @return the total number of posts
+     */
+    int postCount();
 
     /**
      * Checks whether a post exists.
@@ -160,6 +167,13 @@ public interface Database {
      * @param userId the ID of the user removing their downvote
      */
     void removePostDownvote(int postId, int userId);
+
+    /**
+     * Retrieves the number of comments in the database.
+     * 
+     * @return the total number of comments
+     */
+    int commentCount();
 
     /**
      * Adds a comment to the post.

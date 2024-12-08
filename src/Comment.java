@@ -59,8 +59,18 @@ public interface Comment {
      */
     void addDownvote(int userId);
 
+    /**
+     * Removes an upvote from a comment.
+     * 
+     * @param userId the ID of the upvoter
+     */
     void removeUpvote(int userId);
 
+    /**
+     * Removes a downvote from a comment.
+     * 
+     * @param userId the ID of the downvoter
+     */
     void removeDownvote(int userId);
 
     /**

@@ -36,7 +36,8 @@ public class PlatformClientHandler implements ClientHandler {
                 ex.printStackTrace();
             }
             userCount = new AtomicInteger(database.userCount());
-            postCount = new AtomicInteger(database.getPosts().size());
+            postCount = new AtomicInteger(database.postCount());
+            commentCount = new AtomicInteger(database.commentCount());
         }
         this.socket = socket;
     }

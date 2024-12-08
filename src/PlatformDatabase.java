@@ -33,6 +33,7 @@ public class PlatformDatabase implements Database {
         userMap = new HashMap<>();
         usernameMap = new LinkedHashMap<>();
         postMap = new LinkedHashMap<>();
+        commentMap = new HashMap<>();
     }
 
     @Override
@@ -85,6 +86,13 @@ public class PlatformDatabase implements Database {
     }
 
     @Override
+    public int userCount() {
+        synchronized (USER_LOCK) {
+            return users.size();
+        }
+    }
+
+    @Override
     public boolean existsUser(int userId) {
         synchronized (USER_LOCK) {
             return userMap.containsKey(userId);
@@ -123,13 +131,6 @@ public class PlatformDatabase implements Database {
     }
 
     @Override
-    public int userCount() {
-        synchronized (USER_LOCK) {
-            return users.size();
-        }
-    }
-
-    @Override
     public List<Post> getPosts() {
         return posts;
     }
@@ -145,6 +146,13 @@ public class PlatformDatabase implements Database {
     public Post getPost(int postId) {
         synchronized (POST_LOCK) {
             return postMap.get(postId);
+        }
+    }
+
+    @Override
+    public int postCount() {
+        synchronized (POST_LOCK) {
+            return posts.size();
         }
     }
 
@@ -210,6 +218,13 @@ public class PlatformDatabase implements Database {
         synchronized (POST_LOCK) {
             Post post = getPost(postId);
             post.removeDownvote(userId);
+        }
+    }
+
+    @Override
+    public int commentCount() {
+        synchronized (POST_LOCK) {
+            return commentMap.size();
         }
     }
 
