@@ -319,7 +319,7 @@ public class PlatformDatabase implements Database {
     public boolean addFollower(int userId, int followerId) {
         synchronized (USER_LOCK) {
             User user = getUser(userId);
-            User follower = getUser(userId);
+            User follower = getUser(followerId);
             if (!user.addFollower(followerId)) {
                 return false;
             }
