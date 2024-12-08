@@ -1,6 +1,7 @@
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.io.IOException;
 
 class HomeSelection {
 
@@ -57,7 +58,16 @@ class HomeSelection {
             if (option == JOptionPane.YES_OPTION) { // "Post" button clicked
                 String input = textField.getText();
                 if (!input.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Message posted: " + input);
+                    boolean postSuccess;
+
+                    try {
+                        postSuccess = PlatformRunner.client.createPost(input,null);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+
+                    if (postSuccess)
+                        JOptionPane.showMessageDialog(null, "Message posted: " + input);
                 } else {
                     JOptionPane.showMessageDialog(null, "No message entered!");
                 }
@@ -91,11 +101,11 @@ class HomeSelection {
         contentPanel.setBackground(Color.WHITE);
 
         // Add 5 individual posts to the content panel
-        for (int i = 1; i <= 5; i++) {
-            JPanel post = SinglePost.individualPost("friend"); // Create an individual post
-            contentPanel.add(post); // Add the post to the content panel
-            contentPanel.add(Box.createVerticalStrut(40)); // Add spacing between posts
-        }
+//        for (int i = 1; i <= 5; i++) {
+//            JPanel post = SinglePost.individualPost("Username!!", "Message!!","friend"); // Create an individual post
+//            contentPanel.add(post); // Add the post to the content panel
+//            contentPanel.add(Box.createVerticalStrut(40)); // Add spacing between posts
+//        }
 
         // Wrap the content panel in a scroll pane
         JScrollPane scrollPane = new JScrollPane(contentPanel);

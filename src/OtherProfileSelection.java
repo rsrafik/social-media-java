@@ -23,12 +23,6 @@ class OtherProfileSelection {
         usernameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         topPanel.add(usernameLabel);
 
-        // User ID label
-        JLabel userIDLabel = new JLabel("User ID: xxx");
-        userIDLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        userIDLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        topPanel.add(userIDLabel);
-
         // Add spacing between user info and buttons
         topPanel.add(Box.createVerticalStrut(20));
 
@@ -63,11 +57,11 @@ class OtherProfileSelection {
         contentPanel.setBackground(Color.WHITE);
 
         // Add 5 individual posts
-        for (int i = 1; i <= 5; i++) {
-            JPanel post = SinglePost.individualPost("friend");
-            contentPanel.add(post);
-            contentPanel.add(Box.createVerticalStrut(40)); // Add spacing between posts
-        }
+//        for (int i = 1; i <= 5; i++) {
+//            JPanel post = SinglePost.individualPost("Username...", "Message...", "friend");
+//            contentPanel.add(post);
+//            contentPanel.add(Box.createVerticalStrut(40)); // Add spacing between posts
+//        }
 
         // Create a scroll pane for the content panel
         JScrollPane scrollPane = new JScrollPane(contentPanel);

@@ -1,12 +1,26 @@
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 class ProfileSelection {
 
     private static JScrollPane currentScrollPane; // Keeps track of the current scroll pane
+    private static User currentUser;
 
-    public static void mainView(JPanel mainPanel) {
+    static {
+        try {
+            currentUser = PlatformRunner.client.fetchLoggedInUser();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void mainView(JPanel mainPanel) throws IOException, ClassNotFoundException {
         mainPanel.setLayout(new BorderLayout());
         mainPanel.setBackground(Color.WHITE);
 
@@ -14,22 +28,16 @@ class ProfileSelection {
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS)); // Vertical layout
         topPanel.setBackground(Color.WHITE);
-        topPanel.setPreferredSize(new Dimension(mainPanel.getWidth(), 200));
+        topPanel.setPreferredSize(new Dimension(mainPanel.getWidth(), 185));
         topPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         topPanel.add(Box.createVerticalStrut(20));
 
         // Username label
-        JLabel usernameLabel = new JLabel("Username");
+        JLabel usernameLabel = new JLabel(currentUser.getUsername());
         usernameLabel.setFont(new Font("Arial", Font.BOLD, 24));
         usernameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         topPanel.add(usernameLabel);
-
-        // User ID label
-        JLabel userIDLabel = new JLabel("User ID: xxx");
-        userIDLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        userIDLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        topPanel.add(userIDLabel);
 
         // Add spacing between user info and buttons
         topPanel.add(Box.createVerticalStrut(20));
@@ -69,21 +77,38 @@ class ProfileSelection {
         followingButton.addActionListener(e -> switchToFollowingScrollPane(mainPanel));
 
         // Add action listener to Blocked button
-        postsButton.addActionListener(e -> switchToPostsScrollPane(mainPanel));
+        postsButton.addActionListener(e -> {
+            try {
+                switchToPostsScrollPane(mainPanel);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            } catch (ClassNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
         blockedButton.addActionListener(e -> switchToBlockedScrollPane(mainPanel));
     }
 
-    private static JScrollPane createPostsScrollPane() {
+    private static JScrollPane createPostsScrollPane() throws IOException, ClassNotFoundException {
+        // Re-fetch the current user to ensure the posts are up to date
+        currentUser = PlatformRunner.client.fetchLoggedInUser();
+
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBackground(Color.WHITE);
 
-        // Add 5 individual posts
-        for (int i = 1; i <= 5; i++) {
-            JPanel post = SinglePost.individualPost("user");
-            contentPanel.add(post);
-            contentPanel.add(Box.createVerticalStrut(40)); // Add spacing between posts
+        List<Integer> postIds = currentUser.getPostIds();
+        List<Post> posts = new ArrayList<>();
+
+        for(int postId : postIds) {
+            posts.add(PlatformRunner.client.fetchPost(postId));
+        }
+
+        for (Post post : posts) {
+            JPanel postPanel = SinglePost.individualPost(post, "user");
+            contentPanel.add(postPanel);
+            contentPanel.add(Box.createVerticalStrut(40));
         }
 
         JScrollPane scrollPane = new JScrollPane(contentPanel);
@@ -94,6 +119,7 @@ class ProfileSelection {
 
         return scrollPane;
     }
+
 
     private static JScrollPane createFollowingScrollPane() {
         JPanel followingPanel = new JPanel();
@@ -156,11 +182,14 @@ class ProfileSelection {
         mainPanel.repaint();
     }
 
-    private static void switchToPostsScrollPane(JPanel mainPanel) {
-        mainPanel.remove(currentScrollPane); // Remove the existing scrollable content
-        currentScrollPane = createPostsScrollPane(); // Revert to posts (example behavior)
-        mainPanel.add(currentScrollPane, BorderLayout.CENTER); // Add the new content
-        mainPanel.revalidate(); // Refresh the layout
+    private static void switchToPostsScrollPane(JPanel mainPanel) throws IOException, ClassNotFoundException {
+        // Re-fetch the current user here
+        currentUser = PlatformRunner.client.fetchLoggedInUser();
+
+        mainPanel.remove(currentScrollPane);
+        currentScrollPane = createPostsScrollPane();
+        mainPanel.add(currentScrollPane, BorderLayout.CENTER);
+        mainPanel.revalidate();
         mainPanel.repaint();
     }
 

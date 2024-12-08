@@ -1,76 +1,80 @@
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SinglePost {
-    private final String username;
-    private final String message;
-
-    public SinglePost(String username, String message) {
-        this.username = username;
-        this.message = message;
-    }
-
-    public static JPanel individualPost(String role) {
+    public static JPanel individualPost(Post post, String role) throws IOException, ClassNotFoundException {
         // Create a panel to represent the post
         JPanel postPanel = new JPanel();
-        postPanel.setPreferredSize(new Dimension(800, 200)); // Fixed size: width = 800, height = 200
-        postPanel.setMaximumSize(new Dimension(800, 200)); // Ensure the size does not expand
         postPanel.setBackground(new Color(230, 230, 230)); // Light gray background
-        postPanel.setLayout(new BorderLayout()); // Use BorderLayout to center the text
+        postPanel.setLayout(new BorderLayout()); // Use BorderLayout to organize components
 
         // User topper (top bar)
         JPanel userTopper = new JPanel(new BorderLayout());
-        userTopper.setPreferredSize(new Dimension(postPanel.getWidth(), 45));
+        userTopper.setPreferredSize(new Dimension(800, 45));
         userTopper.setBackground(new Color(154, 154, 154));
 
+        UserInfo userInfo = PlatformRunner.client.fetchUserInfo(post.getCreatorId());
+
         // Username label on the left
-        JLabel usernameLabel = new JLabel("Username");
+        JLabel usernameLabel = new JLabel(userInfo.getUsername());
         usernameLabel.setFont(new Font("Arial", Font.BOLD, 16));
         usernameLabel.setForeground(Color.WHITE);
         usernameLabel.setBorder(new EmptyBorder(0, 20, 0, 0)); // Add left padding
         userTopper.add(usernameLabel, BorderLayout.WEST);
 
         // Three dots button on the right
-        JPanel buttonHolder = new JPanel();
-        buttonHolder.setLayout(new BorderLayout()); // Simplify layout for alignment
-        buttonHolder.setBackground(new Color(154, 154, 154)); // Match userTopper background
-        buttonHolder.setBorder(new EmptyBorder(0, 0, 0, 5)); // Reduce padding to align closer to the edge
-
         JButton moreButton = new JButton("•••");
         moreButton.setFont(new Font("Arial", Font.BOLD, 20));
         moreButton.setForeground(Color.WHITE);
         moreButton.setFocusPainted(false);
         moreButton.setContentAreaFilled(false);
         moreButton.setBorderPainted(false);
-        moreButton.setHorizontalAlignment(SwingConstants.RIGHT);
-
         moreButton.addActionListener(e -> {
-            String message = role.equalsIgnoreCase("friend") ? "Hide post?" : "Delete post?";
+            String moreOption = role.equalsIgnoreCase("friend") ? "Hide post?" : "Delete post?";
             int result = JOptionPane.showConfirmDialog(
                     postPanel,
-                    message,
+                    moreOption,
                     "Confirmation",
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE
             );
             if (result == JOptionPane.YES_OPTION) {
-                System.out.println(message.equals("Hide post?") ? "Post hidden!" : "Post deleted!");
+                System.out.println(moreOption.equals("Hide post?") ? "Post hidden!" : "Post deleted!");
             }
         });
-
-        buttonHolder.add(moreButton, BorderLayout.CENTER); // Center alignment
-        userTopper.add(buttonHolder, BorderLayout.EAST);
+        userTopper.add(moreButton, BorderLayout.EAST);
 
         // Add the userTopper to the top of the post panel
         postPanel.add(userTopper, BorderLayout.NORTH);
 
+        // Middle content section (dynamic text with padding)
+        JLabel placeholderLabel = new JLabel(
+                "<html><div style='text-align: center; padding-top: 15px; padding-bottom: 15px;'>" + post.getContent() + "</div></html>",
+                SwingConstants.CENTER
+        );
+        placeholderLabel.setFont(new Font("Arial", Font.PLAIN, 16));
+        placeholderLabel.setForeground(new Color(70, 70, 70));
+
+        JPanel middlePanel = new JPanel(new BorderLayout());
+        middlePanel.setBackground(new Color(230, 230, 230)); // Match postPanel background
+        middlePanel.add(placeholderLabel, BorderLayout.CENTER);
+
+        // Calculate dynamic height based on placeholder text
+        placeholderLabel.setSize(800, Short.MAX_VALUE); // Set a fixed width, unlimited height for size calculation
+        Dimension labelSize = placeholderLabel.getPreferredSize();
+        int dynamicHeight = 45 + labelSize.height + 30; // Topper height + label height + bottomer height
+        postPanel.setPreferredSize(new Dimension(800, dynamicHeight));
+        postPanel.setMaximumSize(new Dimension(800, dynamicHeight));
+
+        postPanel.add(middlePanel, BorderLayout.CENTER);
+
         // User bottomer (bottom bar)
         JPanel userBottomer = new JPanel(new BorderLayout());
-        userBottomer.setPreferredSize(new Dimension(postPanel.getWidth(), 30));
+        userBottomer.setPreferredSize(new Dimension(800, 30));
         userBottomer.setBackground(new Color(197, 197, 197));
 
         // Left section: Upvote/Downvote
@@ -81,17 +85,55 @@ public class SinglePost {
         upvoteLabel.setFont(new Font("Arial", Font.BOLD, 14));
         JToggleButton upvoteButton = new JToggleButton("▲");
         upvoteButton.setFocusPainted(false);
-        upvoteButton.setForeground(new Color(66, 66, 66, 154));
 
         JLabel downvoteLabel = new JLabel("0");
         downvoteLabel.setFont(new Font("Arial", Font.BOLD, 14));
         JToggleButton downvoteButton = new JToggleButton("▼");
         downvoteButton.setFocusPainted(false);
-        downvoteButton.setForeground(new Color(66, 66, 66, 154));
 
         AtomicBoolean isUpvoted = new AtomicBoolean(false);
         AtomicBoolean isDownvoted = new AtomicBoolean(false);
 
+        addVoteButtonListeners(upvoteButton, downvoteButton, upvoteLabel, downvoteLabel, isUpvoted, isDownvoted);
+
+        votePanel.add(upvoteLabel);
+        votePanel.add(upvoteButton);
+        votePanel.add(Box.createHorizontalStrut(10));
+        votePanel.add(downvoteLabel);
+        votePanel.add(downvoteButton);
+
+        // Right section: Comment buttons
+        JPanel commentPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        commentPanel.setBackground(new Color(197, 197, 197));
+        JButton makeComment = new JButton("Add Comment");
+        makeComment.setFocusPainted(false);
+        makeComment.addActionListener(createCommentActionListener());
+        JButton viewComments = new JButton("View Comments");
+        viewComments.setFocusPainted(false);
+        viewComments.addActionListener(e -> {
+            String[] comments = {"Comment 1", "Comment 2", "Comment 3"}; // Example comments
+            ScrollableOptionPane.showDialog(null, comments, "Comments");
+        });
+
+        commentPanel.add(makeComment);
+        commentPanel.add(viewComments);
+
+        userBottomer.add(votePanel, BorderLayout.WEST);
+        userBottomer.add(commentPanel, BorderLayout.EAST);
+
+        postPanel.add(userBottomer, BorderLayout.SOUTH);
+
+        return postPanel;
+    }
+
+    private static void addVoteButtonListeners(
+            JToggleButton upvoteButton,
+            JToggleButton downvoteButton,
+            JLabel upvoteLabel,
+            JLabel downvoteLabel,
+            AtomicBoolean isUpvoted,
+            AtomicBoolean isDownvoted
+    ) {
         upvoteButton.addActionListener(e -> {
             if (!isUpvoted.get()) {
                 upvoteLabel.setText(String.valueOf(Integer.parseInt(upvoteLabel.getText()) + 1));
@@ -121,87 +163,25 @@ public class SinglePost {
             }
             upvoteButton.setSelected(false);
         });
+    }
 
-        votePanel.add(upvoteLabel);
-        votePanel.add(upvoteButton);
-        votePanel.add(Box.createHorizontalStrut(10));
-        votePanel.add(downvoteLabel);
-        votePanel.add(downvoteButton);
-
-        // Right section: Comment buttons
-        JPanel commentPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
-        commentPanel.setBackground(new Color(197, 197, 197));
-        JButton makeComment = new JButton("Add Comment");
-        makeComment.setForeground(new Color(53, 53, 53,154));
-        makeComment.setFocusPainted(false);
-        makeComment.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JTextField textField = new JTextField();
-                Object[] message = {"Create Comment:", textField};
-
-                // Show a dialog with custom "Post" and "Cancel" buttons
-                int option = JOptionPane.showOptionDialog(
-                        null,
-                        message,
-                        "Create Comment",
-                        JOptionPane.YES_NO_OPTION,
-                        JOptionPane.PLAIN_MESSAGE,
-                        null,
-                        new Object[]{"Post", "Cancel"}, // Custom buttons
-                        "Post" // Default button
-                );
-
-
-                if (option == JOptionPane.YES_OPTION) { // "Post" button clicked
-                    String input = textField.getText();
-                    if (!input.isEmpty()) {
-                        JOptionPane.showMessageDialog(null, "Message posted: " + input);
-                    } else {
-                        JOptionPane.showMessageDialog(null, "No message entered!");
-                    }
-                }
+    private static ActionListener createCommentActionListener() {
+        return e -> {
+            JTextField textField = new JTextField();
+            Object[] message = {"Create Comment:", textField};
+            int option = JOptionPane.showOptionDialog(
+                    null,
+                    message,
+                    "Create Comment",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    new Object[]{"Post", "Cancel"},
+                    "Post"
+            );
+            if (option == JOptionPane.YES_OPTION && !textField.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Comment posted: " + textField.getText());
             }
-        });
-
-        String[] comments = {
-                "user1: This is a comment.",
-                "user2: Another comment here.",
-                "user3: Yet another insightful comment.",
-                "user4: Keep the comments coming!",
-                "user5: Here's my contribution.",
-                "user6: I love these discussions.",
-                "user7: Let's add more comments.",
-                "user8: This is so cool!",
-                "user9: Amazing work everyone.",
-                "user10: I agree with all of this.",
-                "user1: This is a comment.",
-                "user2: Another comment here.",
-                "user3: Yet another insightful comment.",
-                "user4: Keep the comments coming!",
-                "user5: Here's my contribution.",
-                "user6: I love these discussions.",
-                "user7: Let's add more comments.",
-                "user8: This is so cool!",
-                "user9: Amazing work everyone.",
-                "user10: I agree with all of this.",
         };
-
-        JButton viewComments = new JButton("View Comments");
-        viewComments.setForeground(new Color(53, 53, 53,154));
-        viewComments.setFocusPainted(false);
-        viewComments.addActionListener(e -> {
-            ScrollableOptionPane.showDialog(null, comments, "Comments");
-        });
-
-        commentPanel.add(makeComment);
-        commentPanel.add(viewComments);
-
-        userBottomer.add(votePanel, BorderLayout.WEST);
-        userBottomer.add(commentPanel, BorderLayout.EAST);
-
-        postPanel.add(userBottomer, BorderLayout.SOUTH);
-
-        return postPanel;
     }
 }
