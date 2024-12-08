@@ -1,23 +1,41 @@
-# Team-Project
+# README
 
-## Running the Server
+## Compiling and Running
 
-```bash
-javac PlatformServer.java
-java PlatformServer
-```
-
-## Running the Client
+**[DO THIS FIRST] Server:**
 
 ```bash
-javac PlatformClient.java
-java PlatformClient
+
+-> COMPILING
+
+javac -cp src -d build/server src/PlatformServer.java
+
+-> RUNNING
+
+java -cp build/server PlatformServer
+
 ```
 
-## Submission Details (and History)
+**Client:**
 
-**Rachel Rafik** - Vocareum Phase 2 Workspace
-**Rachel Rafik** - Vocareum Phase 1 Workspace
+```bash
+-> Compiling
+
+javac -cp src:lib/\* -d build/client src/PlatformRunner.java
+
+-> Running
+
+java -cp build/client:lib/\* PlatformRunner
+
+```
+
+## Submission Details
+
+**Rachel Rafik** - Submitted the Project Report
+
+**Rachel Rafik** - Submitted the Presentation
+
+**Ropan Datta** - Submitted the project to the Phase 3 Workspace
 
 # Description
 
@@ -59,6 +77,7 @@ java PlatformClient
     - Second, we test the ability to read user and post files. We created a test file for each and then read them back and compared that to the expected. It also checks that the program reacts correctly to an empty file
     - Third, we test adding users and posts to the database. We created an empty database object and used the add method for user and post separately, and then read the lists of users and posts to make sure they were the correct size.
     - Fourth, we tested whether the getters for both the Users and Posts array lists within the database were working correctly by creating an empty database object and creating and adding two new user and post objects to the respective array lists. Then we called the respective methods to then make sure that they consisted of the previously added objects within the respective array lists.
+    - we also made similar tests for the functions of blocking, following, commenting, upvoting/ down voting, and search user
         
         
     - **updated the testcase with new parameters in each example user and post to work with new constructors. Also the class was changed to PlatformDatabase instead of FoundationDatabase
@@ -76,8 +95,6 @@ java PlatformClient
     - Used JUNIT to check that the ClientHandler interface exists and also is an interface and not a class. Then we check that ClientHandler is implemented by using reflection to check if PlatformClientHandler either directly implements ClientHandler or is a subclass of a class that implements ClientHandler.
 
 ## Classes
-
----
 
 ### Testing
 
@@ -134,3 +151,12 @@ java PlatformClient
     - The run method is tested through the PlatformClientHandlerRunTestCase class where a mock socket is created to simulate client and server communication.
     - Methods loggedIn, logIn, logOut, createUser, and createPost are tested through the PlatformClientHandlerTestCase class where mock sockets are created following different simulations such as logging in, logging out, creating a user, creating a post, making sure users can’t log in with incorrect credentials and so on to test that each method works as intended.
     - The client handler is where friend requests are processed, so I created a test for different possible scenarios when sending a friend request. The test case makes sure the correct result is returned when a friend request is sent to a nonexistent user, a blocked user, a user that is already a friend. It also tests sending a friend request to a real user.
+
+### User Info
+
+- Functionality
+    - Provides public information about a User
+- Relationship
+    - Stores user information except the sensitive information, such as passwords and followers.
+- Testing
+- UserInfo has the same testing as the User and PlatformUser class due to UserInfo building off of User and consisting off similar methods.
