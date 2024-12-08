@@ -56,6 +56,19 @@ class OtherProfileSelection {
         blockedButton.setFocusPainted(false);
         blockedButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         blockedButton.setPreferredSize(new Dimension(150, 40));
+        blockedButton.addActionListener(e -> {
+            boolean blockSuccess;
+
+            try {
+                blockSuccess = PlatformRunner.client.blockUser(SearchTextField.chosenOne.getId());
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+
+            if (blockSuccess)
+                JOptionPane.showMessageDialog(null, "Blocked user!!");
+        });
+
         topPanel.add(blockedButton);
 
         // Add the top panel to the main panel
