@@ -404,7 +404,7 @@ public class PlatformDatabase implements Database {
         synchronized (USER_LOCK) {
             ArrayList<UserInfo> userInfos = new ArrayList<>();
             for (User user : users) {
-                if (user.getUsername().contains(search)) {
+                if (user.getUsername().toLowerCase().contains(search.toLowerCase())) {
                     UserInfo userInfo = new PlatformUserInfo(user);
                     userInfos.add(userInfo);
                 }
