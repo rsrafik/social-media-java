@@ -18,6 +18,7 @@ public class Welcome {
 
         // Create the "Log In" button
         JButton loginButton = new JButton("Log In");
+        loginButton.setFocusPainted(false);
         loginButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         loginButton.addActionListener(new ActionListener() {
             @Override
@@ -33,6 +34,7 @@ public class Welcome {
 
         // Create the "Sign Up" button
         JButton signUpButton = new JButton("Sign Up");
+        signUpButton.setFocusPainted(false);
         signUpButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         signUpButton.addActionListener(new ActionListener() {
             @Override
@@ -111,6 +113,7 @@ public class Welcome {
         passwordField.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JButton submitButton = new JButton("Log In");
+        submitButton.setFocusPainted(false);
         submitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         submitButton.addActionListener(new ActionListener() {
             @Override
@@ -216,6 +219,7 @@ public class Welcome {
         errorLabel.setVisible(false); // Hide by default
 
         JButton submitButton = new JButton("Sign Up");
+        submitButton.setFocusPainted(false);
         submitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         submitButton.addActionListener(e -> {
             String username = usernameField.getText();

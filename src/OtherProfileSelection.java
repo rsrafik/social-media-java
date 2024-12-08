@@ -25,7 +25,6 @@ class OtherProfileSelection {
         usernameLabel.setFont(new Font("Arial", Font.BOLD, 24));
         usernameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         topPanel.add(usernameLabel);
-
         // Add spacing between user info and buttons
         topPanel.add(Box.createVerticalStrut(20));
 
@@ -50,12 +49,27 @@ class OtherProfileSelection {
 
         topPanel.add(followingButton);
 
+        topPanel.add(Box.createVerticalStrut(10));
+
         // Blocked button
         JButton blockedButton = new JButton("Block");
         blockedButton.setFont(new Font("Arial", Font.PLAIN, 14));
         blockedButton.setFocusPainted(false);
         blockedButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         blockedButton.setPreferredSize(new Dimension(150, 40));
+        blockedButton.addActionListener(e -> {
+            boolean blockSuccess;
+
+            try {
+                blockSuccess = PlatformRunner.client.blockUser(SearchTextField.chosenOne.getId());
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+
+            if (blockSuccess)
+                JOptionPane.showMessageDialog(null, "Blocked user!!");
+        });
+
         topPanel.add(blockedButton);
 
         // Add the top panel to the main panel
@@ -79,7 +93,7 @@ class OtherProfileSelection {
             posts.add(PlatformRunner.client.fetchPost(postId));
 
         // Add 5 individual posts
-        for (int i = 1; i < postIds.size(); i++) {
+        for (int i = 0; i < postIds.size(); i++) {
             JPanel post = SinglePost.individualPost(posts.get(i), "friend");
             contentPanel.add(post);
             contentPanel.add(Box.createVerticalStrut(40)); // Add spacing between posts
