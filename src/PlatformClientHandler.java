@@ -76,7 +76,6 @@ public class PlatformClientHandler implements ClientHandler {
                             out.flush();
                         }
                         case FETCH_USER -> {
-                            int userId = in.readInt();
                             User user = fetchUser();
                             out.writeObject(user);
                             out.flush();
