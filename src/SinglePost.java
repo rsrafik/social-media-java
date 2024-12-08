@@ -4,11 +4,14 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.List;
 
 public class SinglePost {
     public static JPanel individualPost(Post post, String role) throws IOException, ClassNotFoundException {
+        // Get current user ID
+        User currentUser = PlatformRunner.client.fetchLoggedInUser();
+        int currentUserId = currentUser.getId();
+
         // Create a panel to represent the post
         JPanel postPanel = new JPanel();
         postPanel.setBackground(new Color(230, 230, 230)); // Light gray background
@@ -65,8 +68,8 @@ public class SinglePost {
         middlePanel.setBackground(new Color(230, 230, 230)); // Match postPanel background
         middlePanel.add(placeholderLabel, BorderLayout.CENTER);
 
-        // Calculate dynamic height based on placeholder text
-        placeholderLabel.setSize(800, Short.MAX_VALUE); // Set a fixed width, unlimited height for size calculation
+        // Calculate dynamic height
+        placeholderLabel.setSize(800, Short.MAX_VALUE);
         Dimension labelSize = placeholderLabel.getPreferredSize();
         int dynamicHeight = 45 + labelSize.height + 30; // Topper height + label height + bottomer height
         postPanel.setPreferredSize(new Dimension(800, dynamicHeight));
@@ -83,20 +86,24 @@ public class SinglePost {
         JPanel votePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         votePanel.setBackground(new Color(197, 197, 197));
 
-        JLabel upvoteLabel = new JLabel("1");
+        // Display initial counts from the post
+        JLabel upvoteLabel = new JLabel(String.valueOf(post.getUpvoteIds().size()));
         upvoteLabel.setFont(new Font("Arial", Font.BOLD, 14));
         JToggleButton upvoteButton = new JToggleButton("▲");
         upvoteButton.setFocusPainted(false);
 
-        JLabel downvoteLabel = new JLabel("0");
+        JLabel downvoteLabel = new JLabel(String.valueOf(post.getDownvoteIds().size()));
         downvoteLabel.setFont(new Font("Arial", Font.BOLD, 14));
         JToggleButton downvoteButton = new JToggleButton("▼");
         downvoteButton.setFocusPainted(false);
 
-        AtomicBoolean isUpvoted = new AtomicBoolean(false);
-        AtomicBoolean isDownvoted = new AtomicBoolean(false);
+        // Set initial selected state based on whether current user upvoted/downvoted
+        boolean userUpvoted = post.getUpvoteIds().contains(currentUserId);
+        boolean userDownvoted = post.getDownvoteIds().contains(currentUserId);
+        upvoteButton.setSelected(userUpvoted);
+        downvoteButton.setSelected(userDownvoted);
 
-        addVoteButtonListeners(upvoteButton, downvoteButton, upvoteLabel, downvoteLabel, isUpvoted, isDownvoted);
+        addVoteButtonListeners(post, upvoteButton, downvoteButton, upvoteLabel, downvoteLabel, currentUserId);
 
         votePanel.add(upvoteLabel);
         votePanel.add(upvoteButton);
@@ -116,9 +123,7 @@ public class SinglePost {
             List<Comment> commentList = null;
             try {
                 commentList = PlatformRunner.client.fetchComments(post.getId());
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
-            } catch (ClassNotFoundException ex) {
+            } catch (IOException | ClassNotFoundException ex) {
                 throw new RuntimeException(ex);
             }
             List<String> commentMessages = new ArrayList<>();
@@ -126,10 +131,11 @@ public class SinglePost {
             if (commentList != null) {
                 for (Comment comment : commentList) {
                     try {
-                        commentMessages.add(PlatformRunner.client.fetchUserInfo(comment.getCreatorId()).getUsername() + ": " + comment.getContent());
-                    } catch (IOException ex) {
-                        throw new RuntimeException(ex);
-                    } catch (ClassNotFoundException ex) {
+                        commentMessages.add(
+                                PlatformRunner.client.fetchUserInfo(comment.getCreatorId()).getUsername() + ": "
+                                        + comment.getContent()
+                        );
+                    } catch (IOException | ClassNotFoundException ex) {
                         throw new RuntimeException(ex);
                     }
                 }
@@ -138,8 +144,6 @@ public class SinglePost {
             } else {
                 ScrollableOptionPane.showDialog(null, new String[0], "Comments");
             }
-
-
         });
 
         commentPanel.add(makeComment);
@@ -154,42 +158,61 @@ public class SinglePost {
     }
 
     private static void addVoteButtonListeners(
+            Post originalPost,
             JToggleButton upvoteButton,
             JToggleButton downvoteButton,
             JLabel upvoteLabel,
             JLabel downvoteLabel,
-            AtomicBoolean isUpvoted,
-            AtomicBoolean isDownvoted
+            int currentUserId
     ) {
         upvoteButton.addActionListener(e -> {
-            if (!isUpvoted.get()) {
-                upvoteLabel.setText(String.valueOf(Integer.parseInt(upvoteLabel.getText()) + 1));
-                if (isDownvoted.get()) {
-                    downvoteLabel.setText(String.valueOf(Integer.parseInt(downvoteLabel.getText()) - 1));
-                }
-                isUpvoted.set(true);
-                isDownvoted.set(false);
-            } else {
-                upvoteLabel.setText(String.valueOf(Integer.parseInt(upvoteLabel.getText()) - 1));
-                isUpvoted.set(false);
+            try {
+                // User clicked upvote. We call the server to upvote (this might add or remove the upvote)
+                PlatformRunner.client.upvotePost(originalPost.getId());
+
+                // Fetch updated post
+                Post updatedPost = PlatformRunner.client.fetchPost(originalPost.getId());
+                refreshPostUI(updatedPost, upvoteButton, downvoteButton, upvoteLabel, downvoteLabel, currentUserId);
+            } catch (IOException | ClassNotFoundException ex) {
+                ex.printStackTrace();
             }
-            downvoteButton.setSelected(false);
         });
 
         downvoteButton.addActionListener(e -> {
-            if (!isDownvoted.get()) {
-                downvoteLabel.setText(String.valueOf(Integer.parseInt(downvoteLabel.getText()) + 1));
-                if (isUpvoted.get()) {
-                    upvoteLabel.setText(String.valueOf(Integer.parseInt(upvoteLabel.getText()) - 1));
-                }
-                isDownvoted.set(true);
-                isUpvoted.set(false);
-            } else {
-                downvoteLabel.setText(String.valueOf(Integer.parseInt(downvoteLabel.getText()) - 1));
-                isDownvoted.set(false);
+            try {
+                // User clicked downvote. We call the server to downvote (this might add or remove the downvote)
+                PlatformRunner.client.downvotePost(originalPost.getId());
+
+                // Fetch updated post
+                Post updatedPost = PlatformRunner.client.fetchPost(originalPost.getId());
+                refreshPostUI(updatedPost, upvoteButton, downvoteButton, upvoteLabel, downvoteLabel, currentUserId);
+            } catch (IOException | ClassNotFoundException ex) {
+                ex.printStackTrace();
             }
-            upvoteButton.setSelected(false);
         });
+    }
+
+    private static void refreshPostUI(
+            Post updatedPost,
+            JToggleButton upvoteButton,
+            JToggleButton downvoteButton,
+            JLabel upvoteLabel,
+            JLabel downvoteLabel,
+            int currentUserId
+    ) {
+        // Update the counts
+        upvoteLabel.setText(String.valueOf(updatedPost.getUpvoteIds().size()));
+        downvoteLabel.setText(String.valueOf(updatedPost.getDownvoteIds().size()));
+
+        // Update button states based on whether the user is in upvote/downvote lists
+        boolean userUpvoted = updatedPost.getUpvoteIds().contains(currentUserId);
+        boolean userDownvoted = updatedPost.getDownvoteIds().contains(currentUserId);
+
+        upvoteButton.setSelected(userUpvoted);
+        downvoteButton.setSelected(userDownvoted);
+
+        // If user pressed upvote and it was successful, downvote should not remain selected, and vice versa.
+        // The logic above handles this since we re-check the arrays from the server.
     }
 
     private static ActionListener createCommentActionListener(Post post) {
@@ -208,9 +231,8 @@ public class SinglePost {
             );
             if (option == JOptionPane.YES_OPTION && !textField.getText().isEmpty()) {
                 boolean commentSuccess;
-
                 try {
-                    commentSuccess = PlatformRunner.client.createComment(post.getId(),textField.getText());
+                    commentSuccess = PlatformRunner.client.createComment(post.getId(), textField.getText());
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
