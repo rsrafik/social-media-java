@@ -144,4 +144,17 @@ public class DatabaseTestcase {
         Assert.assertTrue("Post two should be in the list", posts.contains(two));
     }
 
+    //test the search user method
+    @Test
+    public void testSearchUser() throws IOException, ClassNotFoundException {
+        PlatformDatabase db = new PlatformDatabase();
+        PlatformUser tester = new PlatformUser(0, "tester", "testerPass");
+        db.addUser(tester);
+        PlatformUserInfo testInfo = new PlatformUserInfo(tester);
+
+        Assert.assertNotEquals("Should result in tester1 info", testInfo, db.searchUsername("tester"));
+    }    //end of search user test
+
+
+
 }    //end of Database testcase
