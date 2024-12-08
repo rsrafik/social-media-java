@@ -14,7 +14,7 @@ public class PlatformClient implements Closeable {
     private ObjectInputStream in;
     private ObjectOutputStream out;
 
-    public PlatformClient(String host, int port) throws IOException, UnknownHostException {
+    public PlatformClient(String host, int port) throws IOException {
         socket = new Socket(host, port);
         in = new ObjectInputStream(socket.getInputStream());
         out = new ObjectOutputStream(socket.getOutputStream());
@@ -111,6 +111,7 @@ public class PlatformClient implements Closeable {
     public boolean cancelFollowRequest(int userId) throws IOException {
         out.writeObject(OperationType.CANCEL_FOLLOWREQUEST);
         out.writeInt(userId);
+        out.flush();
         boolean result = in.readBoolean();
         return result;
     }
@@ -118,6 +119,7 @@ public class PlatformClient implements Closeable {
     public boolean acceptFollowRequest(int userId) throws IOException {
         out.writeObject(OperationType.ACCEPT_FOLLOWREQUEST);
         out.writeInt(userId);
+        out.flush();
         boolean result = in.readBoolean();
         return result;
     }
@@ -125,6 +127,7 @@ public class PlatformClient implements Closeable {
     public boolean rejectFollowRequest(int userId) throws IOException {
         out.writeObject(OperationType.REJECT_FOLLOWREQUEST);
         out.writeInt(userId);
+        out.flush();
         boolean result = in.readBoolean();
         return result;
     }
@@ -132,6 +135,7 @@ public class PlatformClient implements Closeable {
     public boolean unfollowUser(int userId) throws IOException {
         out.writeObject(OperationType.UNFOLLOW_USER);
         out.writeInt(userId);
+        out.flush();
         boolean result = in.readBoolean();
         return result;
     }
