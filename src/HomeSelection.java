@@ -118,8 +118,8 @@ class HomeSelection {
     }
 
     private static void switchToOtherProfileView() {
-        // Remove the current scrollable content
-        mainContentPanel.remove(currentScrollPane);
+        // Remove any existing content, including OtherProfileSelection if it was already displayed
+        mainContentPanel.removeAll();
 
         // Create a new panel for the OtherProfileSelection
         JPanel otherProfilePanel = new JPanel(new BorderLayout());
@@ -132,4 +132,5 @@ class HomeSelection {
         mainContentPanel.revalidate();
         mainContentPanel.repaint();
     }
+
 }

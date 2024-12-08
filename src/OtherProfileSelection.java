@@ -18,7 +18,7 @@ class OtherProfileSelection {
 //        topPanel.add(Box.createVerticalStrut(20));
 
         // Username label
-        JLabel usernameLabel = new JLabel("Username");
+        JLabel usernameLabel = new JLabel(SearchTextField.chosenOne.getUsername());
         usernameLabel.setFont(new Font("Arial", Font.BOLD, 24));
         usernameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         topPanel.add(usernameLabel);
