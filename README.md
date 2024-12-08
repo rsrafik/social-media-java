@@ -16,16 +16,12 @@ java PlatformClient
 
 ## Submission Details (and History)
 
----
-
 **Rachel Rafik** - Vocareum Phase 2 Workspace
 **Rachel Rafik** - Vocareum Phase 1 Workspace
 
 # Description
 
 ## Interfaces
-
----
 
 ### User
 
