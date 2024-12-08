@@ -13,6 +13,7 @@ import java.util.*;
  * @version November 15, 2024
  */
 public class PlatformComment implements Comment, Serializable {
+    private final Integer id;
     private final Integer creatorId; // ID of the user who created the comment
     private final String content; // The content of the comment
 
@@ -26,12 +27,18 @@ public class PlatformComment implements Comment, Serializable {
      * @param creatorId the ID of the user who created the comment
      * @param content the text content of the comment
      */
-    public PlatformComment(Integer creatorId, String content) {
+    public PlatformComment(Integer id, Integer creatorId, String content) {
+        this.id = id;
         this.creatorId = creatorId;
         this.content = content;
 
         upvoteIds = new ArrayList<>();
         downvoteIds = new ArrayList<>();
+    }
+
+    @Override
+    public Integer getId() {
+        return id;
     }
 
     @Override
@@ -78,5 +85,15 @@ public class PlatformComment implements Comment, Serializable {
             upvoteIds.remove((Integer) userId); // remove earlier upvote if it exists
             downvoteIds.add(userId);
         }
+    }
+
+    @Override
+    public void removeUpvote(int userId) {
+        upvoteIds.remove((Integer) userId);
+    }
+
+    @Override
+    public void removeDownvote(int userId) {
+        downvoteIds.remove((Integer) userId);
     }
 }

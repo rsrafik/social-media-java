@@ -13,6 +13,13 @@ import java.util.List;
 public interface Comment {
 
     /**
+     * Retrieves the ID of the comment.
+     * 
+     * @return the ID of the comment
+     */
+    Integer getId();
+
+    /**
      * Retrieves the ID of the user who created the comment.
      *
      * @return the ID of the user who created the comment
@@ -51,6 +58,10 @@ public interface Comment {
      * @param userId the ID of the user downvoting the comment
      */
     void addDownvote(int userId);
+
+    void removeUpvote(int userId);
+
+    void removeDownvote(int userId);
 
     /**
      * Retrieves the number of users who upvoted the comment.

@@ -186,8 +186,25 @@ public class PlatformClient implements Closeable {
         return result;
     }
 
+    public boolean upvoteComment(int commentId) throws IOException {
+        out.writeObject(OperationType.UPVOTE_COMMENT);
+        out.writeInt(commentId);
+        out.flush();
+        boolean result = in.readBoolean();
+        return result;
+    }
+
+    public boolean downvoteComment(int commentId) throws IOException {
+        out.writeObject(OperationType.DOWNVOTE_COMMENT);
+        out.writeInt(commentId);
+        out.flush();
+        boolean result = in.readBoolean();
+        return result;
+    }
+
     public boolean deleteComment(int commentId) throws IOException {
         out.writeObject(OperationType.DELETE_COMMENT);
+        out.writeInt(commentId);
         out.flush();
         boolean result = in.readBoolean();
         return result;
