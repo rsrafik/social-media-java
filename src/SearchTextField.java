@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SearchTextField extends JTextField {
+    public static User chosenOne;
 
     private final TransparentJButton searchButton;
     private final FontIcon searchIcon;
@@ -156,7 +157,7 @@ public class SearchTextField extends JTextField {
                 }
             }
 
-            System.out.println(selectedUser.getUsername());
+            chosenOne = selectedUser;
             searchActionListener.onSearch(selectedOption);
         }
     }
