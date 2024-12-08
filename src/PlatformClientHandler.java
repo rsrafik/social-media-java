@@ -75,9 +75,15 @@ public class PlatformClientHandler implements ClientHandler {
                             out.writeBoolean(result);
                             out.flush();
                         }
-                        case FETCH_USER -> {
-                            User user = fetchUser();
+                        case FETCH_LOGGEDIN_USER -> {
+                            User user = fetchLoggedInUser();
                             out.writeObject(user);
+                            out.flush();
+                        }
+                        case FETCH_USER_INFO -> {
+                            int userId = in.readInt();
+                            UserInfo info = fetchUserInfo(userId);
+                            out.writeObject(info);
                             out.flush();
                         }
                         case GET_BLOCKED_USERS -> {
@@ -255,13 +261,30 @@ public class PlatformClientHandler implements ClientHandler {
     }
 
     @Override
-    public User fetchUser() {
+    public User fetchLoggedInUser() {
         if (!isLoggedIn()) {
             return null;
         }
         try {
             User user = database.fetchUser(loggedInId);
             return user;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    public UserInfo fetchUserInfo(int userId) {
+        if (!isLoggedIn()) {
+            return null;
+        }
+        if (database.hasBlockedUser(userId, loggedInId)) {
+            return null;
+        }
+        try {
+            UserInfo userInfo = new PlatformUserInfo(database.fetchUser(userId));
+            return userInfo;
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
