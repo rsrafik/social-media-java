@@ -6,12 +6,11 @@ import java.util.List;
 
 /**
  * HomeSelection
- *
+ * <p>
  * This class manages the main home view of the application, including
  * a search bar, the ability to create posts, and a scrollable feed.
  *
  * @author Rachel Rafik, L22
- *
  * @version December 8, 2024
  */
 class HomeSelection {
@@ -23,7 +22,7 @@ class HomeSelection {
      * Sets up and displays the main home view.
      *
      * @param mainPanel the panel to which UI elements will be added
-     * @throws IOException if an I/O error occurs
+     * @throws IOException            if an I/O error occurs
      * @throws ClassNotFoundException if a class cannot be found
      */
     public static void mainView(JPanel mainPanel) throws IOException, ClassNotFoundException {
@@ -111,7 +110,7 @@ class HomeSelection {
      * Creates and returns a scroll pane containing a feed of posts.
      *
      * @return the scroll pane containing posts
-     * @throws IOException if an I/O error occurs
+     * @throws IOException            if an I/O error occurs
      * @throws ClassNotFoundException if a class cannot be found
      */
     private static JScrollPane createScrollableContent() throws IOException, ClassNotFoundException {
@@ -138,7 +137,7 @@ class HomeSelection {
     /**
      * Switches to the other profile view.
      *
-     * @throws IOException if an I/O error occurs
+     * @throws IOException            if an I/O error occurs
      * @throws ClassNotFoundException if a class cannot be found
      */
     private static void switchToOtherProfileView() throws IOException, ClassNotFoundException {

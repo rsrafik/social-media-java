@@ -3,7 +3,7 @@ import java.util.*;
 
 /**
  * PlatformDatabase
- *
+ * <p>
  * This class manages a database of User objects and their associated Posts. It provides methods to
  * read users and posts from files, add new users and posts, and retrieve all users and posts.
  *
@@ -438,11 +438,11 @@ public class PlatformDatabase implements Database {
     private Object deepCopy(Object obj) throws IOException, ClassNotFoundException {
         // Serialize the object
         try (ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-                ObjectOutputStream out = new ObjectOutputStream(byteOut);) {
+             ObjectOutputStream out = new ObjectOutputStream(byteOut);) {
             out.writeObject(obj);
             // Deserialize the object
             try (ByteArrayInputStream byteIn = new ByteArrayInputStream(byteOut.toByteArray());
-                    ObjectInputStream in = new ObjectInputStream(byteIn);) {
+                 ObjectInputStream in = new ObjectInputStream(byteIn);) {
                 return in.readObject();
             }
         }

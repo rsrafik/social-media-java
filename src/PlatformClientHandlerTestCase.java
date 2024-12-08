@@ -1,7 +1,10 @@
 import org.junit.Test;
+
 import java.net.Socket;
 import java.awt.image.BufferedImage;
+
 import static org.junit.Assert.*;
+
 /**
  * Test case for the methods isLoggedIn(), LogIn(), LogOut(), CreateUser(), and CreatePost() in the
  * PlatformClientHandler class.

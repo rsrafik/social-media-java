@@ -22,7 +22,7 @@ public interface Post {
 
     /**
      * Retrieves the id of the user who created the post.
-     * 
+     *
      * @return the creator id
      */
     Integer getCreatorId();
@@ -67,7 +67,7 @@ public interface Post {
      *
      * @param userId the ID of the user upvoting the post
      * @return true if the user's upvote was added successfully, false if the user had already
-     *         upvoted
+     * upvoted
      */
     boolean addUpvote(int userId);
 
@@ -76,7 +76,7 @@ public interface Post {
      *
      * @param userId the ID of the user downvoting the post
      * @return true if the user's downvote was added successfully, false if the user had already
-     *         downvoted
+     * downvoted
      */
     boolean addDownvote(int userId);
 
@@ -85,7 +85,7 @@ public interface Post {
      *
      * @param userId the ID of the user removing their upvote
      * @return true if the user's upvote was removed successfully, false if the user had not upvoted
-     *         before
+     * before
      */
     boolean removeUpvote(int userId);
 
@@ -94,7 +94,7 @@ public interface Post {
      *
      * @param userId the ID of the user removing their downvote
      * @return true if the user's downvote was removed successfully, false if the user had not
-     *         downvoted before
+     * downvoted before
      */
     boolean removeDownvote(int userId);
 
@@ -128,7 +128,7 @@ public interface Post {
 
     /**
      * Removes a comment from the post.
-     * 
+     *
      * @param commentId the ID of the comment to remove
      */
     void removeComment(int commentId);

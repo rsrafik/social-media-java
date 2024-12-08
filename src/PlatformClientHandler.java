@@ -6,11 +6,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * PlatformClientHandler
- * 
+ *
  * <p>
  * This class provides a Runnable handler for each client.
  * </p>
- * 
+ *
  * @author Ropan Datta, L22
  * @version November 16, 2024
  */

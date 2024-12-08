@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * SearchTextField
- *
+ * <p>
  * This class extends JTextField and allows searching for users.
  * It displays a placeholder when empty, toggles the search button state
  * based on text input, and shows a dialog with search results.
@@ -125,7 +125,7 @@ public class SearchTextField extends JTextField {
     /**
      * Handles the search action by fetching users, displaying a dialog, and selecting a user.
      *
-     * @throws IOException if an I/O error occurs
+     * @throws IOException            if an I/O error occurs
      * @throws ClassNotFoundException if a required class is not found
      */
     private void handleSearchAction() throws IOException, ClassNotFoundException {

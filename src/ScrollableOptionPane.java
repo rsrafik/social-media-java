@@ -3,7 +3,7 @@ import java.awt.*;
 
 /**
  * ScrollableOptionPane
- *
+ * <p>
  * This class creates a JOptionPane that displays a scrollable list of messages.
  * It is useful when the number of messages is large and would otherwise not fit
  * in a single dialog without scrolling.
@@ -39,8 +39,8 @@ public class ScrollableOptionPane extends JOptionPane {
      * Displays a dialog with a scrollable list of messages.
      *
      * @param parentComponent the parent component of the dialog
-     * @param messages the array of messages to display
-     * @param title the title of the dialog
+     * @param messages        the array of messages to display
+     * @param title           the title of the dialog
      */
     public static void showDialog(Component parentComponent, String[] messages, String title) {
         ScrollableOptionPane optionPane = new ScrollableOptionPane(messages);

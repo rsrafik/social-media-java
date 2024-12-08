@@ -3,7 +3,7 @@ import java.awt.*;
 
 /**
  * RoundedButton
- *
+ * <p>
  * This class creates a JButton with rounded corners and custom insets for padding.
  * The button supports antialiasing for smooth edges and can be styled by setting
  * background and foreground colors.

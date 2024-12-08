@@ -7,12 +7,11 @@ import java.util.List;
 
 /**
  * InboxSelection
- *
+ * <p>
  * This class manages the inbox view of the application, displaying follow requests and
  * providing buttons to accept or reject these requests.
  *
  * @author Rachel Rafik, L22
- *
  * @version December 8, 2024
  */
 class InboxSelection {
@@ -26,7 +25,7 @@ class InboxSelection {
      * Sets up and displays the inbox view on the specified main panel.
      *
      * @param mainPanel the panel on which the inbox view is displayed
-     * @throws IOException if an I/O error occurs
+     * @throws IOException            if an I/O error occurs
      * @throws ClassNotFoundException if a class cannot be found
      */
     public static void mainView(JPanel mainPanel) throws IOException, ClassNotFoundException {
@@ -51,7 +50,7 @@ class InboxSelection {
      * Creates and returns a scroll pane containing inbox requests.
      *
      * @return a JScrollPane containing the inbox requests
-     * @throws IOException if an I/O error occurs
+     * @throws IOException            if an I/O error occurs
      * @throws ClassNotFoundException if a class cannot be found
      */
     private static JScrollPane createInboxScrollPane() throws IOException, ClassNotFoundException {
@@ -99,7 +98,8 @@ class InboxSelection {
 
         JLabel usernameLabel = new JLabel(userInfo.getUsername());
         usernameLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         rowPanel.add(usernameLabel, gbc);
 
         JButton acceptButton = new JButton("Accept");

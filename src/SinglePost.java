@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * SinglePost
- *
+ * <p>
  * This class creates a UI panel to display a single post, including the
  * username of the creator, the post content, upvote/downvote buttons,
  * and comment actions. Users can also view existing comments in a scrollable
@@ -26,7 +26,7 @@ public class SinglePost {
      * @param post The post object containing post data
      * @param role The role of the user viewing this post (e.g., "friend" or "user")
      * @return A JPanel representing the post
-     * @throws IOException if an I/O error occurs
+     * @throws IOException            if an I/O error occurs
      * @throws ClassNotFoundException if a required class cannot be found
      */
     public static JPanel individualPost(Post post, String role) throws IOException, ClassNotFoundException {
@@ -176,12 +176,12 @@ public class SinglePost {
     /**
      * Adds action listeners for the upvote and downvote buttons.
      *
-     * @param originalPost the post before voting action
-     * @param upvoteButton the upvote toggle button
+     * @param originalPost   the post before voting action
+     * @param upvoteButton   the upvote toggle button
      * @param downvoteButton the downvote toggle button
-     * @param upvoteLabel the label showing number of upvotes
-     * @param downvoteLabel the label showing number of downvotes
-     * @param currentUserId the current user's ID
+     * @param upvoteLabel    the label showing number of upvotes
+     * @param downvoteLabel  the label showing number of downvotes
+     * @param currentUserId  the current user's ID
      */
     private static void addVoteButtonListeners(
             Post originalPost,
@@ -215,12 +215,12 @@ public class SinglePost {
     /**
      * Refreshes the UI of a post after an upvote or downvote action.
      *
-     * @param updatedPost the updated post after voting
-     * @param upvoteButton the upvote toggle button
+     * @param updatedPost    the updated post after voting
+     * @param upvoteButton   the upvote toggle button
      * @param downvoteButton the downvote toggle button
-     * @param upvoteLabel the label showing number of upvotes
-     * @param downvoteLabel the label showing number of downvotes
-     * @param currentUserId the current user's ID
+     * @param upvoteLabel    the label showing number of upvotes
+     * @param downvoteLabel  the label showing number of downvotes
+     * @param currentUserId  the current user's ID
      */
     private static void refreshPostUI(
             Post updatedPost,

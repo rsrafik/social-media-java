@@ -7,14 +7,13 @@ import java.util.List;
 
 /**
  * ProfileSelection
- *
+ * <p>
  * This class manages the display of the user's profile, including their posts, following list, and blocked list.
  * Users can view their posts, view and unfollow people they are following, and view and unblock users they have
  * blocked.
  * The UI allows switching between these views seamlessly.
  *
  * @author Rachel Rafik, L22
- *
  * @version December 8, 2024
  */
 class ProfileSelection {
@@ -38,7 +37,7 @@ class ProfileSelection {
      * following, and blocked lists.
      *
      * @param mainPanel the main panel on which the UI will be displayed
-     * @throws IOException if an I/O error occurs
+     * @throws IOException            if an I/O error occurs
      * @throws ClassNotFoundException if a required class cannot be found
      */
     public static void mainView(JPanel mainPanel) throws IOException, ClassNotFoundException {
@@ -126,7 +125,7 @@ class ProfileSelection {
      * Creates and returns a scroll pane displaying the user's posts.
      *
      * @return a JScrollPane containing the user's posts
-     * @throws IOException if an I/O error occurs
+     * @throws IOException            if an I/O error occurs
      * @throws ClassNotFoundException if a required class cannot be found
      */
     private static JScrollPane createPostsScrollPane() throws IOException, ClassNotFoundException {
@@ -162,7 +161,7 @@ class ProfileSelection {
      * Creates and returns a scroll pane displaying the users the current user is following.
      *
      * @return a JScrollPane containing the following list
-     * @throws IOException if an I/O error occurs
+     * @throws IOException            if an I/O error occurs
      * @throws ClassNotFoundException if a required class cannot be found
      */
     private static JScrollPane createFollowingScrollPane() throws IOException, ClassNotFoundException {
@@ -212,13 +211,15 @@ class ProfileSelection {
 
         JLabel usernameLabel = new JLabel(userInfo.getUsername());
         usernameLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         rowPanel.add(usernameLabel, gbc);
 
         JButton unfollowButton = new JButton("Unfollow");
         unfollowButton.setFont(new Font("Arial", Font.PLAIN, 14));
         unfollowButton.setFocusPainted(false);
-        gbc.gridx = 1; gbc.gridy = 0;
+        gbc.gridx = 1;
+        gbc.gridy = 0;
         rowPanel.add(unfollowButton, gbc);
 
         unfollowButton.addActionListener(e -> {
@@ -240,7 +241,7 @@ class ProfileSelection {
      * Creates and returns a scroll pane displaying the blocked users.
      *
      * @return a JScrollPane containing the blocked users
-     * @throws IOException if an I/O error occurs
+     * @throws IOException            if an I/O error occurs
      * @throws ClassNotFoundException if a required class cannot be found
      */
     private static JScrollPane createBlockedScrollPane() throws IOException, ClassNotFoundException {
@@ -290,13 +291,15 @@ class ProfileSelection {
 
         JLabel usernameLabel = new JLabel(userInfo.getUsername());
         usernameLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         rowPanel.add(usernameLabel, gbc);
 
         JButton unBlockButton = new JButton("Unblock");
         unBlockButton.setFont(new Font("Arial", Font.PLAIN, 14));
         unBlockButton.setFocusPainted(false);
-        gbc.gridx = 1; gbc.gridy = 0;
+        gbc.gridx = 1;
+        gbc.gridy = 0;
         rowPanel.add(unBlockButton, gbc);
 
         unBlockButton.addActionListener(e -> {
@@ -318,7 +321,7 @@ class ProfileSelection {
      * Switches the main panel to display the following list scroll pane.
      *
      * @param mainPanel the main panel being updated
-     * @throws IOException if an I/O error occurs
+     * @throws IOException            if an I/O error occurs
      * @throws ClassNotFoundException if a required class cannot be found
      */
     private static void switchToFollowingScrollPane(JPanel mainPanel) throws IOException, ClassNotFoundException {
@@ -334,7 +337,7 @@ class ProfileSelection {
      * Switches the main panel to display the posts scroll pane.
      *
      * @param mainPanel the main panel being updated
-     * @throws IOException if an I/O error occurs
+     * @throws IOException            if an I/O error occurs
      * @throws ClassNotFoundException if a required class cannot be found
      */
     private static void switchToPostsScrollPane(JPanel mainPanel) throws IOException, ClassNotFoundException {
@@ -350,7 +353,7 @@ class ProfileSelection {
      * Switches the main panel to display the blocked users scroll pane.
      *
      * @param mainPanel the main panel being updated
-     * @throws IOException if an I/O error occurs
+     * @throws IOException            if an I/O error occurs
      * @throws ClassNotFoundException if a required class cannot be found
      */
     private static void switchToBlockedScrollPane(JPanel mainPanel) throws IOException, ClassNotFoundException {
