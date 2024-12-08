@@ -1,10 +1,13 @@
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 class OtherProfileSelection {
 
-    public static void mainView(JPanel mainPanel) {
+    public static void mainView(JPanel mainPanel) throws IOException, ClassNotFoundException {
         mainPanel.setLayout(new BorderLayout());
         mainPanel.setBackground(Color.WHITE);
 
@@ -50,18 +53,24 @@ class OtherProfileSelection {
         mainPanel.add(postScrollPane, BorderLayout.CENTER);
     }
 
-    private static JScrollPane createPostsScrollPane() {
+    private static JScrollPane createPostsScrollPane() throws IOException, ClassNotFoundException {
         // Panel to hold post content
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBackground(Color.WHITE);
 
+        List<Integer> postIds = SearchTextField.chosenOne.getPostIds();
+        List<Post> posts = new ArrayList<>();
+
+        for(Integer postId : postIds)
+            posts.add(PlatformRunner.client.fetchPost(postId));
+
         // Add 5 individual posts
-//        for (int i = 1; i <= 5; i++) {
-//            JPanel post = SinglePost.individualPost("Username...", "Message...", "friend");
-//            contentPanel.add(post);
-//            contentPanel.add(Box.createVerticalStrut(40)); // Add spacing between posts
-//        }
+        for (int i = 1; i < postIds.size(); i++) {
+            JPanel post = SinglePost.individualPost(posts.get(i), "friend");
+            contentPanel.add(post);
+            contentPanel.add(Box.createVerticalStrut(40)); // Add spacing between posts
+        }
 
         // Create a scroll pane for the content panel
         JScrollPane scrollPane = new JScrollPane(contentPanel);
