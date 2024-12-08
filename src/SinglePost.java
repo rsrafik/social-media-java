@@ -3,7 +3,9 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.List;
 
 public class SinglePost {
     public static JPanel individualPost(Post post, String role) throws IOException, ClassNotFoundException {
@@ -111,8 +113,33 @@ public class SinglePost {
         JButton viewComments = new JButton("View Comments");
         viewComments.setFocusPainted(false);
         viewComments.addActionListener(e -> {
-            String[] comments = {"Comment 1", "Comment 2", "Comment 3"}; // Example comments
-            ScrollableOptionPane.showDialog(null, comments, "Comments");
+            List<Comment> commentList = null;
+            try {
+                commentList = PlatformRunner.client.fetchComments(post.getId());
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            } catch (ClassNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+            List<String> commentMessages = new ArrayList<>();
+
+            if (commentList != null) {
+                for (Comment comment : commentList) {
+                    try {
+                        commentMessages.add(PlatformRunner.client.fetchUserInfo(comment.getCreatorId()).getUsername() + ": " + comment.getContent());
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (ClassNotFoundException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+
+                ScrollableOptionPane.showDialog(null, commentMessages.toArray(new String[0]), "Comments");
+            } else {
+                ScrollableOptionPane.showDialog(null, new String[0], "Comments");
+            }
+
+
         });
 
         commentPanel.add(makeComment);

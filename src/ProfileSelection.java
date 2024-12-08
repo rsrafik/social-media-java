@@ -305,8 +305,6 @@ class ProfileSelection {
         return rowPanel;
     }
 
-
-
     private static void switchToBlockedScrollPane(JPanel mainPanel) throws IOException, ClassNotFoundException {
         mainPanel.remove(currentScrollPane); // Remove the existing scrollable content
         currentScrollPane = createBlockedScrollPane(); // Create new scrollable content
