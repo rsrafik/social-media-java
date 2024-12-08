@@ -210,13 +210,13 @@ public class PlatformClient implements Closeable {
         return result;
     }
 
-    public List<User> searchUser(String search) throws IOException, ClassNotFoundException {
+    public List<UserInfo> searchUser(String search) throws IOException, ClassNotFoundException {
         out.writeObject(OperationType.SEARCH_USER);
         out.writeUTF(search);
         out.flush();
         @SuppressWarnings("unchecked")
-        List<User> users = (List<User>) in.readObject();
-        return users;
+        List<UserInfo> userInfos = (List<UserInfo>) in.readObject();
+        return userInfos;
     }
 
     public List<Post> loadFeed() throws IOException, ClassNotFoundException {
