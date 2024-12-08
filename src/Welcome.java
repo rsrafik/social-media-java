@@ -3,6 +3,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 public class Welcome {
     public static void welcomeGUI(JFrame jf) {
@@ -22,6 +23,7 @@ public class Welcome {
             @Override
             public void actionPerformed(ActionEvent e) {
                 showLoginPage(jf); // Show login page when clicked
+
             }
         });
 
@@ -117,6 +119,7 @@ public class Welcome {
                 String username = usernameField.getText();
                 String password = new String(passwordField.getPassword());
                 LoggedInPage.totalGUI(jf); // Load the home page
+
             }
         });
 

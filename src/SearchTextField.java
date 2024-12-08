@@ -4,6 +4,8 @@ import org.kordamp.ikonli.swing.FontIcon;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
@@ -13,12 +15,18 @@ public class SearchTextField extends JTextField {
     private final TransparentJButton searchButton;
     private final FontIcon searchIcon;
 
+    // Interface for handling search actions
+    public interface SearchActionListener {
+        void onSearch(String selectedOption);
+    }
+
+    private SearchActionListener searchActionListener;
+
     public SearchTextField() {
         super(); // Call the constructor of JTextField
 
         // Set up placeholder text
         setText("Search here...");
-
         setForeground(Color.GRAY);
 
         // Add focus listener to manage placeholder behavior
@@ -47,6 +55,32 @@ public class SearchTextField extends JTextField {
         searchButton = new TransparentJButton(""); // No text, only icon
         searchButton.setIcon(searchIcon); // Set the search icon
         searchButton.setPreferredSize(new Dimension(30, 30)); // Set button size
+        searchButton.setEnabled(false); // Initially disable the button
+
+        // Add action listener to the search button
+        searchButton.addActionListener(e -> handleSearchAction());
+
+        // Add a DocumentListener to the text field to enable/disable the search button
+        getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                toggleSearchButton();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                toggleSearchButton();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                toggleSearchButton();
+            }
+
+            private void toggleSearchButton() {
+                searchButton.setEnabled(!getText().trim().isEmpty());
+            }
+        });
 
         // Style the search field
         setBackground(new Color(230, 230, 230)); // Light gray background
@@ -59,6 +93,45 @@ public class SearchTextField extends JTextField {
         // Add the button to the field's parent container
         setLayout(new BorderLayout());
         add(searchButton, BorderLayout.EAST);
+    }
+
+    public void setSearchActionListener(SearchActionListener listener) {
+        this.searchActionListener = listener;
+    }
+
+    private void handleSearchAction() {
+        // Get the current text in the search field
+        String searchText = getText();
+
+        // Create a dropdown with options
+        String[] options = {"user1", "user2", "user3"};
+        JComboBox<String> dropdown = new JComboBox<>(options);
+
+        // Prepare the message for the dialog
+        Object[] message = {
+                "\nSearch for: " + searchText,
+                "Select a user:",
+                dropdown,
+                "\n"
+        };
+
+        // Show a JOptionPane with the dropdown and custom buttons
+        int result = JOptionPane.showOptionDialog(
+                null,
+                message,
+                "Search",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.PLAIN_MESSAGE,
+                null,
+                new Object[]{"Search", "Cancel"},
+                "Search" // Default button
+        );
+
+        // If "Search" is clicked, trigger the listener
+        if (result == JOptionPane.YES_OPTION && searchActionListener != null) {
+            String selectedOption = (String) dropdown.getSelectedItem();
+            searchActionListener.onSearch(selectedOption);
+        }
     }
 
     @Override
@@ -77,7 +150,7 @@ public class SearchTextField extends JTextField {
         // No border to paint
     }
 
-    // Remove the @Override annotation for setBorder
+    @Override
     public void setBorder(Border border) {
         // Ignore default border setting
     }
@@ -85,6 +158,10 @@ public class SearchTextField extends JTextField {
     @Override
     public Insets getInsets() {
         // Provide custom insets for padding inside the text field
-        return new Insets(10, 10, 10, 5); // Top, Left (5px padding), Bottom, Right
+        return new Insets(10, 10, 10, 5); // Top, Left, Bottom, Right
+    }
+
+    public TransparentJButton getSearchButton() {
+        return searchButton;
     }
 }
