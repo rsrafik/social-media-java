@@ -25,7 +25,6 @@ class OtherProfileSelection {
         usernameLabel.setFont(new Font("Arial", Font.BOLD, 24));
         usernameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         topPanel.add(usernameLabel);
-
         // Add spacing between user info and buttons
         topPanel.add(Box.createVerticalStrut(20));
 
@@ -49,6 +48,8 @@ class OtherProfileSelection {
         });
 
         topPanel.add(followingButton);
+
+        topPanel.add(Box.createVerticalStrut(10));
 
         // Blocked button
         JButton blockedButton = new JButton("Block");
