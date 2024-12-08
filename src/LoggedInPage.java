@@ -133,7 +133,8 @@ public class LoggedInPage {
      * @param jf the main JFrame
      * @return the created TransparentJButton
      */
-    private static TransparentJButton createSidebarButton(String text, JPanel gridPanel, TransparentJButton[] buttons, JFrame jf) {
+    private static TransparentJButton createSidebarButton(String text, JPanel gridPanel,
+                                                          TransparentJButton[] buttons, JFrame jf) {
         TransparentJButton button = new TransparentJButton(text);
         button.setHorizontalAlignment(SwingConstants.LEFT);
         button.setPreferredSize(new Dimension(200, 50));
