@@ -1,30 +1,47 @@
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * ScrollableOptionPane
+ *
+ * This class creates a JOptionPane that displays a scrollable list of messages.
+ * It is useful when the number of messages is large and would otherwise not fit
+ * in a single dialog without scrolling.
+ *
+ * @author Rachel Rafik, L22
+ * @version December 8, 2024
+ */
 public class ScrollableOptionPane extends JOptionPane {
 
+    /**
+     * Constructs a ScrollableOptionPane with the given array of messages.
+     *
+     * @param messages the array of messages to display
+     */
     public ScrollableOptionPane(String[] messages) {
-        // Create a JPanel to hold the comments
         JPanel commentsPanel = new JPanel();
-        commentsPanel.setLayout(new BoxLayout(commentsPanel, BoxLayout.Y_AXIS)); // Vertical layout
+        commentsPanel.setLayout(new BoxLayout(commentsPanel, BoxLayout.Y_AXIS));
 
-        // Add each comment as a JLabel to the panel
         for (String message : messages) {
             JLabel commentLabel = new JLabel(message);
-            commentLabel.setAlignmentX(Component.LEFT_ALIGNMENT); // Align labels to the left
+            commentLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
             commentsPanel.add(commentLabel);
         }
 
-        // Wrap the JPanel in a JScrollPane
         JScrollPane scrollPane = new JScrollPane(commentsPanel);
-        scrollPane.setPreferredSize(new Dimension(400, 200)); // Set preferred size for scrollable area
+        scrollPane.setPreferredSize(new Dimension(400, 200));
 
-        // Set up the JOptionPane with the JScrollPane as the message
         setMessage(scrollPane);
-        setMessageType(PLAIN_MESSAGE); // Use a plain message to suppress icons
+        setMessageType(PLAIN_MESSAGE);
     }
 
-    // Utility method to show the dialog
+    /**
+     * Displays a dialog with a scrollable list of messages.
+     *
+     * @param parentComponent the parent component of the dialog
+     * @param messages the array of messages to display
+     * @param title the title of the dialog
+     */
     public static void showDialog(Component parentComponent, String[] messages, String title) {
         ScrollableOptionPane optionPane = new ScrollableOptionPane(messages);
         JDialog dialog = optionPane.createDialog(parentComponent, title);

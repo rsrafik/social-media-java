@@ -6,32 +6,49 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * SinglePost
+ *
+ * This class creates a UI panel to display a single post, including the
+ * username of the creator, the post content, upvote/downvote buttons,
+ * and comment actions. Users can also view existing comments in a scrollable
+ * dialog. UI updates are performed dynamically after server calls.
+ *
+ * @author Rachel Rafik, L22
+ * @version December 8, 2024
+ */
 public class SinglePost {
+
+    /**
+     * Creates a JPanel representing a single post, including top bar, content,
+     * upvote/downvote buttons, and comment actions.
+     *
+     * @param post The post object containing post data
+     * @param role The role of the user viewing this post (e.g., "friend" or "user")
+     * @return A JPanel representing the post
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a required class cannot be found
+     */
     public static JPanel individualPost(Post post, String role) throws IOException, ClassNotFoundException {
-        // Get current user ID
         User currentUser = PlatformRunner.client.fetchLoggedInUser();
         int currentUserId = currentUser.getId();
 
-        // Create a panel to represent the post
         JPanel postPanel = new JPanel();
-        postPanel.setBackground(new Color(230, 230, 230)); // Light gray background
-        postPanel.setLayout(new BorderLayout()); // Use BorderLayout to organize components
+        postPanel.setBackground(new Color(230, 230, 230));
+        postPanel.setLayout(new BorderLayout());
 
-        // User topper (top bar)
         JPanel userTopper = new JPanel(new BorderLayout());
         userTopper.setPreferredSize(new Dimension(800, 45));
         userTopper.setBackground(new Color(154, 154, 154));
 
         UserInfo userInfo = PlatformRunner.client.fetchUserInfo(post.getCreatorId());
 
-        // Username label on the left
         JLabel usernameLabel = new JLabel(userInfo.getUsername());
         usernameLabel.setFont(new Font("Arial", Font.BOLD, 16));
         usernameLabel.setForeground(Color.WHITE);
-        usernameLabel.setBorder(new EmptyBorder(0, 20, 0, 0)); // Add left padding
+        usernameLabel.setBorder(new EmptyBorder(0, 20, 0, 0));
         userTopper.add(usernameLabel, BorderLayout.WEST);
 
-        // Three dots button on the right
         JButton moreButton = new JButton("•••");
         moreButton.setFont(new Font("Arial", Font.BOLD, 20));
         moreButton.setForeground(Color.WHITE);
@@ -53,10 +70,8 @@ public class SinglePost {
         });
         userTopper.add(moreButton, BorderLayout.EAST);
 
-        // Add the userTopper to the top of the post panel
         postPanel.add(userTopper, BorderLayout.NORTH);
 
-        // Middle content section (dynamic text with padding)
         JLabel placeholderLabel = new JLabel(
                 "<html><div style='text-align: center; padding-top: 15px; padding-bottom: 15px;'>" + post.getContent() + "</div></html>",
                 SwingConstants.CENTER
@@ -65,28 +80,24 @@ public class SinglePost {
         placeholderLabel.setForeground(new Color(70, 70, 70));
 
         JPanel middlePanel = new JPanel(new BorderLayout());
-        middlePanel.setBackground(new Color(230, 230, 230)); // Match postPanel background
+        middlePanel.setBackground(new Color(230, 230, 230));
         middlePanel.add(placeholderLabel, BorderLayout.CENTER);
 
-        // Calculate dynamic height
         placeholderLabel.setSize(800, Short.MAX_VALUE);
         Dimension labelSize = placeholderLabel.getPreferredSize();
-        int dynamicHeight = 45 + labelSize.height + 30; // Topper height + label height + bottomer height
+        int dynamicHeight = 45 + labelSize.height + 30;
         postPanel.setPreferredSize(new Dimension(800, dynamicHeight));
         postPanel.setMaximumSize(new Dimension(800, dynamicHeight));
 
         postPanel.add(middlePanel, BorderLayout.CENTER);
 
-        // User bottomer (bottom bar)
         JPanel userBottomer = new JPanel(new BorderLayout());
         userBottomer.setPreferredSize(new Dimension(800, 30));
         userBottomer.setBackground(new Color(197, 197, 197));
 
-        // Left section: Upvote/Downvote
         JPanel votePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 0));
         votePanel.setBackground(new Color(197, 197, 197));
 
-        // Display initial counts from the post
         JLabel upvoteLabel = new JLabel(String.valueOf(post.getUpvoteIds().size()));
         upvoteLabel.setFont(new Font("Arial", Font.BOLD, 14));
         JToggleButton upvoteButton = new JToggleButton("▲");
@@ -97,7 +108,6 @@ public class SinglePost {
         JToggleButton downvoteButton = new JToggleButton("▼");
         downvoteButton.setFocusPainted(false);
 
-        // Set initial selected state based on whether current user upvoted/downvoted
         boolean userUpvoted = post.getUpvoteIds().contains(currentUserId);
         boolean userDownvoted = post.getDownvoteIds().contains(currentUserId);
         upvoteButton.setSelected(userUpvoted);
@@ -111,7 +121,6 @@ public class SinglePost {
         votePanel.add(downvoteLabel);
         votePanel.add(downvoteButton);
 
-        // Right section: Comment buttons
         JPanel commentPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         commentPanel.setBackground(new Color(197, 197, 197));
         JButton makeComment = new JButton("Add Comment");
@@ -157,6 +166,16 @@ public class SinglePost {
         return postPanel;
     }
 
+    /**
+     * Adds action listeners for the upvote and downvote buttons.
+     *
+     * @param originalPost the post before voting action
+     * @param upvoteButton the upvote toggle button
+     * @param downvoteButton the downvote toggle button
+     * @param upvoteLabel the label showing number of upvotes
+     * @param downvoteLabel the label showing number of downvotes
+     * @param currentUserId the current user's ID
+     */
     private static void addVoteButtonListeners(
             Post originalPost,
             JToggleButton upvoteButton,
@@ -167,10 +186,7 @@ public class SinglePost {
     ) {
         upvoteButton.addActionListener(e -> {
             try {
-                // User clicked upvote. We call the server to upvote (this might add or remove the upvote)
                 PlatformRunner.client.upvotePost(originalPost.getId());
-
-                // Fetch updated post
                 Post updatedPost = PlatformRunner.client.fetchPost(originalPost.getId());
                 refreshPostUI(updatedPost, upvoteButton, downvoteButton, upvoteLabel, downvoteLabel, currentUserId);
             } catch (IOException | ClassNotFoundException ex) {
@@ -180,10 +196,7 @@ public class SinglePost {
 
         downvoteButton.addActionListener(e -> {
             try {
-                // User clicked downvote. We call the server to downvote (this might add or remove the downvote)
                 PlatformRunner.client.downvotePost(originalPost.getId());
-
-                // Fetch updated post
                 Post updatedPost = PlatformRunner.client.fetchPost(originalPost.getId());
                 refreshPostUI(updatedPost, upvoteButton, downvoteButton, upvoteLabel, downvoteLabel, currentUserId);
             } catch (IOException | ClassNotFoundException ex) {
@@ -192,6 +205,16 @@ public class SinglePost {
         });
     }
 
+    /**
+     * Refreshes the UI of a post after an upvote or downvote action.
+     *
+     * @param updatedPost the updated post after voting
+     * @param upvoteButton the upvote toggle button
+     * @param downvoteButton the downvote toggle button
+     * @param upvoteLabel the label showing number of upvotes
+     * @param downvoteLabel the label showing number of downvotes
+     * @param currentUserId the current user's ID
+     */
     private static void refreshPostUI(
             Post updatedPost,
             JToggleButton upvoteButton,
@@ -200,21 +223,22 @@ public class SinglePost {
             JLabel downvoteLabel,
             int currentUserId
     ) {
-        // Update the counts
         upvoteLabel.setText(String.valueOf(updatedPost.getUpvoteIds().size()));
         downvoteLabel.setText(String.valueOf(updatedPost.getDownvoteIds().size()));
 
-        // Update button states based on whether the user is in upvote/downvote lists
         boolean userUpvoted = updatedPost.getUpvoteIds().contains(currentUserId);
         boolean userDownvoted = updatedPost.getDownvoteIds().contains(currentUserId);
 
         upvoteButton.setSelected(userUpvoted);
         downvoteButton.setSelected(userDownvoted);
-
-        // If user pressed upvote and it was successful, downvote should not remain selected, and vice versa.
-        // The logic above handles this since we re-check the arrays from the server.
     }
 
+    /**
+     * Creates an action listener for posting a new comment.
+     *
+     * @param post the post to comment on
+     * @return an ActionListener that handles comment posting
+     */
     private static ActionListener createCommentActionListener(Post post) {
         return e -> {
             JTextField textField = new JTextField();

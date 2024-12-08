@@ -5,11 +5,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ProfileSelection
+ *
+ * This class manages the display of the user's profile, including their posts, following list, and blocked list.
+ * Users can view their posts, view and unfollow people they are following, and view and unblock users they have blocked.
+ * The UI allows switching between these views seamlessly.
+ *
+ * @author Rachel Rafik, L22
+ *
+ * @version December 8, 2024
+ */
 class ProfileSelection {
 
-    private static JScrollPane currentScrollPane; // Keeps track of the current scroll pane
+    private static JScrollPane currentScrollPane;   // Keeps track of the current scroll pane
     private static User currentUser;
-    private static JPanel mainPanelRef; // Store a reference to the main panel for refreshing
+    private static JPanel mainPanelRef;             // Store a reference to the main panel for refreshing
 
     static {
         try {
@@ -21,15 +32,21 @@ class ProfileSelection {
         }
     }
 
+    /**
+     * Sets up and displays the main profile view including user info and buttons to switch between posts, following, and blocked lists.
+     *
+     * @param mainPanel the main panel on which the UI will be displayed
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a required class cannot be found
+     */
     public static void mainView(JPanel mainPanel) throws IOException, ClassNotFoundException {
-        mainPanelRef = mainPanel; // Store the reference to mainPanel
-        mainPanel.removeAll(); // Clear any existing content
+        mainPanelRef = mainPanel;
+        mainPanel.removeAll();
         mainPanel.setLayout(new BorderLayout());
         mainPanel.setBackground(Color.WHITE);
 
         currentUser = PlatformRunner.client.fetchLoggedInUser();
 
-        // Create the top panel
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         topPanel.setBackground(Color.WHITE);
@@ -38,7 +55,6 @@ class ProfileSelection {
 
         topPanel.add(Box.createVerticalStrut(20));
 
-        // Username label
         JLabel usernameLabel = new JLabel(currentUser.getUsername());
         usernameLabel.setFont(new Font("Arial", Font.BOLD, 24));
         usernameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -46,7 +62,6 @@ class ProfileSelection {
 
         topPanel.add(Box.createVerticalStrut(10));
 
-        // Posts button
         JButton postsButton = new JButton("Posts");
         postsButton.setFont(new Font("Arial", Font.PLAIN, 14));
         postsButton.setFocusPainted(false);
@@ -56,7 +71,6 @@ class ProfileSelection {
 
         topPanel.add(Box.createVerticalStrut(10));
 
-        // Following button
         JButton followingButton = new JButton("Following");
         followingButton.setFont(new Font("Arial", Font.PLAIN, 14));
         followingButton.setFocusPainted(false);
@@ -66,7 +80,6 @@ class ProfileSelection {
 
         topPanel.add(Box.createVerticalStrut(10));
 
-        // Blocked button
         JButton blockedButton = new JButton("Blocked");
         blockedButton.setFont(new Font("Arial", Font.PLAIN, 14));
         blockedButton.setFocusPainted(false);
@@ -76,7 +89,6 @@ class ProfileSelection {
 
         mainPanel.add(topPanel, BorderLayout.NORTH);
 
-        // Initial scroll content
         currentScrollPane = createPostsScrollPane();
         mainPanel.add(currentScrollPane, BorderLayout.CENTER);
 
@@ -108,6 +120,13 @@ class ProfileSelection {
         mainPanel.repaint();
     }
 
+    /**
+     * Creates and returns a scroll pane displaying the user's posts.
+     *
+     * @return a JScrollPane containing the user's posts
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a required class cannot be found
+     */
     private static JScrollPane createPostsScrollPane() throws IOException, ClassNotFoundException {
         currentUser = PlatformRunner.client.fetchLoggedInUser();
 
@@ -118,7 +137,7 @@ class ProfileSelection {
         List<Integer> postIds = currentUser.getPostIds();
         List<Post> posts = new ArrayList<>();
 
-        for(int postId : postIds) {
+        for (int postId : postIds) {
             posts.add(PlatformRunner.client.fetchPost(postId));
         }
 
@@ -137,8 +156,14 @@ class ProfileSelection {
         return scrollPane;
     }
 
+    /**
+     * Creates and returns a scroll pane displaying the users the current user is following.
+     *
+     * @return a JScrollPane containing the following list
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a required class cannot be found
+     */
     private static JScrollPane createFollowingScrollPane() throws IOException, ClassNotFoundException {
-        // Re-fetch user here to ensure list is updated
         currentUser = PlatformRunner.client.fetchLoggedInUser();
 
         JPanel followingPanel = new JPanel();
@@ -167,6 +192,12 @@ class ProfileSelection {
         return scrollPane;
     }
 
+    /**
+     * Creates and returns a panel representing a single user row in the following list.
+     *
+     * @param userInfo the UserInfo of the followed user
+     * @return a JPanel representing a single followed user row
+     */
     private static JPanel createFollowingRow(UserInfo userInfo) {
         JPanel rowPanel = new JPanel(new GridBagLayout());
         rowPanel.setBorder(new EmptyBorder(5, 10, 5, 10));
@@ -203,8 +234,14 @@ class ProfileSelection {
         return rowPanel;
     }
 
+    /**
+     * Creates and returns a scroll pane displaying the blocked users.
+     *
+     * @return a JScrollPane containing the blocked users
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a required class cannot be found
+     */
     private static JScrollPane createBlockedScrollPane() throws IOException, ClassNotFoundException {
-        // Re-fetch user here as well
         currentUser = PlatformRunner.client.fetchLoggedInUser();
 
         JPanel blockedPanel = new JPanel();
@@ -233,6 +270,12 @@ class ProfileSelection {
         return scrollPane;
     }
 
+    /**
+     * Creates and returns a panel representing a single user row in the blocked list.
+     *
+     * @param userInfo the UserInfo of the blocked user
+     * @return a JPanel representing a single blocked user row
+     */
     private static JPanel createBlockedRow(UserInfo userInfo) {
         JPanel rowPanel = new JPanel(new GridBagLayout());
         rowPanel.setBorder(new EmptyBorder(5, 10, 5, 10));
@@ -269,6 +312,13 @@ class ProfileSelection {
         return rowPanel;
     }
 
+    /**
+     * Switches the main panel to display the following list scroll pane.
+     *
+     * @param mainPanel the main panel being updated
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a required class cannot be found
+     */
     private static void switchToFollowingScrollPane(JPanel mainPanel) throws IOException, ClassNotFoundException {
         currentUser = PlatformRunner.client.fetchLoggedInUser();
         mainPanel.remove(currentScrollPane);
@@ -278,6 +328,13 @@ class ProfileSelection {
         mainPanel.repaint();
     }
 
+    /**
+     * Switches the main panel to display the posts scroll pane.
+     *
+     * @param mainPanel the main panel being updated
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a required class cannot be found
+     */
     private static void switchToPostsScrollPane(JPanel mainPanel) throws IOException, ClassNotFoundException {
         currentUser = PlatformRunner.client.fetchLoggedInUser();
         mainPanel.remove(currentScrollPane);
@@ -287,6 +344,13 @@ class ProfileSelection {
         mainPanel.repaint();
     }
 
+    /**
+     * Switches the main panel to display the blocked users scroll pane.
+     *
+     * @param mainPanel the main panel being updated
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a required class cannot be found
+     */
     private static void switchToBlockedScrollPane(JPanel mainPanel) throws IOException, ClassNotFoundException {
         currentUser = PlatformRunner.client.fetchLoggedInUser();
         mainPanel.remove(currentScrollPane);
@@ -296,7 +360,9 @@ class ProfileSelection {
         mainPanel.repaint();
     }
 
-    // Refresh methods: fully rebuild the UI and then switch to the desired pane
+    /**
+     * Refreshes the following list by reinitializing the main view and then switching to the following list view.
+     */
     private static void refreshFollowingList() {
         try {
             mainPanelRef.removeAll();
@@ -309,6 +375,9 @@ class ProfileSelection {
         mainPanelRef.repaint();
     }
 
+    /**
+     * Refreshes the blocked list by reinitializing the main view and then switching to the blocked list view.
+     */
     private static void refreshBlockedList() {
         try {
             mainPanelRef.removeAll();
@@ -320,4 +389,5 @@ class ProfileSelection {
         mainPanelRef.revalidate();
         mainPanelRef.repaint();
     }
+
 }
