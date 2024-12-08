@@ -9,7 +9,8 @@ import java.util.List;
  * ProfileSelection
  *
  * This class manages the display of the user's profile, including their posts, following list, and blocked list.
- * Users can view their posts, view and unfollow people they are following, and view and unblock users they have blocked.
+ * Users can view their posts, view and unfollow people they are following, and view and unblock users they have
+ * blocked.
  * The UI allows switching between these views seamlessly.
  *
  * @author Rachel Rafik, L22
@@ -33,7 +34,8 @@ class ProfileSelection {
     }
 
     /**
-     * Sets up and displays the main profile view including user info and buttons to switch between posts, following, and blocked lists.
+     * Sets up and displays the main profile view including user info and buttons to switch between posts,
+     * following, and blocked lists.
      *
      * @param mainPanel the main panel on which the UI will be displayed
      * @throws IOException if an I/O error occurs

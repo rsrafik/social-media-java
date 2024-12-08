@@ -79,7 +79,8 @@ public class SinglePost {
         postPanel.add(userTopper, BorderLayout.NORTH);
 
         JLabel placeholderLabel = new JLabel(
-                "<html><div style='text-align: center; padding-top: 15px; padding-bottom: 15px;'>" + post.getContent() + "</div></html>",
+                "<html><div style='text-align: center; padding-top: 15px; padding-bottom: 15px;'>" +
+                        post.getContent() + "</div></html>",
                 SwingConstants.CENTER
         );
         placeholderLabel.setFont(new Font("Arial", Font.PLAIN, 16));
@@ -268,7 +269,8 @@ public class SinglePost {
                 }
 
                 if (commentSuccess)
-                    JOptionPane.showMessageDialog(null, "Comment posted: " + textField.getText());
+                    JOptionPane.showMessageDialog(null, "Comment posted: " +
+                            textField.getText());
             }
         };
     }
