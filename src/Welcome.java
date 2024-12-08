@@ -23,7 +23,6 @@ public class Welcome {
             @Override
             public void actionPerformed(ActionEvent e) {
                 showLoginPage(jf); // Show login page when clicked
-
             }
         });
 
@@ -118,8 +117,31 @@ public class Welcome {
             public void actionPerformed(ActionEvent e) {
                 String username = usernameField.getText();
                 String password = new String(passwordField.getPassword());
-                LoggedInPage.totalGUI(jf); // Load the home page
 
+                boolean loginSuccess;
+
+                try {
+                    loginSuccess = PlatformRunner.client.logIn(username,password);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+                if (loginSuccess) {
+                    try {
+                        LoggedInPage.totalGUI(jf); // Load the home page
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (ClassNotFoundException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+                else
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "An unexpected error occurred. Please try again.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
             }
         });
 
@@ -205,7 +227,49 @@ public class Welcome {
             } else {
                 // Hide error message and navigate to the home page
                 errorLabel.setVisible(false);
-                LoggedInPage.totalGUI(jf); // Load the home page
+
+                boolean signUpSuccess;
+
+                try {
+                    signUpSuccess = PlatformRunner.client.createUser(username,password);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+                if (signUpSuccess) {
+                    boolean loginSuccess;
+
+                    try {
+                        loginSuccess = PlatformRunner.client.logIn(username,password);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+
+                    if (loginSuccess) {
+                        try {
+                            LoggedInPage.totalGUI(jf); // Load the home page
+                        } catch (IOException ex) {
+                            throw new RuntimeException(ex);
+                        } catch (ClassNotFoundException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "Error signing in",
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE
+                        );
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Username already exists",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                }
+
             }
         });
 

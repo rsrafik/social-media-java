@@ -1,6 +1,7 @@
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.io.IOException;
 
 public class LoggedInPage {
     private static String selectedButton = "Home"; // Default selected button
@@ -16,13 +17,19 @@ public class LoggedInPage {
             testFrame.setLayout(new BorderLayout());
 
             // Load the GUI
-            totalGUI(testFrame);
+            try {
+                totalGUI(testFrame);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
 
             testFrame.setVisible(true);
         });
     }
 
-    public static void totalGUI(JFrame jf) {
+    public static void totalGUI(JFrame jf) throws IOException, ClassNotFoundException {
         jf.getContentPane().removeAll();
         // Add the side panel
         sidePanel(jf);
@@ -129,7 +136,13 @@ public class LoggedInPage {
                 button.setBackground(Color.DARK_GRAY);
                 button.setForeground(Color.WHITE);
                 selectedButtonReference = button;
-                updateView(text, jf);
+                try {
+                    updateView(text, jf);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                } catch (ClassNotFoundException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
 
@@ -146,7 +159,7 @@ public class LoggedInPage {
         }
     }
 
-    private static void updateView(String view, JFrame jf) {
+    private static void updateView(String view, JFrame jf) throws IOException, ClassNotFoundException {
         mainPanel.removeAll(); // Clear the current view
 
         switch (view) {

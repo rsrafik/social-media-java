@@ -43,6 +43,7 @@ class InboxSelection {
         return scrollPane;
     }
 
+    //MAKE AN INBOX
     private static JPanel createInboxRow(String username) {
         JPanel rowPanel = new JPanel(new GridBagLayout());
         rowPanel.setBorder(new EmptyBorder(5, 10, 5, 10)); // Add padding

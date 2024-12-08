@@ -1,4 +1,5 @@
 import java.awt.Image;
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -7,7 +8,7 @@ import java.util.List;
  * @author Ropan Datta, L22
  * @version December 7, 2024
  */
-public class PlatformUserInfo implements UserInfo {
+public class PlatformUserInfo implements UserInfo, Serializable {
     private Integer id;
     private String username;
     private Image displayImage;

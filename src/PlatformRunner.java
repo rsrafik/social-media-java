@@ -3,6 +3,15 @@ import java.awt.*;
 import java.io.IOException;
 
 public class PlatformRunner {
+    public static final PlatformClient client;
+
+    static {
+        try {
+            client = new PlatformClient("localhost", 5002);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
