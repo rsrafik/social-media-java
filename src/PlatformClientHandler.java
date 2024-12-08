@@ -4,7 +4,6 @@ import java.awt.Image;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-
 /**
  * PlatformClientHandler
  * 
@@ -25,7 +24,7 @@ public class PlatformClientHandler implements ClientHandler {
 
     private Socket socket;
     private Integer loggedInId;
-    private User loggedInUser;
+    // private User loggedInUser;
 
     public PlatformClientHandler(Socket socket) {
         if (database == null) {
@@ -120,6 +119,12 @@ public class PlatformClientHandler implements ClientHandler {
                         case REJECT_FOLLOWREQUEST -> {
                             int userId = in.readInt();
                             boolean result = rejectFollowRequest(userId);
+                            out.writeBoolean(result);
+                            out.flush();
+                        }
+                        case UNFOLLOW_USER -> {
+                            int userId = in.readInt();
+                            boolean result = unfollowUser(userId);
                             out.writeBoolean(result);
                             out.flush();
                         }
@@ -220,7 +225,6 @@ public class PlatformClientHandler implements ClientHandler {
         User user = database.getUser(userId);
         if (user.passwordEquals(password)) {
             loggedInId = userId;
-            loggedInUser = user;
             return true;
         }
         return false;
@@ -265,8 +269,13 @@ public class PlatformClientHandler implements ClientHandler {
         if (!isLoggedIn()) {
             return null;
         }
-        // TODO: make it thread safe
-        return loggedInUser.getBlockedUserIds();
+        try {
+            User loggedInUser = database.fetchUser(loggedInId);
+            return loggedInUser.getBlockedUserIds();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -295,7 +304,13 @@ public class PlatformClientHandler implements ClientHandler {
         if (!isLoggedIn()) {
             return null;
         }
-        return loggedInUser.getFollowRequests();
+        try {
+            User loggedInUser = database.fetchUser(loggedInId);
+            return loggedInUser.getFollowRequests();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -358,6 +373,18 @@ public class PlatformClientHandler implements ClientHandler {
     }
 
     @Override
+    public boolean unfollowUser(int userId) {
+        if (!isLoggedIn()) {
+            return false;
+        }
+        if (!database.existsUser(userId)) {
+            return false;
+        }
+        database.removeFollower(userId, loggedInId);
+        return true;
+    }
+
+    @Override
     public Post fetchPost(int postId) {
         if (!isLoggedIn()) {
             return null;
@@ -366,11 +393,11 @@ public class PlatformClientHandler implements ClientHandler {
             return null;
         }
         try {
-            Post post = database.fetchPost(postId);
-            int creatorId = post.getCreatorId();
+            int creatorId = database.getCreatorId(postId);
             if (database.hasBlockedUser(creatorId, loggedInId)) {
                 return null;
             }
+            Post post = database.fetchPost(postId);
             return post;
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -383,8 +410,10 @@ public class PlatformClientHandler implements ClientHandler {
         if (!isLoggedIn()) {
             return false;
         }
-        Post post = database.getPost(postId);
-        int creatorId = post.getCreatorId();
+        if (!database.existsPost(postId)) {
+            return false;
+        }
+        int creatorId = database.getCreatorId(postId);
         if (database.hasBlockedUser(creatorId, loggedInId)) {
             return false;
         }
@@ -397,6 +426,13 @@ public class PlatformClientHandler implements ClientHandler {
         if (!isLoggedIn()) {
             return false;
         }
+        if (!database.existsPost(postId)) {
+            return false;
+        }
+        int creatorId = database.getCreatorId(postId);
+        if (database.hasBlockedUser(creatorId, loggedInId)) {
+            return false;
+        }
         database.addPostDownvote(postId, loggedInId);
         return true;
     }
@@ -406,9 +442,11 @@ public class PlatformClientHandler implements ClientHandler {
         if (!isLoggedIn()) {
             return false;
         }
-        Post post = database.getPost(postId);
-        User postCreator = database.getUser(post.getCreatorId());
-        if (postCreator.hasBlockedUser(loggedInId)) {
+        if (!database.existsPost(postId)) {
+            return false;
+        }
+        int creatorId = database.getCreatorId(postId);
+        if (database.hasBlockedUser(creatorId, loggedInId)) {
             return false;
         }
         Comment comment = new PlatformComment(loggedInId, content);

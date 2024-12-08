@@ -115,6 +115,14 @@ public interface Database {
     Post fetchPost(int postId) throws Exception;
 
     /**
+     * Retrieves the ID of the user who created the post.
+     * 
+     * @param postId the ID of the post
+     * @return the user ID of the post's creator
+     */
+    int getCreatorId(int postId);
+
+    /**
      * Adds a new post to the database.
      *
      * @param post the PlatformPost to add to the database

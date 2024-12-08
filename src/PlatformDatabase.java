@@ -155,6 +155,13 @@ public class PlatformDatabase implements Database {
         }
     }
 
+    public int getCreatorId(int postId) {
+        synchronized (POST_LOCK) {
+            Post post = getPost(postId);
+            return post.getCreatorId();
+        }
+    }
+
     @Override
     public void addPost(Post post) {
         int creatorId = post.getCreatorId();

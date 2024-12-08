@@ -4,7 +4,7 @@ import java.util.*;
 import java.awt.Image;
 
 /**
- * A client to communicate with the PlatformServer
+ * A client to communicate with the PlatformServer.
  * 
  * @author Ropan Datta, L22
  * @version December 7, 2024
@@ -109,6 +109,13 @@ public class PlatformClient implements Closeable {
 
     public boolean rejectFollowRequest(int userId) throws IOException {
         out.writeObject(OperationType.REJECT_FOLLOWREQUEST);
+        out.writeInt(userId);
+        boolean result = in.readBoolean();
+        return result;
+    }
+
+    public boolean unfollowUser(int userId) throws IOException {
+        out.writeObject(OperationType.UNFOLLOW_USER);
         out.writeInt(userId);
         boolean result = in.readBoolean();
         return result;
