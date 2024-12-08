@@ -175,6 +175,7 @@ public class PlatformClient implements Closeable {
 
     public List<Comment> fetchComments(int postId) throws IOException, ClassNotFoundException {
         out.writeObject(OperationType.FETCH_COMMENTS);
+        out.writeInt(postId);
         out.flush();
         @SuppressWarnings("unchecked")
         List<Comment> comments = (List<Comment>) in.readObject();
