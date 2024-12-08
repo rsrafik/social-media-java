@@ -220,4 +220,22 @@ public class DatabaseTestcase {
             tester2.getFollowRequests().size());
     }    //end of follow request
 
+    //test blocking users
+    @Test
+    public void testBlocking() throws IOException, ClassNotFoundException {
+        PlatformDatabase db = new PlatformDatabase();
+        PlatformUser tester1 = new PlatformUser(0, "tester", "testerPass");
+        PlatformUser tester2 = new PlatformUser(1, "tester", "testerPass");
+        db.addUser(tester1);
+        db.addUser(tester2);
+
+        //test blocking a user
+        db.addBlockedUser(0, 1);
+        Assert.assertTrue("should have a blocked user", db.hasBlockedUser(0, 1));
+
+        //removing blocked user
+        db.removeBlockedUser(0, 1);
+        Assert.assertFalse("shouldn't have a blocked user", db.hasBlockedUser(0, 1));
+    }    //end of tests for blocking users
+
 }    //end of Database testcase
