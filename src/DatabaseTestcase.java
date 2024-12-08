@@ -157,7 +157,7 @@ public class DatabaseTestcase {
     }    //end of search user test
 
     @Test
-    public void testUpvoteAndDownvote() throws IOException, ClassNotFoundException {
+    public void testUpvoteAndDownVote() throws IOException, ClassNotFoundException {
         PlatformDatabase db = new PlatformDatabase();
         PlatformUser tester = new PlatformUser(0, "tester", "testerPass");
         db.addUser(tester);
@@ -170,5 +170,72 @@ public class DatabaseTestcase {
         db.addPostDownvote(1, 0);
         Assert.assertEquals("Expected 1 post to be down vote.", 1, one.getDownvoteIds().size());
     }
+
+    //test all comment functions
+    @Test
+    public void testCommentFunctions() throws IOException, ClassNotFoundException {
+        PlatformDatabase db = new PlatformDatabase();
+        PlatformUser tester = new PlatformUser(0, "tester", "testerPass");
+        db.addUser(tester);
+        PlatformPost one = new PlatformPost(0, 0, "One", null);
+        db.addPost(one);
+
+        //test content
+        PlatformComment comment = new PlatformComment(0, 0, "test comment");
+        db.addComment(0, comment);
+        Assert.assertEquals("comment content should match", "test comment", comment.getContent());
+
+        //test upvote and down vote comment
+        comment.addUpvote(0);
+        Assert.assertEquals("comment should have upvote", 1, comment.getUpvoteIds().size());
+
+        comment.addDownvote(0);
+        Assert.assertEquals("comment should have down vote", 1, comment.getDownvoteIds().size());
+
+        one.removeComment(0);
+        Assert.assertEquals("Post should have not comments", 0, one.getComments().size());
+    }    //end of comment tests
+
+    //test follower functions
+    @Test
+    public void testFollower() throws IOException, ClassNotFoundException {
+        PlatformDatabase db = new PlatformDatabase();
+        PlatformUser tester1 = new PlatformUser(0, "tester", "testerPass");
+        PlatformUser tester2 = new PlatformUser(1, "tester", "testerPass");
+        db.addUser(tester1);
+        db.addUser(tester2);
+
+        //test adding and remove follower
+        db.addFollower(0, 1);
+        Assert.assertEquals("Expected user to have 1 follower", 1,
+            tester1.getFollowerIds().size());
+
+        db.removeFollower(0, 1);
+        Assert.assertEquals("Expected user to have no followers", 0,
+                tester1.getFollowerIds().size());
+
+        //test follow request
+        db.addFollowRequest(1, 0);
+        Assert.assertEquals("tester2 should have a follow request", 1,
+            tester2.getFollowRequests().size());
+    }    //end of follow request
+
+    //test blocking users
+    @Test
+    public void testBlocking() throws IOException, ClassNotFoundException {
+        PlatformDatabase db = new PlatformDatabase();
+        PlatformUser tester1 = new PlatformUser(0, "tester", "testerPass");
+        PlatformUser tester2 = new PlatformUser(1, "tester", "testerPass");
+        db.addUser(tester1);
+        db.addUser(tester2);
+
+        //test blocking a user
+        db.addBlockedUser(0, 1);
+        Assert.assertTrue("should have a blocked user", db.hasBlockedUser(0, 1));
+
+        //removing blocked user
+        db.removeBlockedUser(0, 1);
+        Assert.assertFalse("shouldn't have a blocked user", db.hasBlockedUser(0, 1));
+    }    //end of tests for blocking users
 
 }    //end of Database testcase
