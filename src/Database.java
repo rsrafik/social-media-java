@@ -37,6 +37,13 @@ public interface Database {
     List<User> getUsers();
 
     /**
+     * Retrieves the number of users in the database.
+     * 
+     * @return the total number of users
+     */
+    int userCount();
+
+    /**
      * Checks whether a user exists.
      * 
      * @param userId the user ID to check for
@@ -77,18 +84,18 @@ public interface Database {
     void addUser(User user);
 
     /**
-     * Retrieves the number of users in the database.
-     * 
-     * @return the total number of users
-     */
-    int userCount();
-
-    /**
      * Retrieves all posts stored in the database.
      *
      * @return A LinkedHashMap of PlatformPost objects with post IDs as keys.
      */
     List<Post> getPosts();
+
+    /**
+     * Retrieves the number of posts in the database.
+     * 
+     * @return the total number of posts
+     */
+    int postCount();
 
     /**
      * Checks whether a post exists.
@@ -120,7 +127,7 @@ public interface Database {
      * @param postId the ID of the post
      * @return the user ID of the post's creator
      */
-    int getCreatorId(int postId);
+    int getPosterId(int postId);
 
     /**
      * Adds a new post to the database.
@@ -162,12 +169,82 @@ public interface Database {
     void removePostDownvote(int postId, int userId);
 
     /**
+     * Retrieves the number of comments in the database.
+     * 
+     * @return the total number of comments
+     */
+    int commentCount();
+
+    /**
+     * Checks whether a comment exists.
+     * 
+     * @param commentId the comment ID to check for
+     * @return whether the comment ID exists in the database
+     */
+    boolean existsComment(int commentId);
+
+    /**
+     * Retrieves the creator of a comment.
+     * 
+     * @param commentId the ID of the comment
+     * @return the ID of the commenter
+     */
+    int getCommenterId(int commentId);
+
+    /**
+     * Retrieves the post ID of a comment.
+     * 
+     * @param commentId the ID of the comment
+     * @return the ID of the post on which the comment was made
+     */
+    int getPostIdOfComment(int commentId);
+
+    /**
      * Adds a comment to the post.
      * 
      * @param postId the ID of the post to which the comment is added
      * @param comment the comment to be added
      */
     void addComment(int postId, Comment comment);
+
+    /**
+     * Adds an upvote to a comment.
+     * 
+     * @param commentId the ID of the comment
+     * @param userId the ID of the upvoter
+     */
+    void addCommentUpvote(int commentId, int userId);
+
+    /**
+     * Adds a downvote to a comment.
+     * 
+     * @param commentId the ID of the comment
+     * @param userId the ID of the downvoter
+     */
+    void addCommentDownvote(int commentId, int userId);
+
+    /**
+     * Removes an upvote from a comment.
+     * 
+     * @param commentId the ID of the comment
+     * @param userId the ID of the upvoter
+     */
+    void removeCommentUpvote(int commentId, int userId);
+
+    /**
+     * Removes a downvote from a comment.
+     * 
+     * @param commentId the ID of the comment
+     * @param userId the ID of the downvoter
+     */
+    void removeCommentDownvote(int commentId, int userId);
+
+    /**
+     * Removes a comment from a post.
+     * 
+     * @param commentId the ID of the comment
+     */
+    void removeComment(int commentId);
 
     /**
      * Adds a follower to a user's followers.
@@ -236,7 +313,7 @@ public interface Database {
      * @throws IOException if an error occurs while deep copying a User object
      * @throws ClassNotFoundException should not happen
      */
-    List<User> searchUsername(String search) throws IOException, ClassNotFoundException;
+    List<UserInfo> searchUsername(String search) throws IOException, ClassNotFoundException;
 
     /**
      * Saves user information to disk.

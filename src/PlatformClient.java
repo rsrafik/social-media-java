@@ -14,7 +14,7 @@ public class PlatformClient implements Closeable {
     private ObjectInputStream in;
     private ObjectOutputStream out;
 
-    public PlatformClient(String host, int port) throws IOException, UnknownHostException {
+    public PlatformClient(String host, int port) throws IOException {
         socket = new Socket(host, port);
         in = new ObjectInputStream(socket.getInputStream());
         out = new ObjectOutputStream(socket.getOutputStream());
@@ -53,11 +53,19 @@ public class PlatformClient implements Closeable {
         return result;
     }
 
-    public User fetchUser() throws IOException, ClassNotFoundException {
-        out.writeObject(OperationType.FETCH_USER);
+    public User fetchLoggedInUser() throws IOException, ClassNotFoundException {
+        out.writeObject(OperationType.FETCH_LOGGEDIN_USER);
         out.flush();
         User user = (User) in.readObject();
         return user;
+    }
+
+    public UserInfo fetchUserInfo(int userId) throws IOException, ClassNotFoundException {
+        out.writeObject(OperationType.FETCH_USER_INFO);
+        out.writeInt(userId);
+        out.flush();
+        UserInfo userInfo = (UserInfo) in.readObject();
+        return userInfo;
     }
 
     public List<Integer> getBlockedUserIds() throws ClassNotFoundException, IOException {
@@ -103,6 +111,7 @@ public class PlatformClient implements Closeable {
     public boolean cancelFollowRequest(int userId) throws IOException {
         out.writeObject(OperationType.CANCEL_FOLLOWREQUEST);
         out.writeInt(userId);
+        out.flush();
         boolean result = in.readBoolean();
         return result;
     }
@@ -110,6 +119,7 @@ public class PlatformClient implements Closeable {
     public boolean acceptFollowRequest(int userId) throws IOException {
         out.writeObject(OperationType.ACCEPT_FOLLOWREQUEST);
         out.writeInt(userId);
+        out.flush();
         boolean result = in.readBoolean();
         return result;
     }
@@ -117,6 +127,7 @@ public class PlatformClient implements Closeable {
     public boolean rejectFollowRequest(int userId) throws IOException {
         out.writeObject(OperationType.REJECT_FOLLOWREQUEST);
         out.writeInt(userId);
+        out.flush();
         boolean result = in.readBoolean();
         return result;
     }
@@ -124,6 +135,7 @@ public class PlatformClient implements Closeable {
     public boolean unfollowUser(int userId) throws IOException {
         out.writeObject(OperationType.UNFOLLOW_USER);
         out.writeInt(userId);
+        out.flush();
         boolean result = in.readBoolean();
         return result;
     }
@@ -163,6 +175,7 @@ public class PlatformClient implements Closeable {
 
     public List<Comment> fetchComments(int postId) throws IOException, ClassNotFoundException {
         out.writeObject(OperationType.FETCH_COMMENTS);
+        out.writeInt(postId);
         out.flush();
         @SuppressWarnings("unchecked")
         List<Comment> comments = (List<Comment>) in.readObject();
@@ -178,20 +191,37 @@ public class PlatformClient implements Closeable {
         return result;
     }
 
-    public boolean deleteComment(int commentId) throws IOException {
-        out.writeObject(OperationType.DELETE_COMMENT);
+    public boolean upvoteComment(int commentId) throws IOException {
+        out.writeObject(OperationType.UPVOTE_COMMENT);
+        out.writeInt(commentId);
         out.flush();
         boolean result = in.readBoolean();
         return result;
     }
 
-    public List<User> searchUser(String search) throws IOException, ClassNotFoundException {
+    public boolean downvoteComment(int commentId) throws IOException {
+        out.writeObject(OperationType.DOWNVOTE_COMMENT);
+        out.writeInt(commentId);
+        out.flush();
+        boolean result = in.readBoolean();
+        return result;
+    }
+
+    public boolean deleteComment(int commentId) throws IOException {
+        out.writeObject(OperationType.DELETE_COMMENT);
+        out.writeInt(commentId);
+        out.flush();
+        boolean result = in.readBoolean();
+        return result;
+    }
+
+    public List<UserInfo> searchUser(String search) throws IOException, ClassNotFoundException {
         out.writeObject(OperationType.SEARCH_USER);
         out.writeUTF(search);
         out.flush();
         @SuppressWarnings("unchecked")
-        List<User> users = (List<User>) in.readObject();
-        return users;
+        List<UserInfo> userInfos = (List<UserInfo>) in.readObject();
+        return userInfos;
     }
 
     public List<Post> loadFeed() throws IOException, ClassNotFoundException {

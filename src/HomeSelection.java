@@ -1,38 +1,57 @@
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.io.IOException;
+import java.util.List;
 
+/**
+ * HomeSelection
+ *
+ * This class manages the main home view of the application, including
+ * a search bar, the ability to create posts, and a scrollable feed.
+ *
+ * @author Rachel Rafik, L22
+ *
+ * @version December 8, 2024
+ */
 class HomeSelection {
 
-    private static JPanel mainContentPanel; // Panel to dynamically switch content
+    private static JPanel mainContentPanel;      // Panel to dynamically switch content
     private static JScrollPane currentScrollPane; // Keeps track of the current scrollable content
 
-    public static void mainView(JPanel mainPanel) {
+    /**
+     * Sets up and displays the main home view.
+     *
+     * @param mainPanel the panel to which UI elements will be added
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a class cannot be found
+     */
+    public static void mainView(JPanel mainPanel) throws IOException, ClassNotFoundException {
         mainPanel.setLayout(new BorderLayout());
         mainPanel.setBackground(Color.WHITE);
 
-        // Create the search bar panel
         JPanel searchBarPanel = new JPanel(new BorderLayout());
         searchBarPanel.setBackground(Color.WHITE);
-        searchBarPanel.setBorder(new EmptyBorder(20, 0, 20, 0)); // Add vertical padding
+        searchBarPanel.setBorder(new EmptyBorder(20, 0, 20, 0));
 
-        // Create the search field
         SearchTextField searchField = new SearchTextField();
         searchField.setPreferredSize(new Dimension(400, 40));
+        searchField.setSearchActionListener(selectedOption -> {
+            try {
+                switchToOtherProfileView();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
-        // Set search action listener to switch to OtherProfileSelection
-        searchField.setSearchActionListener(selectedOption -> switchToOtherProfileView());
-
-        // Center the search field in the panel
         JPanel centerPanel = new JPanel();
         centerPanel.setBackground(Color.WHITE);
         centerPanel.add(searchField);
         searchBarPanel.add(centerPanel, BorderLayout.CENTER);
 
-        // Create the "Create New Post" button
         RoundedButton createPostButton = new RoundedButton("Create New Post");
         createPostButton.setForeground(Color.WHITE);
-        createPostButton.setBackground(new Color(0, 122, 255)); // Blue color
+        createPostButton.setBackground(new Color(0, 122, 255));
         createPostButton.setFont(new Font("Arial", Font.BOLD, 14));
         createPostButton.setFocusPainted(false);
         createPostButton.setBorderPainted(false);
@@ -42,7 +61,6 @@ class HomeSelection {
             JTextField textField = new JTextField();
             Object[] message = {"Create Post:", textField};
 
-            // Show a dialog with custom "Post" and "Cancel" buttons
             int option = JOptionPane.showOptionDialog(
                     null,
                     message,
@@ -50,76 +68,90 @@ class HomeSelection {
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.PLAIN_MESSAGE,
                     null,
-                    new Object[]{"Post", "Cancel"}, // Custom buttons
-                    "Post" // Default button
+                    new Object[]{"Post", "Cancel"},
+                    "Post"
             );
 
-            if (option == JOptionPane.YES_OPTION) { // "Post" button clicked
+            if (option == JOptionPane.YES_OPTION) {
                 String input = textField.getText();
                 if (!input.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Message posted: " + input);
+                    boolean postSuccess;
+                    try {
+                        postSuccess = PlatformRunner.client.createPost(input, null);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+
+                    if (postSuccess) {
+                        JOptionPane.showMessageDialog(null, "Message posted: " + input);
+                    }
                 } else {
                     JOptionPane.showMessageDialog(null, "No message entered!");
                 }
             }
         });
 
-        // Add the button to the right (East) of the search bar panel
         JPanel eastPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         eastPanel.setBackground(Color.WHITE);
-        eastPanel.setBorder(new EmptyBorder(0, 0, 0, 20)); // Add right padding
+        eastPanel.setBorder(new EmptyBorder(0, 0, 0, 20));
         eastPanel.add(createPostButton);
         searchBarPanel.add(eastPanel, BorderLayout.EAST);
 
-        // Add the search bar panel to the top of the main panel
         mainPanel.add(searchBarPanel, BorderLayout.NORTH);
 
-        // Main content panel (center area)
         mainContentPanel = new JPanel(new BorderLayout());
         mainContentPanel.setBackground(Color.WHITE);
         mainPanel.add(mainContentPanel, BorderLayout.CENTER);
 
-        // Add the initial scrollable content
         currentScrollPane = createScrollableContent();
         mainContentPanel.add(currentScrollPane, BorderLayout.CENTER);
     }
 
-    private static JScrollPane createScrollableContent() {
-        // Create a panel to hold the content
+    /**
+     * Creates and returns a scroll pane containing a feed of posts.
+     *
+     * @return the scroll pane containing posts
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a class cannot be found
+     */
+    private static JScrollPane createScrollableContent() throws IOException, ClassNotFoundException {
         JPanel contentPanel = new JPanel();
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS)); // Arrange posts vertically
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBackground(Color.WHITE);
 
-        // Add 5 individual posts to the content panel
-        for (int i = 1; i <= 5; i++) {
-            JPanel post = SinglePost.individualPost("friend"); // Create an individual post
-            contentPanel.add(post); // Add the post to the content panel
-            contentPanel.add(Box.createVerticalStrut(40)); // Add spacing between posts
+        List<Post> loadPost = PlatformRunner.client.loadFeed();
+        for (int i = 0; i < loadPost.size(); i++) {
+            JPanel post = SinglePost.individualPost(loadPost.get(i), "friend");
+            contentPanel.add(post);
+            contentPanel.add(Box.createVerticalStrut(40));
         }
 
-        // Wrap the content panel in a scroll pane
         JScrollPane scrollPane = new JScrollPane(contentPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Smooth scrolling
-        scrollPane.setBorder(null); // Remove the border from the scroll pane
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
+        scrollPane.setBorder(null);
 
         return scrollPane;
     }
 
-    private static void switchToOtherProfileView() {
-        // Remove the current scrollable content
-        mainContentPanel.remove(currentScrollPane);
+    /**
+     * Switches to the other profile view.
+     *
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a class cannot be found
+     */
+    private static void switchToOtherProfileView() throws IOException, ClassNotFoundException {
+        mainContentPanel.removeAll();
+        mainContentPanel.revalidate();
+        mainContentPanel.repaint();
 
-        // Create a new panel for the OtherProfileSelection
         JPanel otherProfilePanel = new JPanel(new BorderLayout());
-        OtherProfileSelection.mainView(otherProfilePanel); // Populate the panel using OtherProfileSelection
+        OtherProfileSelection.mainView(otherProfilePanel);
 
-        // Add the otherProfilePanel to the main content panel
         mainContentPanel.add(otherProfilePanel, BorderLayout.CENTER);
-
-        // Refresh the layout
         mainContentPanel.revalidate();
         mainContentPanel.repaint();
     }
+
 }

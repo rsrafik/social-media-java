@@ -1,40 +1,67 @@
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * ProfileSelection
+ *
+ * This class manages the display of the user's profile, including their posts, following list, and blocked list.
+ * Users can view their posts, view and unfollow people they are following, and view and unblock users they have blocked.
+ * The UI allows switching between these views seamlessly.
+ *
+ * @author Rachel Rafik, L22
+ *
+ * @version December 8, 2024
+ */
 class ProfileSelection {
 
-    private static JScrollPane currentScrollPane; // Keeps track of the current scroll pane
+    private static JScrollPane currentScrollPane;   // Keeps track of the current scroll pane
+    private static User currentUser;
+    private static JPanel mainPanelRef;             // Store a reference to the main panel for refreshing
 
-    public static void mainView(JPanel mainPanel) {
+    static {
+        try {
+            currentUser = PlatformRunner.client.fetchLoggedInUser();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Sets up and displays the main profile view including user info and buttons to switch between posts, following, and blocked lists.
+     *
+     * @param mainPanel the main panel on which the UI will be displayed
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a required class cannot be found
+     */
+    public static void mainView(JPanel mainPanel) throws IOException, ClassNotFoundException {
+        mainPanelRef = mainPanel;
+        mainPanel.removeAll();
         mainPanel.setLayout(new BorderLayout());
         mainPanel.setBackground(Color.WHITE);
 
-        // Create the top panel with a fixed height of 185 pixels
+        currentUser = PlatformRunner.client.fetchLoggedInUser();
+
         JPanel topPanel = new JPanel();
-        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS)); // Vertical layout
+        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         topPanel.setBackground(Color.WHITE);
-        topPanel.setPreferredSize(new Dimension(mainPanel.getWidth(), 200));
+        topPanel.setPreferredSize(new Dimension(mainPanel.getWidth(), 195));
         topPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         topPanel.add(Box.createVerticalStrut(20));
 
-        // Username label
-        JLabel usernameLabel = new JLabel("Username");
+        JLabel usernameLabel = new JLabel(currentUser.getUsername());
         usernameLabel.setFont(new Font("Arial", Font.BOLD, 24));
         usernameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         topPanel.add(usernameLabel);
 
-        // User ID label
-        JLabel userIDLabel = new JLabel("User ID: xxx");
-        userIDLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        userIDLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        topPanel.add(userIDLabel);
+        topPanel.add(Box.createVerticalStrut(10));
 
-        // Add spacing between user info and buttons
-        topPanel.add(Box.createVerticalStrut(20));
-
-        // Following button
         JButton postsButton = new JButton("Posts");
         postsButton.setFont(new Font("Arial", Font.PLAIN, 14));
         postsButton.setFocusPainted(false);
@@ -42,7 +69,8 @@ class ProfileSelection {
         postsButton.setPreferredSize(new Dimension(150, 40));
         topPanel.add(postsButton);
 
-        // Following button
+        topPanel.add(Box.createVerticalStrut(10));
+
         JButton followingButton = new JButton("Following");
         followingButton.setFont(new Font("Arial", Font.PLAIN, 14));
         followingButton.setFocusPainted(false);
@@ -50,7 +78,8 @@ class ProfileSelection {
         followingButton.setPreferredSize(new Dimension(150, 40));
         topPanel.add(followingButton);
 
-        // Blocked button
+        topPanel.add(Box.createVerticalStrut(10));
+
         JButton blockedButton = new JButton("Blocked");
         blockedButton.setFont(new Font("Arial", Font.PLAIN, 14));
         blockedButton.setFocusPainted(false);
@@ -58,32 +87,64 @@ class ProfileSelection {
         blockedButton.setPreferredSize(new Dimension(150, 40));
         topPanel.add(blockedButton);
 
-        // Add the top panel to the main panel
         mainPanel.add(topPanel, BorderLayout.NORTH);
 
-        // Add the initial scrollable content
         currentScrollPane = createPostsScrollPane();
         mainPanel.add(currentScrollPane, BorderLayout.CENTER);
 
-        // Add action listener to Following button
-        followingButton.addActionListener(e -> switchToFollowingScrollPane(mainPanel));
+        followingButton.addActionListener(e -> {
+            try {
+                switchToFollowingScrollPane(mainPanel);
+            } catch (IOException | ClassNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
-        // Add action listener to Blocked button
-        postsButton.addActionListener(e -> switchToPostsScrollPane(mainPanel));
+        postsButton.addActionListener(e -> {
+            try {
+                switchToPostsScrollPane(mainPanel);
+            } catch (IOException | ClassNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
-        blockedButton.addActionListener(e -> switchToBlockedScrollPane(mainPanel));
+        blockedButton.addActionListener(e -> {
+            try {
+                switchToBlockedScrollPane(mainPanel);
+            } catch (IOException | ClassNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
+        mainPanel.revalidate();
+        mainPanel.repaint();
     }
 
-    private static JScrollPane createPostsScrollPane() {
+    /**
+     * Creates and returns a scroll pane displaying the user's posts.
+     *
+     * @return a JScrollPane containing the user's posts
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a required class cannot be found
+     */
+    private static JScrollPane createPostsScrollPane() throws IOException, ClassNotFoundException {
+        currentUser = PlatformRunner.client.fetchLoggedInUser();
+
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBackground(Color.WHITE);
 
-        // Add 5 individual posts
-        for (int i = 1; i <= 5; i++) {
-            JPanel post = SinglePost.individualPost("user");
-            contentPanel.add(post);
-            contentPanel.add(Box.createVerticalStrut(40)); // Add spacing between posts
+        List<Integer> postIds = currentUser.getPostIds();
+        List<Post> posts = new ArrayList<>();
+
+        for (int postId : postIds) {
+            posts.add(PlatformRunner.client.fetchPost(postId));
+        }
+
+        for (Post post : posts) {
+            JPanel postPanel = SinglePost.individualPost(post, "user");
+            contentPanel.add(postPanel);
+            contentPanel.add(Box.createVerticalStrut(40));
         }
 
         JScrollPane scrollPane = new JScrollPane(contentPanel);
@@ -95,18 +156,32 @@ class ProfileSelection {
         return scrollPane;
     }
 
-    private static JScrollPane createFollowingScrollPane() {
+    /**
+     * Creates and returns a scroll pane displaying the users the current user is following.
+     *
+     * @return a JScrollPane containing the following list
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a required class cannot be found
+     */
+    private static JScrollPane createFollowingScrollPane() throws IOException, ClassNotFoundException {
+        currentUser = PlatformRunner.client.fetchLoggedInUser();
+
         JPanel followingPanel = new JPanel();
         followingPanel.setLayout(new BoxLayout(followingPanel, BoxLayout.Y_AXIS));
         followingPanel.setBackground(Color.WHITE);
 
-        for (int i = 1; i <= 25; i++) {
-            followingPanel.add(createFollowingRow("user" + i)); // Dynamically create usernames like "user1", "user2", etc.
+        List<Integer> followingIds = currentUser.getFollowingIds();
+        List<UserInfo> followingUsers = new ArrayList<>();
+
+        for (Integer followingId : followingIds)
+            followingUsers.add(PlatformRunner.client.fetchUserInfo(followingId));
+
+        for (int i = 0; i < followingUsers.size(); i++) {
+            followingPanel.add(createFollowingRow(followingUsers.get(i)));
             if (i < 25) {
-                followingPanel.add(Box.createVerticalStrut(15)); // Add spacing between rows, but not after the last one
+                followingPanel.add(Box.createVerticalStrut(15));
             }
         }
-
 
         JScrollPane scrollPane = new JScrollPane(followingPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
@@ -117,67 +192,76 @@ class ProfileSelection {
         return scrollPane;
     }
 
-
-    private static JPanel createFollowingRow(String username) {
+    /**
+     * Creates and returns a panel representing a single user row in the following list.
+     *
+     * @param userInfo the UserInfo of the followed user
+     * @return a JPanel representing a single followed user row
+     */
+    private static JPanel createFollowingRow(UserInfo userInfo) {
         JPanel rowPanel = new JPanel(new GridBagLayout());
-        rowPanel.setBorder(new EmptyBorder(5, 10, 5, 10)); // Minimal padding
+        rowPanel.setBorder(new EmptyBorder(5, 10, 5, 10));
         rowPanel.setBackground(Color.WHITE);
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.NONE; // Components retain their preferred sizes
-        gbc.anchor = GridBagConstraints.CENTER; // Center alignment
-        gbc.insets = new Insets(0, 5, 0, 5); // Minimal spacing between components
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.insets = new Insets(0, 5, 0, 5);
 
-        // Username label
-        JLabel usernameLabel = new JLabel(username);
+        JLabel usernameLabel = new JLabel(userInfo.getUsername());
         usernameLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        gbc.gridx = 0; // First column
-        gbc.gridy = 0; // First row
+        gbc.gridx = 0; gbc.gridy = 0;
         rowPanel.add(usernameLabel, gbc);
 
-        // Unfollow button
         JButton unfollowButton = new JButton("Unfollow");
         unfollowButton.setFont(new Font("Arial", Font.PLAIN, 14));
         unfollowButton.setFocusPainted(false);
-        gbc.gridx = 1; // Second column, same row
-        gbc.gridy = 0;
+        gbc.gridx = 1; gbc.gridy = 0;
         rowPanel.add(unfollowButton, gbc);
+
+        unfollowButton.addActionListener(e -> {
+            try {
+                boolean unfollowSuccess = PlatformRunner.client.unfollowUser(userInfo.getId());
+                if (unfollowSuccess) {
+                    JOptionPane.showMessageDialog(null, "Unfollowed successfully!");
+                    refreshFollowingList();
+                }
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
         return rowPanel;
     }
 
+    /**
+     * Creates and returns a scroll pane displaying the blocked users.
+     *
+     * @return a JScrollPane containing the blocked users
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a required class cannot be found
+     */
+    private static JScrollPane createBlockedScrollPane() throws IOException, ClassNotFoundException {
+        currentUser = PlatformRunner.client.fetchLoggedInUser();
 
+        JPanel blockedPanel = new JPanel();
+        blockedPanel.setLayout(new BoxLayout(blockedPanel, BoxLayout.Y_AXIS));
+        blockedPanel.setBackground(Color.WHITE);
 
-    private static void switchToFollowingScrollPane(JPanel mainPanel) {
-        mainPanel.remove(currentScrollPane); // Remove the existing scrollable content
-        currentScrollPane = createFollowingScrollPane(); // Create new scrollable content
-        mainPanel.add(currentScrollPane, BorderLayout.CENTER); // Add the new content
-        mainPanel.revalidate(); // Refresh the layout
-        mainPanel.repaint();
-    }
+        List<Integer> blockedIds = currentUser.getBlockedUserIds();
+        List<UserInfo> blockedUsers = new ArrayList<>();
 
-    private static void switchToPostsScrollPane(JPanel mainPanel) {
-        mainPanel.remove(currentScrollPane); // Remove the existing scrollable content
-        currentScrollPane = createPostsScrollPane(); // Revert to posts (example behavior)
-        mainPanel.add(currentScrollPane, BorderLayout.CENTER); // Add the new content
-        mainPanel.revalidate(); // Refresh the layout
-        mainPanel.repaint();
-    }
+        for (Integer blockedId : blockedIds)
+            blockedUsers.add(PlatformRunner.client.fetchUserInfo(blockedId));
 
-    private static JScrollPane createBlockedScrollPane() {
-        JPanel followingPanel = new JPanel();
-        followingPanel.setLayout(new BoxLayout(followingPanel, BoxLayout.Y_AXIS));
-        followingPanel.setBackground(Color.WHITE);
-
-        for (int i = 1; i <= 25; i++) {
-            followingPanel.add(createBlockedRow("user" + i)); // Dynamically create usernames like "user1", "user2", etc.
+        for (int i = 0; i < blockedUsers.size(); i++) {
+            blockedPanel.add(createBlockedRow(blockedUsers.get(i)));
             if (i < 25) {
-                followingPanel.add(Box.createVerticalStrut(15)); // Add spacing between rows, but not after the last one
+                blockedPanel.add(Box.createVerticalStrut(15));
             }
         }
 
-
-        JScrollPane scrollPane = new JScrollPane(followingPanel);
+        JScrollPane scrollPane = new JScrollPane(blockedPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
@@ -186,42 +270,124 @@ class ProfileSelection {
         return scrollPane;
     }
 
-
-    private static JPanel createBlockedRow(String username) {
+    /**
+     * Creates and returns a panel representing a single user row in the blocked list.
+     *
+     * @param userInfo the UserInfo of the blocked user
+     * @return a JPanel representing a single blocked user row
+     */
+    private static JPanel createBlockedRow(UserInfo userInfo) {
         JPanel rowPanel = new JPanel(new GridBagLayout());
-        rowPanel.setBorder(new EmptyBorder(5, 10, 5, 10)); // Minimal padding
+        rowPanel.setBorder(new EmptyBorder(5, 10, 5, 10));
         rowPanel.setBackground(Color.WHITE);
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.NONE; // Components retain their preferred sizes
-        gbc.anchor = GridBagConstraints.CENTER; // Center alignment
-        gbc.insets = new Insets(0, 5, 0, 5); // Minimal spacing between components
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.insets = new Insets(0, 5, 0, 5);
 
-        // Username label
-        JLabel usernameLabel = new JLabel(username);
+        JLabel usernameLabel = new JLabel(userInfo.getUsername());
         usernameLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        gbc.gridx = 0; // First column
-        gbc.gridy = 0; // First row
+        gbc.gridx = 0; gbc.gridy = 0;
         rowPanel.add(usernameLabel, gbc);
 
-        // Unfollow button
-        JButton unfollowButton = new JButton("Unblock");
-        unfollowButton.setFont(new Font("Arial", Font.PLAIN, 14));
-        unfollowButton.setFocusPainted(false);
-        gbc.gridx = 1; // Second column, same row
-        gbc.gridy = 0;
-        rowPanel.add(unfollowButton, gbc);
+        JButton unBlockButton = new JButton("Unblock");
+        unBlockButton.setFont(new Font("Arial", Font.PLAIN, 14));
+        unBlockButton.setFocusPainted(false);
+        gbc.gridx = 1; gbc.gridy = 0;
+        rowPanel.add(unBlockButton, gbc);
+
+        unBlockButton.addActionListener(e -> {
+            try {
+                boolean unBlockSuccess = PlatformRunner.client.unblockUser(userInfo.getId());
+                if (unBlockSuccess) {
+                    JOptionPane.showMessageDialog(null, "Unblocked successfully!");
+                    refreshBlockedList();
+                }
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
         return rowPanel;
     }
 
-
-
-    private static void switchToBlockedScrollPane(JPanel mainPanel) {
-        mainPanel.remove(currentScrollPane); // Remove the existing scrollable content
-        currentScrollPane = createBlockedScrollPane(); // Create new scrollable content
-        mainPanel.add(currentScrollPane, BorderLayout.CENTER); // Add the new content
-        mainPanel.revalidate(); // Refresh the layout
+    /**
+     * Switches the main panel to display the following list scroll pane.
+     *
+     * @param mainPanel the main panel being updated
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a required class cannot be found
+     */
+    private static void switchToFollowingScrollPane(JPanel mainPanel) throws IOException, ClassNotFoundException {
+        currentUser = PlatformRunner.client.fetchLoggedInUser();
+        mainPanel.remove(currentScrollPane);
+        currentScrollPane = createFollowingScrollPane();
+        mainPanel.add(currentScrollPane, BorderLayout.CENTER);
+        mainPanel.revalidate();
         mainPanel.repaint();
     }
+
+    /**
+     * Switches the main panel to display the posts scroll pane.
+     *
+     * @param mainPanel the main panel being updated
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a required class cannot be found
+     */
+    private static void switchToPostsScrollPane(JPanel mainPanel) throws IOException, ClassNotFoundException {
+        currentUser = PlatformRunner.client.fetchLoggedInUser();
+        mainPanel.remove(currentScrollPane);
+        currentScrollPane = createPostsScrollPane();
+        mainPanel.add(currentScrollPane, BorderLayout.CENTER);
+        mainPanel.revalidate();
+        mainPanel.repaint();
+    }
+
+    /**
+     * Switches the main panel to display the blocked users scroll pane.
+     *
+     * @param mainPanel the main panel being updated
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a required class cannot be found
+     */
+    private static void switchToBlockedScrollPane(JPanel mainPanel) throws IOException, ClassNotFoundException {
+        currentUser = PlatformRunner.client.fetchLoggedInUser();
+        mainPanel.remove(currentScrollPane);
+        currentScrollPane = createBlockedScrollPane();
+        mainPanel.add(currentScrollPane, BorderLayout.CENTER);
+        mainPanel.revalidate();
+        mainPanel.repaint();
+    }
+
+    /**
+     * Refreshes the following list by reinitializing the main view and then switching to the following list view.
+     */
+    private static void refreshFollowingList() {
+        try {
+            mainPanelRef.removeAll();
+            mainView(mainPanelRef);
+            switchToFollowingScrollPane(mainPanelRef);
+        } catch (IOException | ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
+        mainPanelRef.revalidate();
+        mainPanelRef.repaint();
+    }
+
+    /**
+     * Refreshes the blocked list by reinitializing the main view and then switching to the blocked list view.
+     */
+    private static void refreshBlockedList() {
+        try {
+            mainPanelRef.removeAll();
+            mainView(mainPanelRef);
+            switchToBlockedScrollPane(mainPanelRef);
+        } catch (IOException | ClassNotFoundException ex) {
+            ex.printStackTrace();
+        }
+        mainPanelRef.revalidate();
+        mainPanelRef.repaint();
+    }
+
 }

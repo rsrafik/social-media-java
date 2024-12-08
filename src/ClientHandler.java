@@ -48,6 +48,21 @@ public interface ClientHandler extends Runnable {
     boolean createUser(String username, String password);
 
     /**
+     * Fetches the logged in User.
+     * 
+     * @return a copy of the logged in User
+     */
+    User fetchLoggedInUser();
+
+    /**
+     * Fetches the public user information of a User.
+     * 
+     * @param userId the ID of the user
+     * @return the public information of the user
+     */
+    UserInfo fetchUserInfo(int userId);
+
+    /**
      * Creates a new post.
      * 
      * @param content the text content of the post
@@ -152,6 +167,14 @@ public interface ClientHandler extends Runnable {
     boolean downvotePost(int postId);
 
     /**
+     * Fetches the comments made on a post.
+     * 
+     * @param postId the ID of the post
+     * @return the comments on the post
+     */
+    List<Comment> fetchComments(int postId);
+
+    /**
      * Comments on a post.
      * 
      * @param postId the ID of the post to add the comment to
@@ -160,12 +183,20 @@ public interface ClientHandler extends Runnable {
     boolean createComment(int postId, String content);
 
     /**
+     * Deletes a comment.
+     * 
+     * @param commentId the ID of the comment to delete
+     * @return whether the comment was successfully deleted
+     */
+    boolean deleteComment(int commentId);
+
+    /**
      * Searches for a user by username.
      * 
      * @param search the text to search for in the username
      * @return the list of users whose username contains the search text
      */
-    List<User> searchUsername(String search);
+    List<UserInfo> searchUsername(String search);
 
     /**
      * Generates a default feed based on followed users.
