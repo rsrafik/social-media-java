@@ -65,9 +65,15 @@ public class SinglePost {
                     JOptionPane.QUESTION_MESSAGE
             );
             if (result == JOptionPane.YES_OPTION) {
-                System.out.println(moreOption.equals("Hide post?") ? "Post hidden!" : "Post deleted!");
+                if (moreOption.equals("Hide post?")) {
+                    postPanel.removeAll();
+                    postPanel.setBackground(Color.LIGHT_GRAY);
+                    postPanel.revalidate();
+                    postPanel.repaint();
+                }
             }
         });
+
         userTopper.add(moreButton, BorderLayout.EAST);
 
         postPanel.add(userTopper, BorderLayout.NORTH);
