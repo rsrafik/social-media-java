@@ -236,7 +236,7 @@ public interface Database {
      * @throws IOException if an error occurs while deep copying a User object
      * @throws ClassNotFoundException should not happen
      */
-    List<User> searchUsername(String search) throws IOException, ClassNotFoundException;
+    List<UserInfo> searchUsername(String search) throws IOException, ClassNotFoundException;
 
     /**
      * Saves user information to disk.
