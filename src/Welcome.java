@@ -153,7 +153,7 @@ public class Welcome {
                 else {
                     JOptionPane.showMessageDialog(
                             null,
-                            "An unexpected error occurred. Please try again.",
+                            "Incorrect username or password.",
                             "Error",
                             JOptionPane.ERROR_MESSAGE
                     );
