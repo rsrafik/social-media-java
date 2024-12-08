@@ -164,8 +164,10 @@ public class PlatformClientHandler implements ClientHandler {
                             out.flush();
                         }
                         case FETCH_COMMENTS -> {
-                            // TODO
-                            throw new UnsupportedOperationException();
+                            int postId = in.readInt();
+                            List<Comment> comments = fetchComments(postId);
+                            out.writeObject(comments);
+                            out.flush();
                         }
                         case CREATE_COMMENT -> {
                             int postId = in.readInt();
@@ -180,7 +182,7 @@ public class PlatformClientHandler implements ClientHandler {
                         }
                         case SEARCH_USER -> {
                             String search = in.readUTF();
-                            List<User> users = searchUsername(search);
+                            List<UserInfo> users = searchUsername(search);
                             out.writeObject(users);
                             out.flush();
                         }
@@ -476,6 +478,22 @@ public class PlatformClientHandler implements ClientHandler {
     }
 
     @Override
+    public List<Comment> fetchComments(int postId) {
+        if (!isLoggedIn()) {
+            return null;
+        }
+        if (!database.existsPost(postId)) {
+            return null;
+        }
+        int creatorId = database.getCreatorId(postId);
+        if (database.hasBlockedUser(creatorId, loggedInId)) {
+            return null;
+        }
+        Post post = database.fetchPost(postId);
+        return post.getComments();
+    }
+
+    @Override
     public boolean createComment(int postId, String content) {
         if (!isLoggedIn()) {
             return false;
@@ -498,14 +516,14 @@ public class PlatformClientHandler implements ClientHandler {
     }
 
     @Override
-    public List<User> searchUsername(String search) {
+    public List<UserInfo> searchUsername(String search) {
         if (!isLoggedIn()) {
             return null;
         }
         try {
-            List<User> users = database.searchUsername(search);
-            users.removeIf(user -> user.hasBlockedUser(loggedInId));
-            return users;
+            List<UserInfo> userInfos = database.searchUsername(search);
+            userInfos.removeIf(userInfo -> database.hasBlockedUser(userInfo.getId(), loggedInId));
+            return userInfos;
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;

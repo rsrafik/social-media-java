@@ -282,18 +282,19 @@ public class PlatformDatabase implements Database {
     }
 
     @Override
-    public List<User> searchUsername(String search) throws IOException, ClassNotFoundException {
+    public List<UserInfo> searchUsername(String search) throws IOException, ClassNotFoundException {
         if (search.isEmpty()) {
             return null;
         }
         synchronized (USER_LOCK) {
-            ArrayList<User> searchedUsers = new ArrayList<>();
+            ArrayList<UserInfo> userInfos = new ArrayList<>();
             for (User user : users) {
                 if (user.getUsername().contains(search)) {
-                    searchedUsers.add((User) deepCopy(user));
+                    UserInfo userInfo = new PlatformUserInfo(user);
+                    userInfos.add(userInfo);
                 }
             }
-            return searchedUsers;
+            return userInfos;
         }
     }
 
