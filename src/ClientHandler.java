@@ -120,6 +120,14 @@ public interface ClientHandler extends Runnable {
     boolean rejectFollowRequest(int userId);
 
     /**
+     * Unfollows a user.
+     * 
+     * @param userId the ID of the user to unfollow
+     * @return whether the user was unfollowed successfully
+     */
+    boolean unfollowUser(int userId);
+
+    /**
      * Retrieves a post.
      * 
      * @param postId the ID of the post to fetch
