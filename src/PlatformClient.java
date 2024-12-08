@@ -53,6 +53,13 @@ public class PlatformClient implements Closeable {
         return result;
     }
 
+    public User fetchUser() throws IOException, ClassNotFoundException {
+        out.writeObject(OperationType.FETCH_USER);
+        out.flush();
+        User user = (User) in.readObject();
+        return user;
+    }
+
     public List<Integer> getBlockedUserIds() throws ClassNotFoundException, IOException {
         out.writeObject(OperationType.GET_BLOCKED_USERS);
         out.flush();
