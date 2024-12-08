@@ -1,10 +1,13 @@
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 class InboxSelection {
 
-    public static void mainView(JPanel mainPanel) {
+    public static void mainView(JPanel mainPanel) throws IOException, ClassNotFoundException {
         mainPanel.setLayout(new BorderLayout());
         mainPanel.setBackground(Color.WHITE);
 
@@ -20,16 +23,23 @@ class InboxSelection {
         mainPanel.add(inboxScrollPane, BorderLayout.CENTER);
     }
 
-    private static JScrollPane createInboxScrollPane() {
+    private static JScrollPane createInboxScrollPane() throws IOException, ClassNotFoundException {
         // Create a panel to hold the inbox rows
         JPanel inboxPanel = new JPanel();
         inboxPanel.setLayout(new BoxLayout(inboxPanel, BoxLayout.Y_AXIS));
         inboxPanel.setBackground(Color.WHITE);
         inboxPanel.setBorder(new EmptyBorder(10, 10, 10, 10)); // Add margins around the list
 
+        List<Integer> inboxIds = PlatformRunner.client.getFollowRequests();
+        List<UserInfo> inboxUsers = new ArrayList<>();
+
+        for(int inboxId : inboxIds) {
+            inboxUsers.add(PlatformRunner.client.fetchUserInfo(inboxId));
+        }
+
         // Add sample usernames
-        for (int i = 1; i <= 20; i++) {
-            inboxPanel.add(createInboxRow("user" + i));
+        for (int i = 0; i < inboxUsers.size(); i++) {
+            inboxPanel.add(createInboxRow(inboxUsers.get(i)));
             inboxPanel.add(Box.createVerticalStrut(10)); // Consistent spacing between rows
         }
 
@@ -44,7 +54,7 @@ class InboxSelection {
     }
 
     //MAKE AN INBOX
-    private static JPanel createInboxRow(String username) {
+    private static JPanel createInboxRow(UserInfo userInfo) {
         JPanel rowPanel = new JPanel(new GridBagLayout());
         rowPanel.setBorder(new EmptyBorder(5, 10, 5, 10)); // Add padding
         rowPanel.setBackground(Color.WHITE);
@@ -54,7 +64,7 @@ class InboxSelection {
         gbc.insets = new Insets(0, 5, 0, 5); // Minimal spacing between components
 
         // Username label
-        JLabel usernameLabel = new JLabel(username);
+        JLabel usernameLabel = new JLabel(userInfo.getUsername());
         usernameLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         gbc.gridx = 0; // First column
         gbc.gridy = 0;
@@ -65,7 +75,7 @@ class InboxSelection {
         acceptButton.setFont(new Font("Arial", Font.PLAIN, 14));
         acceptButton.setFocusPainted(false);
         acceptButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(rowPanel, username + " accepted!");
+            JOptionPane.showMessageDialog(rowPanel, userInfo.getUsername() + " accepted!");
         });
         gbc.gridx = 1; // Second column
         gbc.gridy = 0;
@@ -76,7 +86,7 @@ class InboxSelection {
         rejectButton.setFont(new Font("Arial", Font.PLAIN, 14));
         rejectButton.setFocusPainted(false);
         rejectButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(rowPanel, username + " rejected!");
+            JOptionPane.showMessageDialog(rowPanel, userInfo.getUsername() + " rejected!");
         });
         gbc.gridx = 2; // Third column
         gbc.gridy = 0;
