@@ -10,7 +10,8 @@ import java.util.*;
  * Test case for the Database interface and implementation
  * also tests all database functions
  *
- * @author Mckinley Newman 18-217, Navan Dendukuria 218-248
+ * @author Mckinley Newman
+ * @author Navan Dendukuri
  * @version Nov 3, 2024
  */
 public class DatabaseTestcase {
