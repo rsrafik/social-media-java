@@ -48,6 +48,15 @@ public interface ClientHandler extends Runnable {
     boolean createUser(String username, String password);
 
     /**
+     * Fetches the logged in User.
+     * 
+     * @return a copy of the logged in User
+     */
+    User fetchLoggedInUser();
+
+    UserInfo fetchUserInfo(int userId);
+
+    /**
      * Creates a new post.
      * 
      * @param content the text content of the post
