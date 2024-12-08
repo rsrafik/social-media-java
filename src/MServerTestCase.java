@@ -1,10 +1,8 @@
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.Before;
 
 import static org.junit.Assert.*;
 
-import java.io.*;
 import java.util.*;
 
 /**
@@ -45,14 +43,14 @@ public class MServerTestCase {
 
     //should return false if sending friend request to user that doesn't exist
     @Test
-    public void testSendFriendRequestToNonexistentUser() {
+    public void testSendFollowRequestToNonexistentUser() {
         boolean result = handler.sendFollowRequest(999);
         assertFalse(result);
     }    //end of nonexistent user test
 
     //should return false if user is blocked by target
     @Test
-    public void testSendFriendRequestToBlockedUser() {
+    public void testSendFollowRequestToBlockedUser() {
         // Simulate the logged-in user being blocked by the target user
         targetUser.getBlockedUserIds().add(1);
 
@@ -62,7 +60,7 @@ public class MServerTestCase {
 
     //should be false if a user is already friend with target
     @Test
-    public void testSendFriendRequestToExistingFriend() {
+    public void testSendFollowRequestToExistingFriend() {
         // Simulate the logged-in user already being friends with the target user
         loggedInUser.getFollowerIds().add(2);
         targetUser.getFollowerIds().add(1);
@@ -73,7 +71,7 @@ public class MServerTestCase {
 
     //should make both users friends if the target already requested the user
     @Test
-    public void testSendFriendRequestWithPendingRequest() {
+    public void testSendFollowRequestWithPendingRequest() {
         // Simulate a pending friend request from the target user to the logged-in user
         loggedInUser.getFollowRequests().add(2);
 
@@ -86,7 +84,7 @@ public class MServerTestCase {
 
     //checks that target receives request
     @Test
-    public void testSendFriendRequestSuccessfully() {
+    public void testSendFollowRequestSuccessfully() {
         // Precondition: Ensure the target user exists and is not a friend or blocked
         List<Integer> targetFriendRequests = targetUser.getFollowRequests();
         assertFalse(targetFriendRequests.contains(1));

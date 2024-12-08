@@ -255,7 +255,7 @@ public class PlatformClientHandler implements ClientHandler {
         return true;
     }
 
-    @Override
+    //@Override
     public User fetchUser() {
         if (!isLoggedIn()) {
             return null;
