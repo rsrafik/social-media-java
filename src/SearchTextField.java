@@ -10,32 +10,47 @@ import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.io.IOException;
-import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
+/**
+ * SearchTextField
+ *
+ * This class extends JTextField and allows searching for users.
+ * It displays a placeholder when empty, toggles the search button state
+ * based on text input, and shows a dialog with search results.
+ * The user can select a user from the dropdown, triggering a listener.
+ *
+ * @author Rachel Rafik, L22
+ * @version December 8, 2024
+ */
 public class SearchTextField extends JTextField {
     public static UserInfo chosenOne;
-
     private final TransparentJButton searchButton;
     private final FontIcon searchIcon;
 
-    // Interface for handling search actions
+    /**
+     * Interface for handling search actions.
+     */
     public interface SearchActionListener {
+        /**
+         * Called when a search is performed and a user is selected.
+         *
+         * @param selectedOption the selected user's username
+         */
         void onSearch(String selectedOption);
     }
 
     private SearchActionListener searchActionListener;
 
+    /**
+     * Constructs a SearchTextField with a placeholder and a search button.
+     */
     public SearchTextField() {
-        super(); // Call the constructor of JTextField
-
-        // Set up placeholder text
+        super();
         setText("Search here...");
         setForeground(Color.GRAY);
 
-        // Add focus listener to manage placeholder behavior
         addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -54,16 +69,13 @@ public class SearchTextField extends JTextField {
             }
         });
 
-        // Create FontAwesome search icon
         searchIcon = FontIcon.of(FontAwesome.SEARCH, 16);
 
-        // Create the search button
-        searchButton = new TransparentJButton(""); // No text, only icon
-        searchButton.setIcon(searchIcon); // Set the search icon
-        searchButton.setPreferredSize(new Dimension(30, 30)); // Set button size
-        searchButton.setEnabled(false); // Initially disable the button
+        searchButton = new TransparentJButton("");
+        searchButton.setIcon(searchIcon);
+        searchButton.setPreferredSize(new Dimension(30, 30));
+        searchButton.setEnabled(false);
 
-        // Add action listener to the search button
         searchButton.addActionListener(e -> {
             try {
                 handleSearchAction();
@@ -72,7 +84,6 @@ public class SearchTextField extends JTextField {
             }
         });
 
-        // Add a DocumentListener to the text field to enable/disable the search button
         getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -94,46 +105,45 @@ public class SearchTextField extends JTextField {
             }
         });
 
-        // Style the search field
-        setBackground(new Color(230, 230, 230)); // Light gray background
-        setBorder(new EmptyBorder(5, 10, 5, 40)); // Add padding inside
-        setPreferredSize(new Dimension(200, 30)); // Set field size
-
-        // Set up rounded edges
+        setBackground(new Color(230, 230, 230));
+        setBorder(new EmptyBorder(5, 10, 5, 40));
+        setPreferredSize(new Dimension(200, 30));
         setOpaque(false);
-
-        // Add the button to the field's parent container
         setLayout(new BorderLayout());
         add(searchButton, BorderLayout.EAST);
     }
 
+    /**
+     * Sets the search action listener.
+     *
+     * @param listener the listener to handle search actions
+     */
     public void setSearchActionListener(SearchActionListener listener) {
         this.searchActionListener = listener;
     }
 
+    /**
+     * Handles the search action by fetching users, displaying a dialog, and selecting a user.
+     *
+     * @throws IOException if an I/O error occurs
+     * @throws ClassNotFoundException if a required class is not found
+     */
     private void handleSearchAction() throws IOException, ClassNotFoundException {
-        // Get the current text in the search field
         String searchText = getText();
-
         List<UserInfo> results = PlatformRunner.client.searchUser(searchText);
         List<String> usernames = new ArrayList<>();
 
-
-        for(int i = 0; i < results.size(); i++) {
+        for (int i = 0; i < results.size(); i++) {
             if (results.get(i).getId().equals(PlatformRunner.client.fetchLoggedInUser().getId()))
                 results.remove(i);
         }
 
-        for(UserInfo result: results) {
-                usernames.add(result.getUsername());
+        for (UserInfo result : results) {
+            usernames.add(result.getUsername());
         }
 
-
-
-        // Create a dropdown with options
         JComboBox<String> dropdown = new JComboBox<>(usernames.toArray(new String[0]));
 
-        // Prepare the message for the dialog
         Object[] message = {
                 "\nSearch for: " + searchText,
                 "Select a user:",
@@ -141,7 +151,6 @@ public class SearchTextField extends JTextField {
                 "\n"
         };
 
-        // Show a JOptionPane with the dropdown and custom buttons
         int result = JOptionPane.showOptionDialog(
                 null,
                 message,
@@ -150,17 +159,15 @@ public class SearchTextField extends JTextField {
                 JOptionPane.PLAIN_MESSAGE,
                 null,
                 new Object[]{"Search", "Cancel"},
-                "Search" // Default button
+                "Search"
         );
 
-        // If "Search" is clicked, trigger the listener
         if (result == JOptionPane.YES_OPTION && searchActionListener != null) {
             String selectedOption = (String) dropdown.getSelectedItem();
             UserInfo selectedUser = null;
 
-            for(int i = 0; i < usernames.size(); i++) {
-                assert selectedOption != null;
-                if (selectedOption.equals(usernames.get(i))) {
+            for (int i = 0; i < usernames.size(); i++) {
+                if (selectedOption != null && selectedOption.equals(usernames.get(i))) {
                     selectedUser = results.get(i);
                     break;
                 }
@@ -171,20 +178,28 @@ public class SearchTextField extends JTextField {
         }
     }
 
+    /**
+     * Returns the search button.
+     *
+     * @return the search button
+     */
+    public TransparentJButton getSearchButton() {
+        return searchButton;
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
-        // Paint rounded rectangle for the text field background
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setColor(getBackground());
-        g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20); // Rounded corners
+        g2.fillRoundRect(0, 0, getWidth(), getHeight(), 20, 20);
         super.paintComponent(g2);
         g2.dispose();
     }
 
     @Override
     protected void paintBorder(Graphics g) {
-        // No border to paint
+        // No border
     }
 
     @Override
@@ -194,11 +209,6 @@ public class SearchTextField extends JTextField {
 
     @Override
     public Insets getInsets() {
-        // Provide custom insets for padding inside the text field
-        return new Insets(10, 10, 10, 5); // Top, Left, Bottom, Right
-    }
-
-    public TransparentJButton getSearchButton() {
-        return searchButton;
+        return new Insets(10, 10, 10, 5);
     }
 }
