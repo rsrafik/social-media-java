@@ -33,7 +33,7 @@ class ProfileSelection {
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
         topPanel.setBackground(Color.WHITE);
-        topPanel.setPreferredSize(new Dimension(mainPanel.getWidth(), 185));
+        topPanel.setPreferredSize(new Dimension(mainPanel.getWidth(), 195));
         topPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
         topPanel.add(Box.createVerticalStrut(20));
@@ -44,7 +44,7 @@ class ProfileSelection {
         usernameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         topPanel.add(usernameLabel);
 
-        topPanel.add(Box.createVerticalStrut(20));
+        topPanel.add(Box.createVerticalStrut(10));
 
         // Posts button
         JButton postsButton = new JButton("Posts");
@@ -54,6 +54,8 @@ class ProfileSelection {
         postsButton.setPreferredSize(new Dimension(150, 40));
         topPanel.add(postsButton);
 
+        topPanel.add(Box.createVerticalStrut(10));
+
         // Following button
         JButton followingButton = new JButton("Following");
         followingButton.setFont(new Font("Arial", Font.PLAIN, 14));
@@ -61,6 +63,8 @@ class ProfileSelection {
         followingButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         followingButton.setPreferredSize(new Dimension(150, 40));
         topPanel.add(followingButton);
+
+        topPanel.add(Box.createVerticalStrut(10));
 
         // Blocked button
         JButton blockedButton = new JButton("Blocked");
