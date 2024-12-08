@@ -1,10 +1,11 @@
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 class HomeSelection {
+
+    private static JPanel mainContentPanel; // Panel to dynamically switch content
+    private static JScrollPane currentScrollPane; // Keeps track of the current scrollable content
 
     public static void mainView(JPanel mainPanel) {
         mainPanel.setLayout(new BorderLayout());
@@ -18,6 +19,9 @@ class HomeSelection {
         // Create the search field
         SearchTextField searchField = new SearchTextField();
         searchField.setPreferredSize(new Dimension(400, 40));
+
+        // Set search action listener to switch to OtherProfileSelection
+        searchField.setSearchActionListener(selectedOption -> switchToOtherProfileView());
 
         // Center the search field in the panel
         JPanel centerPanel = new JPanel();
@@ -34,11 +38,29 @@ class HomeSelection {
         createPostButton.setBorderPainted(false);
         createPostButton.setOpaque(false);
 
-        // Add action listener for the button
-        createPostButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showInputDialog("Enter your message:");
+        createPostButton.addActionListener(e -> {
+            JTextField textField = new JTextField();
+            Object[] message = {"Create Post:", textField};
+
+            // Show a dialog with custom "Post" and "Cancel" buttons
+            int option = JOptionPane.showOptionDialog(
+                    null,
+                    message,
+                    "Create Post",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    new Object[]{"Post", "Cancel"}, // Custom buttons
+                    "Post" // Default button
+            );
+
+            if (option == JOptionPane.YES_OPTION) { // "Post" button clicked
+                String input = textField.getText();
+                if (!input.isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "Message posted: " + input);
+                } else {
+                    JOptionPane.showMessageDialog(null, "No message entered!");
+                }
             }
         });
 
@@ -52,11 +74,17 @@ class HomeSelection {
         // Add the search bar panel to the top of the main panel
         mainPanel.add(searchBarPanel, BorderLayout.NORTH);
 
-        // Add the scrollable content in the CENTER region
-        addScrollableContent(mainPanel);
+        // Main content panel (center area)
+        mainContentPanel = new JPanel(new BorderLayout());
+        mainContentPanel.setBackground(Color.WHITE);
+        mainPanel.add(mainContentPanel, BorderLayout.CENTER);
+
+        // Add the initial scrollable content
+        currentScrollPane = createScrollableContent();
+        mainContentPanel.add(currentScrollPane, BorderLayout.CENTER);
     }
 
-    private static void addScrollableContent(JPanel mainPanel) {
+    private static JScrollPane createScrollableContent() {
         // Create a panel to hold the content
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS)); // Arrange posts vertically
@@ -74,11 +102,24 @@ class HomeSelection {
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Smooth scrolling
+        scrollPane.setBorder(null); // Remove the border from the scroll pane
 
-        // Remove the border from the scroll pane
-        scrollPane.setBorder(null);
+        return scrollPane;
+    }
 
-        // Add the scroll pane to the CENTER region
-        mainPanel.add(scrollPane, BorderLayout.CENTER);
+    private static void switchToOtherProfileView() {
+        // Remove the current scrollable content
+        mainContentPanel.remove(currentScrollPane);
+
+        // Create a new panel for the OtherProfileSelection
+        JPanel otherProfilePanel = new JPanel(new BorderLayout());
+        OtherProfileSelection.mainView(otherProfilePanel); // Populate the panel using OtherProfileSelection
+
+        // Add the otherProfilePanel to the main content panel
+        mainContentPanel.add(otherProfilePanel, BorderLayout.CENTER);
+
+        // Refresh the layout
+        mainContentPanel.revalidate();
+        mainContentPanel.repaint();
     }
 }

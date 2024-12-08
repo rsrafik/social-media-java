@@ -68,7 +68,7 @@ public class LoggedInPage {
         buttons[1] = createSidebarButton("Profile", gridPanel, buttons, jf);
         buttons[2] = createSidebarButton("Inbox", gridPanel, buttons, jf);
 
-        buttons[3] = new TransparentJButton("Log Out and Exit");
+        buttons[3] = new TransparentJButton("Log Out");
         buttons[3].setHorizontalAlignment(SwingConstants.LEFT);
         buttons[3].setPreferredSize(new Dimension(250, 50));
         buttons[3].setFont(new Font("Arial", Font.BOLD, 20));
@@ -80,7 +80,7 @@ public class LoggedInPage {
             // Display the confirmation dialog
             int result = JOptionPane.showConfirmDialog(
                     jf,
-                    "Are you sure you want to log out and exit?",
+                    "Are you sure you want to log out?",
                     "Confirm Logout",
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE
@@ -88,12 +88,15 @@ public class LoggedInPage {
 
             // Handle the user's choice
             if (result == JOptionPane.YES_OPTION) {
-                jf.dispose(); // Close the JFrame if "Yes" is selected
+                // Load the Welcome page instead of disposing of the frame
+                jf.getContentPane().removeAll();
+                Welcome.welcomeGUI(jf);
+                jf.revalidate();
+                jf.repaint();
             }
 
-            selectedButton = "Log out"; // Retain functionality to update the selected button
+            selectedButton = "Log Out"; // Retain functionality to update the selected button
         });
-
 
         gridPanel.add(buttons[3]);
 
@@ -111,7 +114,7 @@ public class LoggedInPage {
         button.setForeground(Color.BLACK);
         button.setOpaque(true);
 
-        button.setBorder(new EmptyBorder(0,20,0,0));
+        button.setBorder(new EmptyBorder(0, 20, 0, 0));
 
         if ("Home".equals(text)) {
             button.setBackground(Color.DARK_GRAY);
@@ -120,7 +123,7 @@ public class LoggedInPage {
         }
 
         button.addActionListener(e -> {
-            if (!selectedButton.equals(text)) {
+            if (!selectedButton.equals(text) || "Home".equals(text)) {
                 selectedButton = text;
                 resetButtons(buttons);
                 button.setBackground(Color.DARK_GRAY);
@@ -155,6 +158,4 @@ public class LoggedInPage {
         mainPanel.revalidate();
         mainPanel.repaint();
     }
-
-
 }
