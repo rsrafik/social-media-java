@@ -9,6 +9,10 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.io.IOException;
+import java.sql.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SearchTextField extends JTextField {
 
@@ -58,7 +62,15 @@ public class SearchTextField extends JTextField {
         searchButton.setEnabled(false); // Initially disable the button
 
         // Add action listener to the search button
-        searchButton.addActionListener(e -> handleSearchAction());
+        searchButton.addActionListener(e -> {
+            try {
+                handleSearchAction();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            } catch (ClassNotFoundException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
 
         // Add a DocumentListener to the text field to enable/disable the search button
         getDocument().addDocumentListener(new DocumentListener() {
@@ -99,13 +111,18 @@ public class SearchTextField extends JTextField {
         this.searchActionListener = listener;
     }
 
-    private void handleSearchAction() {
+    private void handleSearchAction() throws IOException, ClassNotFoundException {
         // Get the current text in the search field
         String searchText = getText();
 
+        List<User> results = PlatformRunner.client.searchUser(searchText);
+        List<String> usernames = new ArrayList<>();
+
+        for(User result: results)
+            usernames.add(result.getUsername());
+
         // Create a dropdown with options
-        String[] options = {"user1", "user2", "user3"};
-        JComboBox<String> dropdown = new JComboBox<>(options);
+        JComboBox<String> dropdown = new JComboBox<>(usernames.toArray(new String[0]));
 
         // Prepare the message for the dialog
         Object[] message = {
@@ -130,6 +147,16 @@ public class SearchTextField extends JTextField {
         // If "Search" is clicked, trigger the listener
         if (result == JOptionPane.YES_OPTION && searchActionListener != null) {
             String selectedOption = (String) dropdown.getSelectedItem();
+            User selectedUser = null;
+
+            for(int i = 0; i < usernames.size(); i++) {
+                if (selectedOption.equals(usernames.get(i))) {
+                    selectedUser = results.get(i);
+                    break;
+                }
+            }
+
+            System.out.println(selectedUser.getUsername());
             searchActionListener.onSearch(selectedOption);
         }
     }
