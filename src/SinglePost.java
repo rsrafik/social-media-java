@@ -107,7 +107,7 @@ public class SinglePost {
         commentPanel.setBackground(new Color(197, 197, 197));
         JButton makeComment = new JButton("Add Comment");
         makeComment.setFocusPainted(false);
-        makeComment.addActionListener(createCommentActionListener());
+        makeComment.addActionListener(createCommentActionListener(post));
         JButton viewComments = new JButton("View Comments");
         viewComments.setFocusPainted(false);
         viewComments.addActionListener(e -> {
@@ -165,7 +165,7 @@ public class SinglePost {
         });
     }
 
-    private static ActionListener createCommentActionListener() {
+    private static ActionListener createCommentActionListener(Post post) {
         return e -> {
             JTextField textField = new JTextField();
             Object[] message = {"Create Comment:", textField};
@@ -180,7 +180,16 @@ public class SinglePost {
                     "Post"
             );
             if (option == JOptionPane.YES_OPTION && !textField.getText().isEmpty()) {
-                JOptionPane.showMessageDialog(null, "Comment posted: " + textField.getText());
+                boolean commentSuccess;
+
+                try {
+                    commentSuccess = PlatformRunner.client.createComment(post.getId(),textField.getText());
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+
+                if (commentSuccess)
+                    JOptionPane.showMessageDialog(null, "Comment posted: " + textField.getText());
             }
         };
     }

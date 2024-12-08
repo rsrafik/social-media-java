@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class SearchTextField extends JTextField {
-    public static User chosenOne;
+    public static UserInfo chosenOne;
 
     private final TransparentJButton searchButton;
     private final FontIcon searchIcon;
@@ -115,7 +115,7 @@ public class SearchTextField extends JTextField {
         // Get the current text in the search field
         String searchText = getText();
 
-        List<User> results = PlatformRunner.client.searchUser(searchText);
+        List<UserInfo> results = PlatformRunner.client.searchUser(searchText);
         List<String> usernames = new ArrayList<>();
 
 
@@ -124,7 +124,7 @@ public class SearchTextField extends JTextField {
                 results.remove(i);
         }
 
-        for(User result: results) {
+        for(UserInfo result: results) {
                 usernames.add(result.getUsername());
         }
 
@@ -156,7 +156,7 @@ public class SearchTextField extends JTextField {
         // If "Search" is clicked, trigger the listener
         if (result == JOptionPane.YES_OPTION && searchActionListener != null) {
             String selectedOption = (String) dropdown.getSelectedItem();
-            User selectedUser = null;
+            UserInfo selectedUser = null;
 
             for(int i = 0; i < usernames.size(); i++) {
                 assert selectedOption != null;

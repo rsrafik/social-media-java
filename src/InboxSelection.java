@@ -6,29 +6,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 class InboxSelection {
+    private static JPanel mainPanelRef;
 
     public static void mainView(JPanel mainPanel) throws IOException, ClassNotFoundException {
+        mainPanelRef = mainPanel; // Store reference
         mainPanel.setLayout(new BorderLayout());
         mainPanel.setBackground(Color.WHITE);
 
-        // Add the title at the top
         JLabel titleLabel = new JLabel("Inbox");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         titleLabel.setBorder(new EmptyBorder(20, 0, 20, 0));
         mainPanel.add(titleLabel, BorderLayout.NORTH);
 
-        // Create and add the scrollable inbox content
         JScrollPane inboxScrollPane = createInboxScrollPane();
         mainPanel.add(inboxScrollPane, BorderLayout.CENTER);
+
+        mainPanel.revalidate();
+        mainPanel.repaint();
     }
 
     private static JScrollPane createInboxScrollPane() throws IOException, ClassNotFoundException {
-        // Create a panel to hold the inbox rows
         JPanel inboxPanel = new JPanel();
         inboxPanel.setLayout(new BoxLayout(inboxPanel, BoxLayout.Y_AXIS));
         inboxPanel.setBackground(Color.WHITE);
-        inboxPanel.setBorder(new EmptyBorder(10, 10, 10, 10)); // Add margins around the list
+        inboxPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         List<Integer> inboxIds = PlatformRunner.client.getFollowRequests();
         List<UserInfo> inboxUsers = new ArrayList<>();
@@ -37,61 +39,82 @@ class InboxSelection {
             inboxUsers.add(PlatformRunner.client.fetchUserInfo(inboxId));
         }
 
-        // Add sample usernames
-        for (int i = 0; i < inboxUsers.size(); i++) {
-            inboxPanel.add(createInboxRow(inboxUsers.get(i)));
-            inboxPanel.add(Box.createVerticalStrut(10)); // Consistent spacing between rows
+        for (UserInfo user : inboxUsers) {
+            inboxPanel.add(createInboxRow(user));
+            inboxPanel.add(Box.createVerticalStrut(10));
         }
 
-        // Wrap the panel in a scroll pane
         JScrollPane scrollPane = new JScrollPane(inboxPanel);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Smooth scrolling
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
         scrollPane.setBorder(null);
 
         return scrollPane;
     }
 
-    //MAKE AN INBOX
     private static JPanel createInboxRow(UserInfo userInfo) {
         JPanel rowPanel = new JPanel(new GridBagLayout());
-        rowPanel.setBorder(new EmptyBorder(5, 10, 5, 10)); // Add padding
+        rowPanel.setBorder(new EmptyBorder(5, 10, 5, 10));
         rowPanel.setBackground(Color.WHITE);
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.NONE; // Retain components' preferred sizes
-        gbc.insets = new Insets(0, 5, 0, 5); // Minimal spacing between components
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.insets = new Insets(0, 5, 0, 5);
 
-        // Username label
         JLabel usernameLabel = new JLabel(userInfo.getUsername());
         usernameLabel.setFont(new Font("Arial", Font.PLAIN, 16));
-        gbc.gridx = 0; // First column
-        gbc.gridy = 0;
+        gbc.gridx = 0; gbc.gridy = 0;
         rowPanel.add(usernameLabel, gbc);
 
-        // Accept button
         JButton acceptButton = new JButton("Accept");
         acceptButton.setFont(new Font("Arial", Font.PLAIN, 14));
         acceptButton.setFocusPainted(false);
         acceptButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(rowPanel, userInfo.getUsername() + " accepted!");
+            try {
+                boolean acceptedSuccess = PlatformRunner.client.acceptFollowRequest(userInfo.getId());
+                if (acceptedSuccess) {
+                    JOptionPane.showMessageDialog(rowPanel, userInfo.getUsername() + " accepted!");
+                    refreshInbox();
+                } else {
+                    System.out.println("false");
+                }
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         });
-        gbc.gridx = 1; // Second column
-        gbc.gridy = 0;
+        gbc.gridx = 1;
         rowPanel.add(acceptButton, gbc);
 
-        // Reject button
         JButton rejectButton = new JButton("Reject");
         rejectButton.setFont(new Font("Arial", Font.PLAIN, 14));
         rejectButton.setFocusPainted(false);
         rejectButton.addActionListener(e -> {
-            JOptionPane.showMessageDialog(rowPanel, userInfo.getUsername() + " rejected!");
+            try {
+                boolean rejectedSuccess = PlatformRunner.client.rejectFollowRequest(userInfo.getId());
+                if (rejectedSuccess) {
+                    JOptionPane.showMessageDialog(rowPanel, userInfo.getUsername() + " rejected!");
+                    refreshInbox();
+                }
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
         });
-        gbc.gridx = 2; // Third column
-        gbc.gridy = 0;
+        gbc.gridx = 2;
         rowPanel.add(rejectButton, gbc);
 
         return rowPanel;
+    }
+
+    // Call this after accept/reject to refresh the inbox.
+    private static void refreshInbox() {
+        mainPanelRef.removeAll();
+        try {
+            mainView(mainPanelRef);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        mainPanelRef.revalidate();
+        mainPanelRef.repaint();
     }
 }
