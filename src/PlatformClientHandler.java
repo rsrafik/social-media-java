@@ -391,8 +391,8 @@ public class PlatformClientHandler implements ClientHandler {
             return false;
         }
         try {
-            User user = database.fetchUser(userId);
-            if (!user.getFollowRequests().contains(userId)) {
+            User loggedInUser = database.fetchUser(loggedInId);
+            if (!loggedInUser.getFollowRequests().contains(userId)) {
                 return false;
             }
             database.removeFollowRequest(loggedInId, userId);
