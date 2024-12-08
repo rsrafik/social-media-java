@@ -24,7 +24,6 @@ public class PlatformClientHandler implements ClientHandler {
 
     private Socket socket;
     private Integer loggedInId;
-    // private User loggedInUser;
 
     public PlatformClientHandler(Socket socket) {
         if (database == null) {
@@ -74,6 +73,12 @@ public class PlatformClientHandler implements ClientHandler {
                             String password = in.readUTF();
                             boolean result = createUser(username, password);
                             out.writeBoolean(result);
+                            out.flush();
+                        }
+                        case FETCH_USER -> {
+                            int userId = in.readInt();
+                            User user = fetchUser();
+                            out.writeObject(user);
                             out.flush();
                         }
                         case GET_BLOCKED_USERS -> {
@@ -180,10 +185,7 @@ public class PlatformClientHandler implements ClientHandler {
                             out.flush();
                         }
                         case TESTING -> {
-                            // System.out.println("testing");
-                            // String str = (String) in.readObject();
-                            Object lol = in.readObject();
-                            System.out.println(lol);
+                            // testing
                         }
                         default -> {
                             throw new UnsupportedOperationException(String
@@ -194,11 +196,11 @@ public class PlatformClientHandler implements ClientHandler {
                     break;
                 } catch (ClassNotFoundException ex) {
                     ex.printStackTrace();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
                 }
             }
         } catch (IOException ex) {
+            ex.printStackTrace();
+        } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
             System.out.println("Client disconnected.");
@@ -251,6 +253,20 @@ public class PlatformClientHandler implements ClientHandler {
         User user = new PlatformUser(userId, username, password);
         database.addUser(user);
         return true;
+    }
+
+    @Override
+    public User fetchUser() {
+        if (!isLoggedIn()) {
+            return null;
+        }
+        try {
+            User user = database.fetchUser(loggedInId);
+            return user;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
     }
 
     @Override
