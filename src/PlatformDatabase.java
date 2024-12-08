@@ -22,6 +22,7 @@ public class PlatformDatabase implements Database {
     private HashMap<Integer, User> userMap; // Map of user IDs to users
     private LinkedHashMap<String, Integer> usernameMap; // Map of usernames to user IDs
     private LinkedHashMap<Integer, Post> postMap; // Map of post IDs to posts
+    private HashMap<Integer, Integer> commentMap; // Map of comment IDs to post IDs
 
     /**
      * Constructs a new PlatformDatabase and initializes all collections to be empty.
@@ -155,7 +156,8 @@ public class PlatformDatabase implements Database {
         }
     }
 
-    public int getCreatorId(int postId) {
+    @Override
+    public int getPosterId(int postId) {
         synchronized (POST_LOCK) {
             Post post = getPost(postId);
             return post.getCreatorId();
@@ -164,6 +166,7 @@ public class PlatformDatabase implements Database {
 
     @Override
     public void addPost(Post post) {
+        int postId = post.getId();
         int creatorId = post.getCreatorId();
         synchronized (USER_LOCK) {
             User creator = userMap.get(creatorId);
@@ -171,7 +174,10 @@ public class PlatformDatabase implements Database {
         }
         synchronized (POST_LOCK) {
             posts.add(post);
-            postMap.put(post.getId(), post);
+            postMap.put(postId, post);
+            for (Comment comment : post.getComments()) {
+                commentMap.put(comment.getId(), postId);
+            }
         }
     }
 
@@ -207,11 +213,105 @@ public class PlatformDatabase implements Database {
         }
     }
 
+    // TODO: override
+    public boolean existsComment(int commentId) {
+        synchronized (POST_LOCK) {
+            return commentMap.containsKey(commentId);
+        }
+    }
+
+    // TODO: override
+    public int getCommenterId(int commentId) {
+        synchronized (POST_LOCK) {
+            int postId = commentMap.get(commentId);
+            Post post = getPost(postId);
+            for (Comment comment : post.getComments()) {
+                if (comment.getId() == commentId) {
+                    return comment.getCreatorId();
+                }
+            }
+        }
+        throw new NullPointerException();
+    }
+
+    // TODO: override
+    public int getPostIdOfComment(int commentId) {
+        synchronized (POST_LOCK) {
+            return commentMap.get(commentId);
+        }
+    }
+
     @Override
     public void addComment(int postId, Comment comment) {
         synchronized (POST_LOCK) {
             Post post = getPost(postId);
             post.addComment(comment);
+        }
+    }
+
+    @Override
+    public void addCommentUpvote(int commentId, int userId) {
+        synchronized (POST_LOCK) {
+            int postId = commentMap.get(commentId);
+            Post post = getPost(postId);
+            List<Comment> comments = post.getComments();
+            for (Comment comment : comments) {
+                if (comment.getId() == commentId) {
+                    comment.addUpvote(userId);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void addCommentDownvote(int commentId, int userId) {
+        synchronized (POST_LOCK) {
+            int postId = commentMap.get(commentId);
+            Post post = getPost(postId);
+            List<Comment> comments = post.getComments();
+            for (Comment comment : comments) {
+                if (comment.getId() == commentId) {
+                    comment.addDownvote(userId);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void removeCommentUpvote(int commentId, int userId) {
+        synchronized (POST_LOCK) {
+            int postId = commentMap.get(commentId);
+            Post post = getPost(postId);
+            List<Comment> comments = post.getComments();
+            for (Comment comment : comments) {
+                if (comment.getId() == commentId) {
+                    comment.removeUpvote(userId);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void removeCommentDownvote(int commentId, int userId) {
+        synchronized (POST_LOCK) {
+            int postId = commentMap.get(commentId);
+            Post post = getPost(postId);
+            List<Comment> comments = post.getComments();
+            for (Comment comment : comments) {
+                if (comment.getId() == commentId) {
+                    comment.removeDownvote(userId);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void removeComment(int commentId) {
+        synchronized (POST_LOCK) {
+            int postId = commentMap.get(commentId);
+            Post post = getPost(postId);
+            post.removeComment(commentId);
+            commentMap.remove(commentId);
         }
     }
 
@@ -242,7 +342,7 @@ public class PlatformDatabase implements Database {
     public boolean addFollowRequest(int userId, int fromId) {
         synchronized (USER_LOCK) {
             User user = getUser(userId);
-            return user.addFollowRequest(userId);
+            return user.addFollowRequest(fromId);
         }
     }
 

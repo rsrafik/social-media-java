@@ -120,7 +120,7 @@ public interface Database {
      * @param postId the ID of the post
      * @return the user ID of the post's creator
      */
-    int getCreatorId(int postId);
+    int getPosterId(int postId);
 
     /**
      * Adds a new post to the database.
@@ -168,6 +168,45 @@ public interface Database {
      * @param comment the comment to be added
      */
     void addComment(int postId, Comment comment);
+
+    /**
+     * Adds an upvote to a comment.
+     * 
+     * @param commentId the ID of the comment
+     * @param userId the ID of the upvoter
+     */
+    void addCommentUpvote(int commentId, int userId);
+
+    /**
+     * Adds a downvote to a comment.
+     * 
+     * @param commentId the ID of the comment
+     * @param userId the ID of the downvoter
+     */
+    void addCommentDownvote(int commentId, int userId);
+
+    /**
+     * Removes an upvote from a comment.
+     * 
+     * @param commentId the ID of the comment
+     * @param userId the ID of the upvoter
+     */
+    void removeCommentUpvote(int commentId, int userId);
+
+    /**
+     * Removes a downvote from a comment.
+     * 
+     * @param commentId the ID of the comment
+     * @param userId the ID of the downvoter
+     */
+    void removeCommentDownvote(int commentId, int userId);
+
+    /**
+     * Removes a comment from a post.
+     * 
+     * @param commentId the ID of the comment
+     */
+    void removeComment(int commentId);
 
     /**
      * Adds a follower to a user's followers.

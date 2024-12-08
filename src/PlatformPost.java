@@ -94,11 +94,6 @@ public class PlatformPost implements Post, Serializable {
     }
 
     @Override
-    public boolean removeUpvote(int userId) {
-        return upvoteIds.remove((Integer) userId);
-    }
-
-    @Override
     public boolean addDownvote(int userId) {
         if (!downvoteIds.contains(userId)) {
             upvoteIds.remove((Integer) userId);
@@ -106,6 +101,11 @@ public class PlatformPost implements Post, Serializable {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public boolean removeUpvote(int userId) {
+        return upvoteIds.remove((Integer) userId);
     }
 
     @Override
@@ -141,5 +141,10 @@ public class PlatformPost implements Post, Serializable {
     @Override
     public void addComment(Comment comment) {
         comments.add(comment);
+    }
+
+    @Override
+    public void removeComment(int commentId) {
+        comments.removeIf(comment -> comment.getId() == commentId);
     }
 }
