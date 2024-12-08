@@ -79,7 +79,7 @@ class OtherProfileSelection {
             posts.add(PlatformRunner.client.fetchPost(postId));
 
         // Add 5 individual posts
-        for (int i = 1; i < postIds.size(); i++) {
+        for (int i = 0; i < postIds.size(); i++) {
             JPanel post = SinglePost.individualPost(posts.get(i), "friend");
             contentPanel.add(post);
             contentPanel.add(Box.createVerticalStrut(40)); // Add spacing between posts
