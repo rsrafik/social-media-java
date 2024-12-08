@@ -42,6 +42,10 @@ public class PlatformClientHandler implements ClientHandler {
         this.socket = socket;
     }
 
+    public static PlatformDatabase getDatabase() {
+        return database;
+    }
+
     @Override
     public void run() {
         try {
