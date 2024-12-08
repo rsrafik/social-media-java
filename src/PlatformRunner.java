@@ -4,12 +4,11 @@ import java.io.IOException;
 
 /**
  * PlatformRunner
- *
+ * <p>
  * This class serves as the entry point of the application.
  * It initializes the platform client and launches the main frame.
  *
  * @author Rachel Rafik, L22
- *
  * @version December 8, 2024
  */
 public class PlatformRunner {

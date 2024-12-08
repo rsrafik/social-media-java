@@ -50,8 +50,8 @@ public class DatabaseTestcase {
         // Prepare a test users.dat file with serialized PlatformUser objects
         try (FileOutputStream fileOut = new FileOutputStream("users.dat");
              ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
-            out.writeObject(new PlatformUser(0,"User1", "pass1"));
-            out.writeObject(new PlatformUser(1,"User2", "pass2"));
+            out.writeObject(new PlatformUser(0, "User1", "pass1"));
+            out.writeObject(new PlatformUser(1, "User2", "pass2"));
         }
 
         db.readUsers("users.dat");
@@ -153,7 +153,7 @@ public class DatabaseTestcase {
         PlatformUserInfo testInfo = new PlatformUserInfo(tester);
 
         Assert.assertNotEquals("Should result in tester1 info", testInfo,
-            db.searchUsername("tester"));
+                db.searchUsername("tester"));
     }    //end of search user test
 
     @Test
@@ -208,7 +208,7 @@ public class DatabaseTestcase {
         //test adding and remove follower
         db.addFollower(0, 1);
         Assert.assertEquals("Expected user to have 1 follower", 1,
-            tester1.getFollowerIds().size());
+                tester1.getFollowerIds().size());
 
         db.removeFollower(0, 1);
         Assert.assertEquals("Expected user to have no followers", 0,
@@ -217,7 +217,7 @@ public class DatabaseTestcase {
         //test follow request
         db.addFollowRequest(1, 0);
         Assert.assertEquals("tester2 should have a follow request", 1,
-            tester2.getFollowRequests().size());
+                tester2.getFollowRequests().size());
     }    //end of follow request
 
     //test blocking users

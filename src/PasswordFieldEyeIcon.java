@@ -6,12 +6,11 @@ import java.awt.*;
 
 /**
  * PasswordFieldEyeIcon
- *
+ * <p>
  * This class extends JPasswordField and adds a toggleable eye icon button
  * to show or hide the typed password.
  *
  * @author Rachel Rafik, L22
- *
  * @version December 8, 2024
  */
 public class PasswordFieldEyeIcon extends JPasswordField {

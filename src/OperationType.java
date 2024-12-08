@@ -3,7 +3,7 @@
  * <p>
  * This enum provides a list of operations the server provides to the client.
  * </p>
- * 
+ *
  * @author Ropan Datta, L22
  * @version December 2, 2022
  */

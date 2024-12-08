@@ -6,12 +6,12 @@ import java.util.concurrent.*;
  * PlatformServer
  * <p>
  * Entry point for the server.
- * 
+ * <p>
  * Uses multi-threading to instantiate several client handlers to support multiple clients.
- * 
+ * <p>
  * Runs on port 5002.
  * </p>
- * 
+ *
  * @author Ropan Datta, L22
  * @version November 13, 2024
  */

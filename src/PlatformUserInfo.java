@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * Provides a class storing public information about a User.
- * 
+ *
  * @author Ropan Datta, L22
  * @version December 7, 2024
  */

@@ -5,7 +5,7 @@ import java.awt.Image;
 
 /**
  * A client to communicate with the PlatformServer.
- * 
+ *
  * @author Ropan Datta, L22
  * @version December 7, 2024
  */

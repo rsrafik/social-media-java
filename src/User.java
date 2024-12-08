@@ -52,21 +52,21 @@ public interface User {
 
     /**
      * Checks whether the user has a profile picture.
-     * 
+     *
      * @return whether or not the user's display image is null
      */
     boolean hasDisplayImage();
 
     /**
      * Retrieves the user's profile picture.
-     * 
+     *
      * @return the profile picture of the user
      */
     Image getDisplayImage();
 
     /**
      * Sets a new profile picture for the user.
-     * 
+     *
      * @param image the new profile picture
      */
     void setDisplayImage(Image image);
@@ -85,7 +85,7 @@ public interface User {
 
     /**
      * Adds a post.
-     * 
+     *
      * @param postId the ID of the post
      */
     void addPost(int postId);
@@ -99,21 +99,21 @@ public interface User {
 
     /**
      * Retrieves the IDs of the users being followed.
-     * 
+     *
      * @return the the list of IDs the user is following
      */
     List<Integer> getFollowingIds();
 
     /**
      * Follows a user.
-     * 
+     *
      * @param userId the ID of the user to follow
      */
     void addFollowing(int userId);
 
     /**
      * Unfollows a user.
-     * 
+     *
      * @param userId the ID of the user to unfollow
      */
     void removeFollowing(int userId);
@@ -127,16 +127,16 @@ public interface User {
 
     /**
      * Adds a follower.
-     * 
+     *
      * @param userId the ID of the user to add as a follower
      * @return {@code true} if the user was added or was already present in the list of followers,
-     *         {@code false} if the user is blocked or could not be added for some reason
+     * {@code false} if the user is blocked or could not be added for some reason
      */
     boolean addFollower(int userId);
 
     /**
      * Removes a follower.
-     * 
+     *
      * @param userId the ID of the follower to remove
      */
     void removeFollower(int userId);
@@ -157,16 +157,16 @@ public interface User {
 
     /**
      * Adds an incoming follow request to the user.
-     * 
+     *
      * @param userId the ID of the user who sent the follow request
      * @return {@code true} if the follow request was sent successfully, {@code false} if the follow
-     *         request failed
+     * request failed
      */
     boolean addFollowRequest(int userId);
 
     /**
      * Removes an incoming follow request to the user.
-     * 
+     *
      * @param userId the ID of the user who canceled the follow request
      */
     void removeFollowRequest(int userId);
@@ -180,7 +180,7 @@ public interface User {
 
     /**
      * Checks whether or not a user has been blocked.
-     * 
+     *
      * @param userId the ID of the user to check for
      * @return whether or not the user has been blocked
      */
@@ -188,14 +188,14 @@ public interface User {
 
     /**
      * Blocks a user.
-     * 
+     *
      * @param userId the ID of the user to block
      */
     void addBlockedUser(int userId);
 
     /**
      * Unblocks a user.
-     * 
+     *
      * @param userId the ID of the user to unblock
      */
     void removeBlockedUser(int userId);

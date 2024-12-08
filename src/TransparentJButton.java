@@ -2,7 +2,7 @@ import javax.swing.*;
 
 /**
  * TransparentJButton
- *
+ * <p>
  * This class creates a JButton with no border, no background,
  * and a transparent look. It is useful for creating overlay
  * buttons or buttons that blend into their backgrounds.
@@ -17,7 +17,7 @@ public class TransparentJButton extends JButton {
      *
      * @param text the text to be displayed on the button
      */
-    public TransparentJButton (String text) {
+    public TransparentJButton(String text) {
         super(text);
         setBorder(null);
         setBorderPainted(false);

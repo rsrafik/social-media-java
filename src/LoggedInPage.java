@@ -5,14 +5,13 @@ import java.io.IOException;
 
 /**
  * LoggedInPage
- *
+ * <p>
  * This class manages the main logged-in page view of the application.
  * It provides a side panel with navigation buttons ("Home", "Profile", "Inbox", and "Log Out")
  * and a main panel area that displays the content of the selected view.
  * Users can log out, switch between views, and the display updates accordingly.
  *
  * @author Rachel Rafik, L22
- *
  * @version December 8, 2024
  */
 public class LoggedInPage {
@@ -46,7 +45,7 @@ public class LoggedInPage {
      * Sets up the entire GUI, including the side panel and the main content panel.
      *
      * @param jf the JFrame to which the GUI elements are added
-     * @throws IOException if an I/O error occurs
+     * @throws IOException            if an I/O error occurs
      * @throws ClassNotFoundException if a required class cannot be found
      */
     public static void totalGUI(JFrame jf) throws IOException, ClassNotFoundException {
@@ -127,10 +126,10 @@ public class LoggedInPage {
     /**
      * Creates a sidebar button with the given text and adds it to the specified grid panel.
      *
-     * @param text the text to display on the button
+     * @param text      the text to display on the button
      * @param gridPanel the panel to which this button will be added
-     * @param buttons an array of all sidebar buttons for resetting their states
-     * @param jf the main JFrame
+     * @param buttons   an array of all sidebar buttons for resetting their states
+     * @param jf        the main JFrame
      * @return the created TransparentJButton
      */
     private static TransparentJButton createSidebarButton(String text, JPanel gridPanel,
@@ -187,8 +186,8 @@ public class LoggedInPage {
      * Updates the mainPanel to display the selected view.
      *
      * @param view the view to display ("Home", "Profile", or "Inbox")
-     * @param jf the main JFrame
-     * @throws IOException if an I/O error occurs
+     * @param jf   the main JFrame
+     * @throws IOException            if an I/O error occurs
      * @throws ClassNotFoundException if a required class cannot be found
      */
     private static void updateView(String view, JFrame jf) throws IOException, ClassNotFoundException {

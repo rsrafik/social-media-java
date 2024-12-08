@@ -7,12 +7,11 @@ import java.util.List;
 
 /**
  * OtherProfileSelection
- *
+ * <p>
  * This class displays another user's profile, allowing the current user to follow or block them.
  * It also shows the selected user's posts in a scrollable panel.
  *
  * @author Rachel Rafik, L22
- *
  * @version December 8, 2024
  */
 class OtherProfileSelection {
@@ -22,7 +21,7 @@ class OtherProfileSelection {
      * as well as their posts in a scrollable panel.
      *
      * @param mainPanel the main panel to which components will be added
-     * @throws IOException if an I/O error occurs
+     * @throws IOException            if an I/O error occurs
      * @throws ClassNotFoundException if a required class cannot be found
      */
     public static void mainView(JPanel mainPanel) throws IOException, ClassNotFoundException {
@@ -87,7 +86,7 @@ class OtherProfileSelection {
      * Creates and returns a scroll pane containing the selected user's posts.
      *
      * @return a JScrollPane containing the selected user's posts
-     * @throws IOException if an I/O error occurs
+     * @throws IOException            if an I/O error occurs
      * @throws ClassNotFoundException if a required class cannot be found
      */
     private static JScrollPane createPostsScrollPane() throws IOException, ClassNotFoundException {

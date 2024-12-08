@@ -8,7 +8,7 @@ import java.util.*;
  * includes a creator ID, a content, and lists to track user IDs for upvotes and downvotes. This
  * class implements the Comment interface and is serializable.
  * </p>
- * 
+ *
  * @author Rachel Rafik, L22
  * @version November 15, 2024
  */
@@ -25,7 +25,7 @@ public class PlatformComment implements Comment, Serializable {
      * for upvotes and downvotes.
      *
      * @param creatorId the ID of the user who created the comment
-     * @param content the text content of the comment
+     * @param content   the text content of the comment
      */
     public PlatformComment(Integer id, Integer creatorId, String content) {
         this.id = id;

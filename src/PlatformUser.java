@@ -4,12 +4,12 @@ import java.awt.Image;
 
 /**
  * PlatformUser
- *
+ * <p>
  * This class represents a user on the platform with unique user ID, username, password, and lists
  * to store posts, friends, blocked users, and friend requests.
- * 
+ * <p>
  * This class is serializable to allow persistence.
- * 
+ *
  * @author Rachel Rafik, L22
  * @author Ropan Datta, L22
  * @version December 3, 2024
@@ -27,8 +27,8 @@ public class PlatformUser implements User, Serializable {
 
     /**
      * Constructs a new PlatformUser with an integer ID, username, and password.
-     * 
-     * @param id the integer ID of the created user
+     *
+     * @param id       the integer ID of the created user
      * @param username the username of the created user
      * @param password the password of the created user
      */
@@ -46,7 +46,7 @@ public class PlatformUser implements User, Serializable {
 
     /**
      * Copy constructor.
-     * 
+     *
      * @param user the PlatformUser to copy
      */
     public PlatformUser(PlatformUser user) {

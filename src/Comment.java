@@ -14,7 +14,7 @@ public interface Comment {
 
     /**
      * Retrieves the ID of the comment.
-     * 
+     *
      * @return the ID of the comment
      */
     Integer getId();
@@ -61,14 +61,14 @@ public interface Comment {
 
     /**
      * Removes an upvote from a comment.
-     * 
+     *
      * @param userId the ID of the upvoter
      */
     void removeUpvote(int userId);
 
     /**
      * Removes a downvote from a comment.
-     * 
+     *
      * @param userId the ID of the downvoter
      */
     void removeDownvote(int userId);

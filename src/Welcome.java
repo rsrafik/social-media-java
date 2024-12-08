@@ -7,7 +7,7 @@ import java.io.IOException;
 
 /**
  * Welcome
- *
+ * <p>
  * This class displays the initial welcome interface.
  * It provides options for the user to log in or sign up,
  * and transitions to appropriate pages based on user actions.
@@ -49,7 +49,7 @@ public class Welcome {
 
         JLabel or = new JLabel("-----or-----");
         or.setAlignmentX(Component.CENTER_ALIGNMENT);
-        or.setBorder(new EmptyBorder(5,0,5,0));
+        or.setBorder(new EmptyBorder(5, 0, 5, 0));
 
         JButton signUpButton = new JButton("Sign Up");
         signUpButton.setFocusPainted(false);
@@ -94,7 +94,7 @@ public class Welcome {
         loginPanel.setLayout(new BorderLayout());
 
         TransparentJButton backButton = new TransparentJButton("< Back");
-        backButton.setBorder(new EmptyBorder(10,10,0,0));
+        backButton.setBorder(new EmptyBorder(10, 10, 0, 0));
         backButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -138,7 +138,7 @@ public class Welcome {
                 boolean loginSuccess;
 
                 try {
-                    loginSuccess = PlatformRunner.client.logIn(username,password);
+                    loginSuccess = PlatformRunner.client.logIn(username, password);
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -149,8 +149,7 @@ public class Welcome {
                     } catch (IOException | ClassNotFoundException ex) {
                         throw new RuntimeException(ex);
                     }
-                }
-                else {
+                } else {
                     JOptionPane.showMessageDialog(
                             null,
                             "Incorrect username or password.",
@@ -240,7 +239,7 @@ public class Welcome {
                 boolean signUpSuccess;
 
                 try {
-                    signUpSuccess = PlatformRunner.client.createUser(username,password);
+                    signUpSuccess = PlatformRunner.client.createUser(username, password);
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -248,7 +247,7 @@ public class Welcome {
                 if (signUpSuccess) {
                     boolean loginSuccess;
                     try {
-                        loginSuccess = PlatformRunner.client.logIn(username,password);
+                        loginSuccess = PlatformRunner.client.logIn(username, password);
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
                     }
