@@ -495,7 +495,10 @@ public class PlatformClientHandler implements ClientHandler {
         }
         try {
             Post post = database.fetchPost(postId);
-            return post.getComments();
+            List<Comment> comments = post.getComments();
+            comments.removeIf(
+                    comment -> database.hasBlockedUser(comment.getCreatorId(), loggedInId));
+            return comments;
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
